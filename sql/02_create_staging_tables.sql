@@ -1,4 +1,4 @@
--- Drop tables if they exist to allow re-runnable scripts
+--drop das tabelas
 DROP TABLE IF EXISTS stg.channels CASCADE;
 DROP TABLE IF EXISTS stg.deliveries CASCADE;
 DROP TABLE IF EXISTS stg.drivers CASCADE;
@@ -26,7 +26,7 @@ CREATE TABLE stg.hubs (
     hub_id INT,
     hub_name VARCHAR(100),
     hub_city VARCHAR(100),
-    hub_state VARCHAR(10), -- Aumentado para 10 por segurança caso haja nomes maiores ou códigos
+    hub_state VARCHAR(2),
     hub_latitude DOUBLE PRECISION,
     hub_longitude DOUBLE PRECISION
 );
