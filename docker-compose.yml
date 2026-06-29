@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: mini_datamart_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: datamart_user
+      POSTGRES_PASSWORD: datamart_pass
+      POSTGRES_DB: mini_datamart_delivery
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./data/raw:/data/raw
+
+volumes:
+  postgres_data:
