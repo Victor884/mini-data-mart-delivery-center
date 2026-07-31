@@ -32,6 +32,44 @@ Criar um projeto robusto de BI e SQL para provar a capacidade de:
 
 ---
 
+## ✅ Status Atual do Projeto
+
+A estrutura de dados está implementada e validada até a camada de consumo analítico:
+
+| Camada | Implementação |
+|---|---|
+| `stg` | 7 tabelas carregadas diretamente dos CSVs |
+| `dw` | 8 dimensões conformadas e 3 tabelas fato |
+| `mart` | 3 views detalhadas e 5 views agregadas |
+
+Volumes reconciliados entre staging, DW e data marts:
+
+- **368.999 pedidos**
+- **378.843 entregas/tentativas**
+- **400.834 pagamentos**
+- **R$ 38.800.730,73** em valor de produtos preservado entre `stg` e `dw`
+- **R$ 37.313.340,92** em pagamentos preservado entre `stg` e `dw`
+
+As cargas foram executadas mais de uma vez para confirmar reprocessamento seguro. As validações também confirmaram:
+
+- ausência de chaves de negócio duplicadas;
+- integridade das foreign keys e cobertura por índices;
+- preservação de pedidos com múltiplas entregas ou pagamentos;
+- ausência de multiplicação de valores nas views do `mart`;
+- coerência entre timestamps e a dimensão de tempo;
+- reconciliação dos totais financeiros.
+
+Baselines publicados para o futuro dashboard:
+
+- taxa de cancelamento: **4,60%**;
+- valor transacionado de pedidos finalizados: **R$ 37.481.358,97**;
+- ticket médio finalizado: **R$ 106,48**;
+- margem agregada de entrega: **-R$ 434.905,63**;
+- tempo de ciclo P50/P90: **42,18 / 83,17 minutos**;
+- taxa de entrega concluída: **97,95%**.
+
+---
+
 ## 🏗️ Arquitetura de Dados e Tecnologia
 
 Os dados brutos em formato CSV são ingeridos e transformados dentro de um banco de dados PostgreSQL executado em container Docker.
@@ -106,11 +144,19 @@ Conecte-se ao banco de dados (`localhost:5432`, base `mini_datamart_delivery`, u
 
 ## 🚀 Próximos Passos
 
-1. **Desenvolver o Dashboard**:
-   * Conectar o Power BI ao PostgreSQL local.
-   * Criar o modelo de dados no Power BI (relacionamentos 1:N).
-   * Desenvolver as medidas em DAX para os KPIs executivos.
-   * Adicionar drill-through para pedidos, entregas e pagamentos.
-2. **Definir Metas Operacionais**:
+1. **Conectar o Power BI ao schema `mart`**:
+   * Usar as views agregadas nas páginas executivas.
+   * Reservar as views detalhadas para drill-through.
+2. **Criar três páginas iniciais do dashboard**:
+   * Visão Executiva de Vendas.
+   * Performance Logística e Tempos de Ciclo.
+   * Conciliação e Mix de Pagamentos.
+3. **Desenvolver as medidas em DAX**:
+   * Recalcular taxas usando numeradores e denominadores.
+   * Criar comparações mensais, acumulados e participação percentual.
+4. **Definir Metas Operacionais**:
    * Avaliar as séries semanais e mensais dos KPIs.
    * Aprovar limites de SLA e metas por hub antes de classificar performance.
+5. **Finalizar a apresentação do projeto**:
+   * Adicionar prints do dashboard ao README.
+   * Documentar os principais insights e decisões de negócio.
