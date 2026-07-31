@@ -21,12 +21,14 @@ Criar um projeto robusto de BI e SQL para provar a capacidade de:
 - [x] **Modelagem Dimensional**: Modelo Star Schema detalhado com tabelas fato e dimensão prontas para análise.
 - [x] **Scripts SQL de Criação e Carga**: Scripts automatizados para staging e DW, com tratamento de codificação (`LATIN1`/`UTF8`), valores nulos e carga full-refresh idempotente.
 - [x] **Validações de Qualidade de Dados**: Consultas para assegurar a integridade e consistência volumétrica dos dados importados.
-- [ ] **Consultas para KPIs Executivos**: Scripts SQL para extrair os principais indicadores de negócio diretamente do DW.
+- [x] **Camada de Data Marts**: Views detalhadas e agregadas para vendas, logística, pagamentos e desempenho de lojas.
+- [x] **Consultas para KPIs Executivos**: Indicadores documentados e calculados com regras explícitas de grão, denominador e exclusão.
 - [ ] **Dashboard Power BI**: Painel interativo com os KPIs consolidados (prints serão adicionados no README).
 - [x] **Documentação Completa**:
   * [Regras de Negócio](docs/regras-negocio.md)
   * [Modelo Dimensional](docs/modelo-dimensional.md)
   * [Dicionário de Dados](docs/dicionario-dados.md)
+  * [Catálogo de KPIs](docs/kpis.md)
 
 ---
 
@@ -74,6 +76,8 @@ Conecte-se ao banco de dados (`localhost:5432`, base `mini_datamart_delivery`, u
 6. [`sql/06_create_dw_facts.sql`](sql/06_create_dw_facts.sql): Cria as fatos de pedidos, entregas e pagamentos, suas constraints e índices.
 7. [`sql/07_load_dw.sql`](sql/07_load_dw.sql): Transforma e carrega os dados da `stg` para a `dw`.
 8. [`sql/08_dw_quality_checks.sql`](sql/08_dw_quality_checks.sql): Valida volumes, chaves de negócio e reconciliação financeira da DW.
+9. [`sql/09_create_mart_views.sql`](sql/09_create_mart_views.sql): Cria as views detalhadas e agregadas da camada `mart`.
+10. [`sql/10_mart_quality_checks.sql`](sql/10_mart_quality_checks.sql): Verifica cardinalidade, reconciliação e ausência de dupla contagem nas views.
 
 ---
 
@@ -86,6 +90,8 @@ Conecte-se ao banco de dados (`localhost:5432`, base `mini_datamart_delivery`, u
 * **Grãos Separados**: O DW possui uma fato por pedido, uma por entrega/tentativa e uma por transação de pagamento. Essa separação preserva corretamente pedidos com múltiplas entregas ou pagamentos sem multiplicar valores.
 * **Chaves Substitutas e Integridade**: As dimensões usam surrogate keys sequenciais e chaves naturais únicas. Todas as relações das fatos possuem foreign keys e índices próprios.
 * **Carga Repetível**: As dimensões são atualizadas como SCD Tipo 1 por `UPSERT`; as fatos passam por full-refresh dentro de uma única transação.
+* **Data Marts sem Fanout**: Pedidos, entregas e pagamentos são enriquecidos em views separadas. Pagamentos são agregados por pedido antes da conciliação e a performance logística utiliza uma única última tentativa por pedido.
+* **KPIs Auditáveis**: As views publicam numeradores e denominadores junto das taxas, permitindo reagregação correta no Power BI.
 
 ---
 
@@ -100,11 +106,11 @@ Conecte-se ao banco de dados (`localhost:5432`, base `mini_datamart_delivery`, u
 
 ## 🚀 Próximos Passos
 
-1. **Criar a camada `mart`**:
-   * Criar as Views analíticas para simplificar as métricas de vendas e logística.
-   * Criar uma View de conciliação entre pedidos e pagamentos.
-   * Definir os KPIs executivos e suas regras de cálculo.
-2. **Desenvolver o Dashboard**:
+1. **Desenvolver o Dashboard**:
    * Conectar o Power BI ao PostgreSQL local.
    * Criar o modelo de dados no Power BI (relacionamentos 1:N).
    * Desenvolver as medidas em DAX para os KPIs executivos.
+   * Adicionar drill-through para pedidos, entregas e pagamentos.
+2. **Definir Metas Operacionais**:
+   * Avaliar as séries semanais e mensais dos KPIs.
+   * Aprovar limites de SLA e metas por hub antes de classificar performance.

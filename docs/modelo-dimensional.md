@@ -205,14 +205,19 @@ Caso qualquer etapa falhe, a transação inteira é revertida.
 
 ---
 
-## 6. Camada de negócios planejada (`mart`)
+## 6. Camada de negócios (`mart`)
 
-As primeiras views recomendadas são:
+A camada implementada contém:
 
-1. **`mart.vw_pedidos_enriquecidos`**: uma linha por pedido, combinando dimensões e métricas.
-2. **`mart.vw_vendas_diarias`**: pedidos, cancelamentos, ticket médio, valor transacionado e margem por dia, loja e canal.
-3. **`mart.vw_performance_logistica`**: tentativas, entregas concluídas, distância e perfil de entregadores por hub.
-4. **`mart.vw_conciliacao_pagamentos`**: valor esperado do pedido versus pagamentos confirmados.
-5. **`mart.vw_mix_pagamentos`**: participação de métodos e taxas por canal e período.
+1. **`mart.vw_pedidos_enriquecidos`**: uma linha por pedido.
+2. **`mart.vw_entregas_enriquecidas`**: uma linha por entrega ou tentativa.
+3. **`mart.vw_pagamentos_enriquecidos`**: uma linha por transação de pagamento.
+4. **`mart.vw_kpis_vendas_diarios`**: pedidos, cancelamentos, ticket, valor transacionado e margem por dia, loja e canal.
+5. **`mart.vw_performance_logistica`**: última tentativa, distância e tempos por dia, hub e perfil de entregador.
+6. **`mart.vw_conciliacao_pagamentos`**: valor esperado versus pagamentos confirmados, com uma linha por pedido.
+7. **`mart.vw_mix_pagamentos`**: participação dos métodos `PAID` por dia, hub e canal.
+8. **`mart.vw_performance_lojas`**: desempenho mensal por loja.
 
 As agregações de pedidos, entregas e pagamentos devem ser realizadas separadamente antes de serem combinadas. Fazer um join direto entre as três fatos pode multiplicar valores devido às relações 1:N.
+
+As definições formais, filtros e limitações dos indicadores estão documentadas em [`docs/kpis.md`](kpis.md).
