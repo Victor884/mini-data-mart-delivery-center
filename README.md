@@ -19,7 +19,7 @@ Criar um projeto robusto de BI e SQL para provar a capacidade de:
 
 - [x] **Arquitetura e Camadas de Dados**: Separação física em schemas (`stg`, `dw` e `mart`) usando **PostgreSQL 16** via **Docker**.
 - [x] **Modelagem Dimensional**: Modelo Star Schema detalhado com tabelas fato e dimensão prontas para análise.
-- [x] **Scripts SQL de Criação e Carga**: Scripts automatizados de DDL e DML (`COPY`) com tratamento de codificação (`LATIN1`/`UTF8`) e valores nulos.
+- [x] **Scripts SQL de Criação e Carga**: Scripts automatizados para staging e DW, com tratamento de codificação (`LATIN1`/`UTF8`), valores nulos e carga full-refresh idempotente.
 - [x] **Validações de Qualidade de Dados**: Consultas para assegurar a integridade e consistência volumétrica dos dados importados.
 - [ ] **Consultas para KPIs Executivos**: Scripts SQL para extrair os principais indicadores de negócio diretamente do DW.
 - [ ] **Dashboard Power BI**: Painel interativo com os KPIs consolidados (prints serão adicionados no README).
@@ -70,6 +70,10 @@ Conecte-se ao banco de dados (`localhost:5432`, base `mini_datamart_delivery`, u
 2. [`sql/02_create_staging_tables.sql`](sql/02_create_staging_tables.sql): Cria as tabelas da camada de staging.
 3. [`sql/03_load_staging.sql`](sql/03_load_staging.sql): Limpa e carrega os dados dos CSVs para as tabelas staging usando `COPY`.
 4. [`sql/04_data_quality_checks.sql`](sql/04_data_quality_checks.sql): Executa testes de integridade e contagem de linhas.
+5. [`sql/05_create_dw_dimensions.sql`](sql/05_create_dw_dimensions.sql): Cria as dimensões conformadas da camada `dw`.
+6. [`sql/06_create_dw_facts.sql`](sql/06_create_dw_facts.sql): Cria as fatos de pedidos, entregas e pagamentos, suas constraints e índices.
+7. [`sql/07_load_dw.sql`](sql/07_load_dw.sql): Transforma e carrega os dados da `stg` para a `dw`.
+8. [`sql/08_dw_quality_checks.sql`](sql/08_dw_quality_checks.sql): Valida volumes, chaves de negócio e reconciliação financeira da DW.
 
 ---
 
@@ -77,7 +81,11 @@ Conecte-se ao banco de dados (`localhost:5432`, base `mini_datamart_delivery`, u
 
 * **Resiliência na Carga Bruta (`stg`)**: As tabelas de staging foram criadas sem chaves primárias ou restrições de integridade (`NOT NULL`, `FOREIGN KEY`). Isso garante que os dados brutos sejam carregados sem falhas, permitindo que a limpeza ocorra na etapa de transformação para a camada `dw`.
 * **Tratamento de Codificação (Encoding)**: Os arquivos `hubs.csv` e `stores.csv` continham caracteres acentuados codificados em **LATIN1** (padrão Windows), gerando erros ao tentar importar em UTF-8. O script de carga foi ajustado para interpretar esses dois arquivos especificamente como `LATIN1`, traduzindo os acentos perfeitamente na carga do banco (que utiliza UTF-8).
-* **Campos de Data Temporários**: Colunas de timestamp (`order_moment_...`) foram importadas como `VARCHAR` na staging para evitar que variações de formatação quebrassem a carga. Elas serão convertidas para `TIMESTAMP` via SQL utilizando `TO_TIMESTAMP` durante a carga do DW.
+* **Campos de Data Temporários**: Colunas de timestamp (`order_moment_...`) são importadas como `VARCHAR` na staging para evitar falhas na carga bruta e convertidas para `TIMESTAMPTZ` durante a carga do DW, considerando o fuso `America/Sao_Paulo`.
+* **Data Canônica do Pedido**: A data analítica é derivada de `order_moment_created`, que possui o timestamp completo. As colunas fragmentadas de ano, mês e dia permanecem apenas como campos brutos de conferência.
+* **Grãos Separados**: O DW possui uma fato por pedido, uma por entrega/tentativa e uma por transação de pagamento. Essa separação preserva corretamente pedidos com múltiplas entregas ou pagamentos sem multiplicar valores.
+* **Chaves Substitutas e Integridade**: As dimensões usam surrogate keys sequenciais e chaves naturais únicas. Todas as relações das fatos possuem foreign keys e índices próprios.
+* **Carga Repetível**: As dimensões são atualizadas como SCD Tipo 1 por `UPSERT`; as fatos passam por full-refresh dentro de uma única transação.
 
 ---
 
@@ -92,13 +100,11 @@ Conecte-se ao banco de dados (`localhost:5432`, base `mini_datamart_delivery`, u
 
 ## 🚀 Próximos Passos
 
-1. **Desenvolver os scripts da camada `dw`**:
-   * Criar as tabelas dimensionais (`dim_lojas`, `dim_entregadores`, `dim_canais`, `dim_tempo`, `dim_status`).
-   * Criar as tabelas fato (`fato_pedidos`, `fato_pagamentos`).
-   * Escrever a lógica de transformação (carga incremental ou carga total) de `stg` para `dw`.
-2. **Criar a camada `mart`**:
+1. **Criar a camada `mart`**:
    * Criar as Views analíticas para simplificar as métricas de vendas e logística.
-3. **Desenvolver o Dashboard**:
+   * Criar uma View de conciliação entre pedidos e pagamentos.
+   * Definir os KPIs executivos e suas regras de cálculo.
+2. **Desenvolver o Dashboard**:
    * Conectar o Power BI ao PostgreSQL local.
    * Criar o modelo de dados no Power BI (relacionamentos 1:N).
    * Desenvolver as medidas em DAX para os KPIs executivos.
