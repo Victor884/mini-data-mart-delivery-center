@@ -1,0 +1,64 @@
+:root {
+  --dc-canvas: #08111f;
+  --dc-surface: #101b2d;
+  --dc-surface-alt: #15233a;
+  --dc-border: #263a56;
+  --dc-text: #f8fafc;
+  --dc-muted: #9fb0c7;
+  --dc-teal: #2dd4bf;
+  --dc-blue: #60a5fa;
+  --dc-purple: #a78bfa;
+  --dc-green: #4ade80;
+  --dc-amber: #fbbf24;
+  --dc-red: #fb7185;
+}
+
+.dc-panel {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding: 15px 18px;
+  color: var(--dc-text);
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: var(--dc-surface);
+  border: 1px solid var(--dc-border);
+  border-radius: 14px;
+}
+
+.dc-kpi-grid {
+  display: flex;
+  gap: 10px;
+}
+
+.dc-kpi {
+  flex: 1;
+  box-sizing: border-box;
+  padding: 10px;
+  background: var(--dc-surface-alt);
+  border-radius: 10px;
+}
+
+.dc-kpi__label {
+  color: var(--dc-muted);
+  font-size: 10px;
+}
+
+.dc-kpi__value {
+  margin-top: 7px;
+  font-size: 22px;
+  font-weight: 750;
+}
+
+.dc-rank__track {
+  height: 7px;
+  margin-top: 4px;
+  overflow: hidden;
+  background: var(--dc-border);
+  border-radius: 7px;
+}
+
+.dc-rank__bar {
+  height: 7px;
+  background: linear-gradient(90deg, var(--dc-teal), var(--dc-blue));
+  border-radius: 7px;
+}

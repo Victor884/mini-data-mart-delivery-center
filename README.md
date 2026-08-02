@@ -23,12 +23,13 @@ Criar um projeto robusto de BI e SQL para provar a capacidade de:
 - [x] **Validações de Qualidade de Dados**: Consultas para assegurar a integridade e consistência volumétrica dos dados importados.
 - [x] **Camada de Data Marts**: Views detalhadas e agregadas para vendas, logística, pagamentos e desempenho de lojas.
 - [x] **Consultas para KPIs Executivos**: Indicadores documentados e calculados com regras explícitas de grão, denominador e exclusão.
-- [ ] **Dashboard Power BI**: Painel interativo com os KPIs consolidados (prints serão adicionados no README).
+- [x] **Dashboard Power BI**: Projeto `.pbip` versionável, modelo TMDL, tema JSON, medidas DAX, páginas analíticas e componentes HTML/CSS.
 - [x] **Documentação Completa**:
   * [Regras de Negócio](docs/regras-negocio.md)
   * [Modelo Dimensional](docs/modelo-dimensional.md)
   * [Dicionário de Dados](docs/dicionario-dados.md)
   * [Catálogo de KPIs](docs/kpis.md)
+  * [Projeto Power BI](powerbi/README.md)
 
 ---
 
@@ -41,6 +42,7 @@ A estrutura de dados está implementada e validada até a camada de consumo anal
 | `stg` | 7 tabelas carregadas diretamente dos CSVs |
 | `dw` | 8 dimensões conformadas e 3 tabelas fato |
 | `mart` | 3 views detalhadas e 5 views agregadas |
+| Power BI | 6 dimensões, 4 fatos, 40 medidas, 4 páginas e 36 visuais |
 
 Volumes reconciliados entre staging, DW e data marts:
 
@@ -59,14 +61,16 @@ As cargas foram executadas mais de uma vez para confirmar reprocessamento seguro
 - coerência entre timestamps e a dimensão de tempo;
 - reconciliação dos totais financeiros.
 
-Baselines publicados para o futuro dashboard:
+Baselines publicados para o dashboard:
 
 - taxa de cancelamento: **4,60%**;
 - valor transacionado de pedidos finalizados: **R$ 37.481.358,97**;
 - ticket médio finalizado: **R$ 106,48**;
 - margem agregada de entrega: **-R$ 434.905,63**;
 - tempo de ciclo P50/P90: **42,18 / 83,17 minutos**;
-- taxa de entrega concluída: **97,95%**.
+- taxa de entrega concluída: **97,95%**;
+- taxa de conciliação de pedidos finalizados: **96,60%**;
+- valor pago confirmado: **R$ 37.304.232,78**.
 
 ---
 
@@ -79,7 +83,9 @@ flowchart LR
     CSV[Arquivos CSV] -->|COPY Ingestion| STG[(Schema stg)]
     STG -->|ELT / SQL| DW[(Schema dw)]
     DW -->|Views / Agregados| MART[(Schema mart)]
-    MART -->|Conexão Direta| PBI[Power BI Dashboard]
+    MART -->|Views detalhadas| MODEL[Modelo semântico TMDL]
+    MODEL -->|Medidas DAX| PBI[Relatório PBIR]
+    PBI --> HTML[KPIs HTML/CSS]
 ```
 
 ### Tecnologias Utilizadas:
@@ -87,7 +93,7 @@ flowchart LR
 * **Ambiente**: Docker & Docker Compose
 * **Linguagem**: SQL (PL/pgSQL)
 * **Modelagem**: Star Schema (Fatos e Dimensões)
-* **Visualização**: Power BI
+* **Visualização**: Power BI Project (`.pbip`), PBIR, TMDL, DAX e HTML Content (lite)
 
 ---
 
@@ -117,6 +123,12 @@ Conecte-se ao banco de dados (`localhost:5432`, base `mini_datamart_delivery`, u
 9. [`sql/09_create_mart_views.sql`](sql/09_create_mart_views.sql): Cria as views detalhadas e agregadas da camada `mart`.
 10. [`sql/10_mart_quality_checks.sql`](sql/10_mart_quality_checks.sql): Verifica cardinalidade, reconciliação e ausência de dupla contagem nas views.
 
+### Passo 3: Abrir o projeto Power BI
+
+Com o banco em execução, abra [`powerbi/DeliveryCenterAnalytics.pbip`](powerbi/DeliveryCenterAnalytics.pbip) em uma versão atual do Power BI Desktop. Informe as credenciais do PostgreSQL somente no Desktop, atualize o modelo e confira os baselines descritos em [`powerbi/docs/VALIDACAO.md`](powerbi/docs/VALIDACAO.md).
+
+Os cartões e rankings em HTML/CSS usam o visual certificado **HTML Content (lite)**. Caso o tenant não o carregue automaticamente, instale-o pelo AppSource do Power BI.
+
 ---
 
 ## 💡 Decisões de Engenharia de Dados
@@ -135,28 +147,33 @@ Conecte-se ao banco de dados (`localhost:5432`, base `mini_datamart_delivery`, u
 
 ## 📊 Dashboard Power BI
 
-*(Os prints do dashboard finalizado e as principais visões do painel executivo serão adicionados aqui)*
+O projeto está em [`powerbi/`](powerbi/README.md) e contém:
 
-- [ ] *Print do Dashboard - Visão Executiva de Vendas*
-- [ ] *Print do Dashboard - Visão Operacional e SLAs de Entrega*
+- **01 Executivo**: valor transacionado, pedidos, ticket, cancelamento, margem, tendência e ranking;
+- **02 Logística**: conclusão, retentativas, ciclo P50/P90, distância e análise por hub/modal;
+- **03 Financeiro**: pagamentos, conciliação, chargebacks, mix e diferenças;
+- **04 Detalhe do Pedido**: drill-through com pedido, entregas e pagamentos;
+- filtros por período e dimensões conformadas;
+- tema escuro em JSON e sete componentes HTML/CSS orientados por medidas DAX.
+
+A estrutura PBIP/PBIR foi validada com **0 erros**, e **28 de 28** baselines conferiram com o PostgreSQL. A renderização final ainda deve ser aberta e atualizada no Power BI Desktop, que não está instalado no ambiente usado para gerar os arquivos.
 
 ---
 
 ## 🚀 Próximos Passos
 
-1. **Conectar o Power BI ao schema `mart`**:
-   * Usar as views agregadas nas páginas executivas.
-   * Reservar as views detalhadas para drill-through.
-2. **Criar três páginas iniciais do dashboard**:
-   * Visão Executiva de Vendas.
-   * Performance Logística e Tempos de Ciclo.
-   * Conciliação e Mix de Pagamentos.
-3. **Desenvolver as medidas em DAX**:
-   * Recalcular taxas usando numeradores e denominadores.
-   * Criar comparações mensais, acumulados e participação percentual.
-4. **Definir Metas Operacionais**:
+1. **Homologar no Power BI Desktop**:
+   * Atualizar o modelo com as credenciais locais.
+   * Conferir o carregamento do HTML Content (lite), responsividade, cross-filter e drill-through.
+   * Registrar capturas das quatro páginas no README.
+2. **Preparar a publicação**:
+   * Configurar gateway para o PostgreSQL.
+   * Definir atualização agendada e política do visual customizado no tenant.
+   * Implementar RLS quando houver uma regra de acesso aprovada.
+3. **Definir Metas Operacionais**:
    * Avaliar as séries semanais e mensais dos KPIs.
    * Aprovar limites de SLA e metas por hub antes de classificar performance.
-5. **Finalizar a apresentação do projeto**:
-   * Adicionar prints do dashboard ao README.
-   * Documentar os principais insights e decisões de negócio.
+4. **Evoluir a análise**:
+   * Adicionar metas, tooltips dedicados e bookmarks após homologação visual.
+   * Avaliar agregações/import incremental se o volume crescer.
+   * Documentar os principais insights e decisões de negócio após uso pelos stakeholders.

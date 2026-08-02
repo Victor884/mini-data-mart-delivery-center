@@ -1,0 +1,3 @@
+expression 'Servidor PostgreSQL' = "localhost:5432" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+
+expression 'Banco PostgreSQL' = "mini_datamart_delivery" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]

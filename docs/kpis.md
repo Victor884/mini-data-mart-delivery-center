@@ -173,7 +173,7 @@ A origem possui 15.886 entregas sem `driver_id`.
 2. Somar apenas métricas aditivas, como valores e contagens.
 3. Recalcular taxas a partir de numerador e denominador no nível exibido.
 4. Não relacionar simultaneamente as três views detalhadas por `order_id` em relações bidirecionais.
-5. Usar as views agregadas para os painéis executivos e as detalhadas apenas para drill-through.
+5. No modelo estrela atual, usar as views detalhadas separadas por fato para preservar filtros conformados e drill-through; reservar as views agregadas para QA e futuras agregações de desempenho.
 6. Manter pedidos cancelados separados dos indicadores financeiros confirmados.
 
 ---

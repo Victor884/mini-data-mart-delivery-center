@@ -1,0 +1,17 @@
+EVALUATE
+ROW(
+    "Pedidos Criados", [Pedidos Criados],
+    "Pedidos Finalizados", [Pedidos Finalizados],
+    "Pedidos Cancelados", [Pedidos Cancelados],
+    "Taxa Cancelamento", [Taxa Cancelamento],
+    "Valor Transacionado", [Valor Transacionado],
+    "Ticket Médio", [Ticket Médio],
+    "Margem Entrega", [Margem Entrega],
+    "Tempo Ciclo P50", [Tempo Ciclo P50],
+    "Tempo Ciclo P90", [Tempo Ciclo P90],
+    "Taxa Entrega Concluída", [Taxa Entrega Concluída],
+    "Taxa Múltiplas Tentativas", [Taxa Múltiplas Tentativas],
+    "Valor Pago", [Valor Pago],
+    "Valor Chargeback", [Valor Chargeback],
+    "Taxa Conciliação", [Taxa Conciliação]
+)

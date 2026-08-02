@@ -1,0 +1,109 @@
+/// Fato de conciliação no grão de uma linha por pedido, com pagamentos previamente agregados.
+table 'Conciliação'
+
+	column 'Chave Pedido'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: sk_pedido
+
+	column 'Pedido ID'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: order_id
+
+	column 'Chave Data'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: sk_tempo
+
+	column 'Chave Loja'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: store_id
+
+	column 'Chave Hub'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: hub_id
+
+	column 'Chave Canal'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: channel_id
+
+	column 'Status Pedido'
+		dataType: string
+		sourceColumn: order_status
+
+	column 'Valor Esperado'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: valor_esperado_pedido
+
+	column 'Quantidade Pagamentos'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: qtd_pagamentos
+
+	column 'Quantidade Pagamentos Pagos'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: qtd_pagamentos_pagos
+
+	column 'Quantidade Chargebacks'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: qtd_chargebacks
+
+	column 'Quantidade Aguardando'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: qtd_pagamentos_aguardando
+
+	column 'Total Pago Confirmado'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: total_pago_confirmado
+
+	column 'Total Chargeback'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: total_chargeback
+
+	column 'Total Aguardando'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: total_aguardando
+
+	column 'Taxas Pagamentos Pagos'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: taxas_pagamentos_pagos
+
+	column 'Valor Pago Após Taxas'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: valor_pago_apos_taxas
+
+	column 'Diferença Conciliação'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: diferenca_conciliacao
+
+	column 'Status Conciliação'
+		dataType: string
+		sourceColumn: status_conciliacao
+
+	partition 'Conciliação' = m
+		mode: import
+		source =
+			let
+				Fonte = PostgreSQL.Database(#"Servidor PostgreSQL", #"Banco PostgreSQL", [Query = "SELECT sk_pedido, order_id, sk_tempo, store_id, hub_id, channel_id, order_status, valor_esperado_pedido, qtd_pagamentos, qtd_pagamentos_pagos, qtd_chargebacks, qtd_pagamentos_aguardando, total_pago_confirmado, total_chargeback, total_aguardando, taxas_pagamentos_pagos, valor_pago_apos_taxas, diferenca_conciliacao, status_conciliacao FROM mart.vw_conciliacao_pagamentos"])
+			in
+				Fonte

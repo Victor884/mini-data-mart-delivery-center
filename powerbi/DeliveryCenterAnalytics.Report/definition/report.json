@@ -1,0 +1,54 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/report/3.3.0/schema.json",
+  "themeCollection": {
+    "customTheme": {
+      "name": "DeliveryCenterDark-4f61c2a9.json",
+      "reportVersionAtImport": {
+        "visual": "2.9.0",
+        "page": "2.1.0",
+        "report": "3.3.0"
+      },
+      "type": "RegisteredResources"
+    }
+  },
+  "publicCustomVisuals": [
+    "htmlContent443BE3AD55E043BF878BED274D3A6865"
+  ],
+  "resourcePackages": [
+    {
+      "name": "RegisteredResources",
+      "type": "RegisteredResources",
+      "items": [
+        {
+          "name": "DeliveryCenterDark-4f61c2a9.json",
+          "path": "DeliveryCenterDark-4f61c2a9.json",
+          "type": "CustomTheme"
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "hideVisualContainerHeader": false,
+    "useStylableVisualContainerHeader": true,
+    "exportDataMode": "AllowSummarized",
+    "defaultFilterActionIsDataFilter": true,
+    "defaultDrillFilterOtherVisuals": true,
+    "useEnhancedTooltips": true,
+    "filterPaneHiddenInEditMode": true,
+    "pagesPosition": "Bottom"
+  },
+  "annotations": [
+    {
+      "name": "owner",
+      "value": "Mini Data Mart Delivery Center"
+    },
+    {
+      "name": "source",
+      "value": "PostgreSQL mart views"
+    },
+    {
+      "name": "htmlVisual",
+      "value": "HTML Content (lite) - AppSource"
+    }
+  ]
+}

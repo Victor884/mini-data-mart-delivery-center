@@ -1,0 +1,125 @@
+/// Fato de pedidos no grão de uma linha por pedido, oriunda de mart.vw_pedidos_enriquecidos.
+table Pedidos
+
+	column 'Chave Pedido'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: sk_pedido
+
+	column 'Pedido ID'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: order_id
+
+	column 'Chave Data'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: sk_tempo
+
+	column 'Chave Loja'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: store_id
+
+	column 'Chave Hub'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: hub_id
+
+	column 'Chave Canal'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: channel_id
+
+	column 'Status Pedido'
+		dataType: string
+		sourceColumn: order_status
+
+	column 'Hora Criação'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: hora_criacao
+
+	column 'Valor Produtos'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: valor_pedido
+
+	column 'Taxa Entrega'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: taxa_entrega
+
+	column 'Custo Entrega'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: custo_entrega
+
+	column 'Valor Total Pedido'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: valor_total_pedido
+
+	column 'Margem Entrega'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: margem_entrega
+
+	column 'Pedido Criado Em'
+		dataType: dateTime
+		summarizeBy: none
+		sourceColumn: pedido_criado_em
+
+	column 'Pedido Aceito Em'
+		dataType: dateTime
+		summarizeBy: none
+		sourceColumn: pedido_aceito_em
+
+	column 'Pedido Pronto Em'
+		dataType: dateTime
+		summarizeBy: none
+		sourceColumn: pedido_pronto_em
+
+	column 'Pedido Coletado Em'
+		dataType: dateTime
+		summarizeBy: none
+		sourceColumn: pedido_coletado_em
+
+	column 'Pedido Em Entrega Em'
+		dataType: dateTime
+		summarizeBy: none
+		sourceColumn: pedido_em_entrega_em
+
+	column 'Pedido Finalizado Em'
+		dataType: dateTime
+		summarizeBy: none
+		sourceColumn: pedido_finalizado_em
+
+	column 'Tempo Produção'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: tempo_producao_minutos
+
+	column 'Tempo Trânsito'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: tempo_transito_minutos
+
+	column 'Tempo Ciclo'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: tempo_ciclo_total_minutos
+
+	partition Pedidos = m
+		mode: import
+		source =
+			let
+				Fonte = PostgreSQL.Database(#"Servidor PostgreSQL", #"Banco PostgreSQL", [Query = "SELECT sk_pedido, order_id, sk_tempo, store_id, hub_id, channel_id, order_status, hora_criacao::bigint AS hora_criacao, valor_pedido, taxa_entrega, custo_entrega, valor_total_pedido, margem_entrega, pedido_criado_em AT TIME ZONE 'America/Sao_Paulo' AS pedido_criado_em, pedido_aceito_em AT TIME ZONE 'America/Sao_Paulo' AS pedido_aceito_em, pedido_pronto_em AT TIME ZONE 'America/Sao_Paulo' AS pedido_pronto_em, pedido_coletado_em AT TIME ZONE 'America/Sao_Paulo' AS pedido_coletado_em, pedido_em_entrega_em AT TIME ZONE 'America/Sao_Paulo' AS pedido_em_entrega_em, pedido_finalizado_em AT TIME ZONE 'America/Sao_Paulo' AS pedido_finalizado_em, tempo_producao_minutos::numeric(18,2) AS tempo_producao_minutos, tempo_transito_minutos::numeric(18,2) AS tempo_transito_minutos, tempo_ciclo_total_minutos::numeric(18,2) AS tempo_ciclo_total_minutos FROM mart.vw_pedidos_enriquecidos"])
+			in
+				Fonte
