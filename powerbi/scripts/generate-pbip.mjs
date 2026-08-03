@@ -24,18 +24,20 @@ const schemas = {
 };
 
 const colors = {
-  canvas: "#F4F7FB",
-  surface: "#FFFFFF",
-  surfaceAlt: "#F8FAFC",
-  border: "#DDE5EF",
-  text: "#172033",
-  muted: "#64748B",
-  teal: "#0F766E",
-  blue: "#2563EB",
-  purple: "#6D5BD0",
-  green: "#15803D",
-  amber: "#D97706",
-  red: "#BE123C"
+  canvas: "#090D18",
+  sidebar: "#101627",
+  surface: "#141B2F",
+  surfaceAlt: "#1A2340",
+  border: "#293451",
+  text: "#F5F7FF",
+  muted: "#9BA8C7",
+  teal: "#22D3EE",
+  blue: "#3B82F6",
+  purple: "#8B5CF6",
+  magenta: "#D946EF",
+  green: "#10B981",
+  amber: "#F59E0B",
+  red: "#FB7185"
 };
 
 const htmlVisualType = "htmlContent443BE3AD55E043BF878BED274D3A6865";
@@ -151,10 +153,10 @@ function chrome(title, { padding = 8, background = true, border = true, altText 
         show: bool(background),
         preset: text("Bottom"),
         position: text("Outer"),
-        color: fill("#172033"),
-        transparency: number(90),
-        shadowBlur: number(8),
-        shadowDistance: number(2)
+        color: fill("#020617"),
+        transparency: number(68),
+        shadowBlur: number(12),
+        shadowDistance: number(4)
       }
     }],
     visualHeader: [{
@@ -224,28 +226,40 @@ function textboxVisual(title, subtitle = "", { titleSize = 24, subtitleSize = 10
   };
 }
 
+function sidebarVisual() {
+  return {
+    visualType: "shape",
+    objects: {
+      shape: [{ properties: { tileShape: text("rectangle") } }],
+      fill: [{ properties: { show: bool(true), fillColor: fill(colors.sidebar), transparency: number(0) } }],
+      outline: [{ properties: { show: bool(true), lineColor: fill(colors.border), transparency: number(35), weight: number(1) } }]
+    },
+    visualContainerObjects: chrome("", { padding: 0, background: false, border: false, altText: "Painel lateral de navegação e filtros" })
+  };
+}
+
 function pageNavigatorVisual() {
   const state = (id) => ({ id });
   return {
     visualType: "pageNavigator",
     objects: {
-      layout: [{ properties: { rowCount: number(1, true), cellPadding: number(5, true) } }],
+      layout: [{ properties: { rowCount: number(5, true), cellPadding: number(4, true) } }],
       pages: [{ properties: { showHiddenPages: bool(false), showTooltipPages: bool(false), showByDefault: bool(true) } }],
       shape: [{ properties: { tileShape: text("rectangleRounded"), rectangleRoundedCurve: number(8, true) } }],
       fill: [
-        { selector: state("default"), properties: { show: bool(true), fillColor: fill(colors.surface), transparency: number(100) } },
+        { selector: state("default"), properties: { show: bool(true), fillColor: fill(colors.sidebar), transparency: number(100) } },
         { selector: state("hover"), properties: { show: bool(true), fillColor: fill(colors.surfaceAlt), transparency: number(0) } },
-        { selector: state("selected"), properties: { show: bool(true), fillColor: fill("#E8F0FF"), transparency: number(0) } }
+        { selector: state("selected"), properties: { show: bool(true), fillColor: fill("#28204A"), transparency: number(0) } }
       ],
       outline: [
         { selector: state("default"), properties: { show: bool(false), lineColor: fill(colors.border), transparency: number(100), weight: number(0) } },
-        { selector: state("selected"), properties: { show: bool(true), lineColor: fill(colors.blue), transparency: number(0), weight: number(1) } }
+        { selector: state("selected"), properties: { show: bool(true), lineColor: fill(colors.purple), transparency: number(0), weight: number(1) } }
       ],
       text: [
-        { selector: state("default"), properties: { show: bool(true), fontFamily: text("Segoe UI Semibold"), fontSize: number(10), bold: bool(false), fontColor: fill(colors.muted), horizontalAlignment: text("center"), verticalAlignment: text("middle") } },
-        { selector: state("selected"), properties: { show: bool(true), fontFamily: text("Segoe UI Semibold"), fontSize: number(10), bold: bool(true), fontColor: fill(colors.blue), horizontalAlignment: text("center"), verticalAlignment: text("middle") } }
+        { selector: state("default"), properties: { show: bool(true), fontFamily: text("Segoe UI Semibold"), fontSize: number(9), bold: bool(false), fontColor: fill(colors.muted), horizontalAlignment: text("left"), verticalAlignment: text("middle") } },
+        { selector: state("selected"), properties: { show: bool(true), fontFamily: text("Segoe UI Semibold"), fontSize: number(9), bold: bool(true), fontColor: fill(colors.text), horizontalAlignment: text("left"), verticalAlignment: text("middle") } }
       ],
-      accentBar: [{ selector: state("selected"), properties: { show: bool(true), position: text("Bottom"), color: fill(colors.blue), transparency: number(0), width: number(3) } }]
+      accentBar: [{ selector: state("selected"), properties: { show: bool(true), position: text("Left"), color: fill(colors.teal), transparency: number(0), width: number(4) } }]
     },
     visualContainerObjects: chrome("", { padding: 0, background: false, border: false, altText: "Navegação entre as páginas do relatório" })
   };
@@ -273,10 +287,10 @@ function clearFiltersButtonVisual() {
     visualType: "actionButton",
     objects: {
       shape: [{ properties: { tileShape: text("rectangleRounded"), rectangleRoundedCurve: number(10) } }],
-      fill: [{ properties: { show: bool(true), fillColor: fill(colors.surface), transparency: number(0) } }],
-      outline: [{ properties: { show: bool(true), lineColor: fill(colors.blue), transparency: number(0), weight: number(1) } }],
-      text: [{ properties: { show: bool(true), text: text("Limpar filtros"), fontFamily: text("Segoe UI Semibold"), fontSize: number(10), bold: bool(true), fontColor: fill(colors.blue), horizontalAlignment: text("center") } }],
-      icon: [{ properties: { show: bool(true), shapeType: text("clearAllSlicers"), lineColor: fill(colors.blue), lineWeight: number(2), placement: text("left"), iconSize: number(16) } }]
+      fill: [{ properties: { show: bool(true), fillColor: fill("#28204A"), transparency: number(0) } }],
+      outline: [{ properties: { show: bool(true), lineColor: fill(colors.purple), transparency: number(0), weight: number(1) } }],
+      text: [{ properties: { show: bool(true), text: text("Limpar filtros"), fontFamily: text("Segoe UI Semibold"), fontSize: number(10), bold: bool(true), fontColor: fill(colors.text), horizontalAlignment: text("center") } }],
+      icon: [{ properties: { show: bool(true), shapeType: text("clearAllSlicers"), lineColor: fill(colors.teal), lineWeight: number(2), placement: text("left"), iconSize: number(16) } }]
     },
     visualContainerObjects: {
       ...chrome("", { padding: 0, background: false, border: false, altText: "Limpar todas as segmentações desta página" }),
@@ -377,6 +391,59 @@ function cartesianVisual(type, title, category, measures, { tooltips = [], toolt
   return {
     visualType: type,
     query,
+    objects: {
+      categoryAxis: [{ properties: {
+        show: bool(true),
+        fontFamily: text("Segoe UI"),
+        fontSize: number(9),
+        labelColor: fill(colors.muted),
+        showAxisTitle: bool(false),
+        gridlineShow: bool(false)
+      } }],
+      valueAxis: [{ properties: {
+        show: bool(true),
+        fontFamily: text("Segoe UI"),
+        fontSize: number(9),
+        labelColor: fill(colors.muted),
+        showAxisTitle: bool(false),
+        gridlineShow: bool(true),
+        gridlineThickness: number(1),
+        gridlineColor: fill(colors.border),
+        gridlineTransparency: number(48),
+        gridlineStyle: text("dashed")
+      } }],
+      legend: [{ properties: {
+        show: bool(measures.length > 1),
+        position: text("TopRight"),
+        showTitle: bool(false),
+        fontFamily: text("Segoe UI"),
+        fontSize: number(9),
+        labelColor: fill(colors.muted),
+        ...(type === "lineChart" ? { legendMarkerRendering: text("lineAndMarker") } : {})
+      } }],
+      labels: [{ properties: {
+        show: bool(type === "clusteredBarChart"),
+        labelPosition: text("OutsideEnd"),
+        fontFamily: text("Segoe UI Semibold"),
+        fontSize: number(9),
+        color: fill(colors.text),
+        enableBackground: bool(false),
+        optimizeLabelDisplay: bool(true)
+      } }],
+      ...(type === "lineChart" ? {
+        lineStyles: [{ properties: {
+          strokeShow: bool(true),
+          strokeWidth: number(2),
+          lineStyle: text("solid"),
+          strokeLineJoin: text("round"),
+          showMarker: bool(false),
+          lineChartType: text("smooth"),
+          interpolationSmooth: text("monotoneX"),
+          areaShow: bool(false),
+          segmentGradient: bool(false)
+        } }]
+      } : {})
+    },
     visualContainerObjects: {
       ...chrome(title, { altText: altText || title }),
       visualTooltip: [{
@@ -481,7 +548,7 @@ function pageDefinition(name, displayName, { drillthrough = false, tooltip = fal
       }],
       outspace: [{
         properties: {
-          color: fill("#E8EEF6"),
+          color: fill("#050812"),
           transparency: number(0)
         }
       }]
@@ -1133,10 +1200,10 @@ ROW(
     "Valor pago anterior", [Valor Pago Mês Anterior]
 )`);
 
-const themeFile = "DeliveryCenterPortfolio-20260802.json";
+const themeFile = "DeliveryCenterDarkNeon-20260802.json";
 writeJson(`${reportName}/StaticResources/RegisteredResources/${themeFile}`, {
   name: themeFile,
-  dataColors: [colors.blue, colors.teal, colors.purple, colors.amber, colors.red, colors.green, "#0284C7", "#7C3AED"],
+  dataColors: [colors.teal, colors.purple, colors.blue, colors.magenta, colors.green, colors.amber, colors.red, "#06B6D4"],
   good: colors.green,
   neutral: colors.amber,
   bad: colors.red,
@@ -1202,7 +1269,7 @@ writeJson(`${reportName}/definition/report.json`, {
     { name: "source", value: "PostgreSQL mart views" },
     { name: "htmlVisual", value: "HTML Content (lite) - AppSource" },
     { name: "designContract", value: "powerbi/docs/CONTRATO_VISUAL.md" },
-    { name: "redesign", value: "portfolio-2026" }
+    { name: "redesign", value: "dark-neon-portfolio-2026" }
   ]
 });
 
@@ -1367,26 +1434,27 @@ const posNew = (x, y, width, height) => ({ x, y, width, height, z: (zNew += 1000
 
 function reportShell(page, title, subtitle, filters, { detail = false } = {}) {
   const visuals = [
-    visualFile(page.name, "brand", posNew(20, 12, 290, 42), textboxVisual("Delivery Center Analytics", "PostgreSQL · schema mart", { titleSize: 20, subtitleSize: 9 })),
-    visualFile(page.name, "navigation", posNew(330, 10, 750, 46), pageNavigatorVisual()),
-    visualFile(page.name, "model-status", posNew(1090, 17, 170, 30), textboxVisual("MODELO VALIDADO", "120 dias · 01/01 a 30/04/2021", { titleSize: 10, subtitleSize: 8 })),
-    visualFile(page.name, "page-title", posNew(240, 74, 1024, 46), textboxVisual(title, subtitle, { titleSize: 21, subtitleSize: 10 })),
-    visualFile(page.name, "filter-title", posNew(16, 82, 208, 34), textboxVisual("Filtros", "Contexto da página", { titleSize: 15, subtitleSize: 9 }))
+    visualFile(page.name, "sidebar", posNew(0, 0, 224, 720), sidebarVisual()),
+    visualFile(page.name, "brand", posNew(20, 18, 196, 42), textboxVisual("Delivery Center", "ANALYTICS · POSTGRESQL", { titleSize: 17, subtitleSize: 8 })),
+    visualFile(page.name, "navigation", posNew(16, 74, 208, 166), pageNavigatorVisual()),
+    visualFile(page.name, "filter-title", posNew(20, 252, 196, 28), textboxVisual("FILTROS", "Contexto da página", { titleSize: 11, subtitleSize: 8 })),
+    visualFile(page.name, "model-status", posNew(16, 664, 208, 38), textboxVisual("● MODELO VALIDADO", "120 dias · jan–abr/2021", { titleSize: 9, subtitleSize: 8 })),
+    visualFile(page.name, "page-title", posNew(244, 20, 1020, 50), textboxVisual(title, subtitle, { titleSize: 23, subtitleSize: 10 }))
   ];
 
   filters.forEach((filter, index) => {
     visuals.push(visualFile(
       page.name,
       `filter-${filter.key}`,
-      posNew(16, 126 + (index * 82), 208, 78),
+      posNew(16, 282 + (index * 80), 208, 76),
       slicerVisual(filter.table, filter.property, filter.label, filter.mode || "Dropdown")
     ));
   });
 
   if (detail) {
-    visuals.push(visualFile(page.name, "back", posNew(16, 570, 208, 48), backButtonVisual()));
+    visuals.push(visualFile(page.name, "back", posNew(16, 388, 208, 44), backButtonVisual()));
   }
-  visuals.push(visualFile(page.name, "clear-filters", posNew(16, 636, 208, 48), clearFiltersButtonVisual()));
+  visuals.push(visualFile(page.name, "clear-filters", posNew(16, detail ? 444 : 608, 208, 44), clearFiltersButtonVisual()));
   return visuals;
 }
 
@@ -1421,8 +1489,8 @@ const executiveVisuals = [
     { key: "store", table: "Lojas", property: "Loja", label: "Loja" },
     { key: "channel", table: "Canais", property: "Canal", label: "Canal" }
   ]),
-  visualFile(executivePage.name, "kpis", posNew(240, 130, 1024, 118), htmlVisual("HTML | KPIs Executivos")),
-  visualFile(executivePage.name, "value-trend", posNew(240, 264, 620, 230), cartesianVisual(
+  visualFile(executivePage.name, "kpis", posNew(244, 88, 1020, 120), htmlVisual("HTML | KPIs Executivos")),
+  visualFile(executivePage.name, "value-trend", posNew(244, 224, 620, 250), cartesianVisual(
     "lineChart",
     "Valor transacionado por dia",
     { table: "Calendário", property: "Data" },
@@ -1433,7 +1501,7 @@ const executiveVisuals = [
       altText: "Linha diária do valor transacionado no período selecionado."
     }
   )),
-  visualFile(executivePage.name, "hub-ranking", posNew(876, 264, 388, 230), cartesianVisual(
+  visualFile(executivePage.name, "hub-ranking", posNew(880, 224, 384, 250), cartesianVisual(
     "clusteredBarChart",
     "Hubs por valor transacionado",
     { table: "Hubs", property: "Hub" },
@@ -1445,8 +1513,8 @@ const executiveVisuals = [
       altText: "Ranking horizontal dos hubs por valor transacionado, em ordem decrescente."
     }
   )),
-  visualFile(executivePage.name, "health", posNew(240, 510, 330, 194), htmlVisual("HTML | Saúde Executiva")),
-  visualFile(executivePage.name, "store-ranking", posNew(586, 510, 678, 194), tableVisual("Lojas com maior impacto", [
+  visualFile(executivePage.name, "health", posNew(244, 490, 330, 214), htmlVisual("HTML | Saúde Executiva")),
+  visualFile(executivePage.name, "store-ranking", posNew(590, 490, 674, 214), tableVisual("Lojas com maior impacto", [
     { table: "Lojas", property: "Loja", kind: "column" },
     { property: "Valor Transacionado", kind: "measure" },
     { property: "Pedidos Finalizados", kind: "measure" },
@@ -1466,8 +1534,8 @@ const ordersVisuals = [
     { key: "store", table: "Lojas", property: "Loja", label: "Loja" },
     { key: "channel", table: "Canais", property: "Canal", label: "Canal" }
   ]),
-  visualFile(ordersPage.name, "kpis", posNew(240, 130, 1024, 118), htmlVisual("HTML | KPIs Pedidos")),
-  visualFile(ordersPage.name, "orders-trend", posNew(240, 264, 620, 230), cartesianVisual(
+  visualFile(ordersPage.name, "kpis", posNew(244, 88, 1020, 120), htmlVisual("HTML | KPIs Pedidos")),
+  visualFile(ordersPage.name, "orders-trend", posNew(244, 224, 620, 250), cartesianVisual(
     "lineChart",
     "Pedidos criados por dia",
     { table: "Calendário", property: "Data" },
@@ -1478,7 +1546,7 @@ const ordersVisuals = [
       altText: "Linha diária do volume de pedidos criados."
     }
   )),
-  visualFile(ordersPage.name, "status", posNew(876, 264, 388, 230), cartesianVisual(
+  visualFile(ordersPage.name, "status", posNew(880, 224, 384, 250), cartesianVisual(
     "clusteredBarChart",
     "Composição por status",
     { table: "Pedidos", property: "Status Pedido" },
@@ -1490,8 +1558,8 @@ const ordersVisuals = [
       altText: "Barras horizontais com pedidos finalizados e cancelados."
     }
   )),
-  visualFile(ordersPage.name, "stages", posNew(240, 510, 330, 194), htmlVisual("HTML | Etapas Operacionais")),
-  visualFile(ordersPage.name, "hub-operations", posNew(586, 510, 678, 194), tableVisual("Operação por hub", [
+  visualFile(ordersPage.name, "stages", posNew(244, 490, 330, 214), htmlVisual("HTML | Etapas Operacionais")),
+  visualFile(ordersPage.name, "hub-operations", posNew(590, 490, 674, 214), tableVisual("Operação por hub", [
     { table: "Hubs", property: "Hub", kind: "column" },
     { property: "Pedidos Criados", kind: "measure" },
     { property: "Pedidos Finalizados", kind: "measure" },
@@ -1512,8 +1580,8 @@ const financeVisuals = [
     { key: "channel", table: "Canais", property: "Canal", label: "Canal" },
     { key: "method", table: "Pagamentos", property: "Meio Pagamento", label: "Meio de pagamento" }
   ]),
-  visualFile(financePage.name, "kpis", posNew(240, 130, 1024, 118), htmlVisual("HTML | KPIs Financeiros")),
-  visualFile(financePage.name, "finance-trend", posNew(240, 264, 620, 230), cartesianVisual(
+  visualFile(financePage.name, "kpis", posNew(244, 88, 1020, 120), htmlVisual("HTML | KPIs Financeiros")),
+  visualFile(financePage.name, "finance-trend", posNew(244, 224, 620, 250), cartesianVisual(
     "lineChart",
     "Valor transacionado e valor pago por dia",
     { table: "Calendário", property: "Data" },
@@ -1524,7 +1592,7 @@ const financeVisuals = [
       altText: "Linhas diárias do valor transacionado e do valor pago."
     }
   )),
-  visualFile(financePage.name, "payment-ranking", posNew(876, 264, 388, 230), cartesianVisual(
+  visualFile(financePage.name, "payment-ranking", posNew(880, 224, 384, 250), cartesianVisual(
     "clusteredBarChart",
     "Meios de pagamento por valor pago",
     { table: "Pagamentos", property: "Meio Pagamento" },
@@ -1536,7 +1604,7 @@ const financeVisuals = [
       altText: "Ranking horizontal dos meios de pagamento por valor pago."
     }
   )),
-  visualFile(financePage.name, "reconciliation-status", posNew(240, 510, 330, 194), cartesianVisual(
+  visualFile(financePage.name, "reconciliation-status", posNew(244, 490, 330, 214), cartesianVisual(
     "clusteredBarChart",
     "Pedidos por status de conciliação",
     { table: "Conciliação", property: "Status Conciliação" },
@@ -1547,7 +1615,7 @@ const financeVisuals = [
       altText: "Distribuição de pedidos pelos status de conciliação."
     }
   )),
-  visualFile(financePage.name, "segment-finance", posNew(586, 510, 678, 194), tableVisual("Resultado por segmento de loja", [
+  visualFile(financePage.name, "segment-finance", posNew(590, 490, 674, 214), tableVisual("Resultado por segmento de loja", [
     { table: "Lojas", property: "Segmento Loja", kind: "column" },
     { property: "Valor Transacionado", kind: "measure" },
     { property: "Valor Pago", kind: "measure" },
@@ -1568,8 +1636,8 @@ const deliveryVisuals = [
     { key: "modal", table: "Entregadores", property: "Modal Entregador", label: "Modal" },
     { key: "driver-type", table: "Entregadores", property: "Tipo Entregador", label: "Tipo de entregador" }
   ]),
-  visualFile(deliveryPage.name, "kpis", posNew(240, 130, 1024, 118), htmlVisual("HTML | KPIs Logística")),
-  visualFile(deliveryPage.name, "cycle-trend", posNew(240, 264, 620, 230), cartesianVisual(
+  visualFile(deliveryPage.name, "kpis", posNew(244, 88, 1020, 120), htmlVisual("HTML | KPIs Logística")),
+  visualFile(deliveryPage.name, "cycle-trend", posNew(244, 224, 620, 250), cartesianVisual(
     "lineChart",
     "Ciclo P50 e P90 por dia · percentis, não SLA",
     { table: "Calendário", property: "Data" },
@@ -1580,7 +1648,7 @@ const deliveryVisuals = [
       altText: "Linhas diárias dos percentis 50 e 90 do tempo de ciclo, em minutos."
     }
   )),
-  visualFile(deliveryPage.name, "modal-quality", posNew(876, 264, 388, 230), cartesianVisual(
+  visualFile(deliveryPage.name, "modal-quality", posNew(880, 224, 384, 250), cartesianVisual(
     "clusteredBarChart",
     "Conclusão por modal",
     { table: "Entregadores", property: "Modal Entregador" },
@@ -1592,7 +1660,7 @@ const deliveryVisuals = [
       altText: "Barras horizontais com a taxa de conclusão por modal."
     }
   )),
-  visualFile(deliveryPage.name, "hub-retry", posNew(240, 510, 330, 194), cartesianVisual(
+  visualFile(deliveryPage.name, "hub-retry", posNew(244, 490, 330, 214), cartesianVisual(
     "clusteredBarChart",
     "Hubs com mais retentativas",
     { table: "Hubs", property: "Hub" },
@@ -1604,7 +1672,7 @@ const deliveryVisuals = [
       altText: "Ranking horizontal dos hubs por taxa de múltiplas tentativas."
     }
   )),
-  visualFile(deliveryPage.name, "hub-delivery", posNew(586, 510, 678, 194), tableVisual("Qualidade por hub", [
+  visualFile(deliveryPage.name, "hub-delivery", posNew(590, 490, 674, 214), tableVisual("Qualidade por hub", [
     { table: "Hubs", property: "Hub", kind: "column" },
     { property: "Pedidos com Entrega", kind: "measure" },
     { property: "Taxa Entrega Concluída", kind: "measure" },
@@ -1622,8 +1690,8 @@ const detailVisuals = [
   ...reportShell(detailPage, "Detalhamento", "Use o drill-through ou selecione um pedido para investigar o registro", [
     { key: "order", table: "Pedido", property: "Pedido ID", label: "Pedido ID" }
   ], { detail: true }),
-  visualFile(detailPage.name, "detail-header", posNew(240, 130, 1024, 112), htmlVisual("HTML | Detalhe Pedido")),
-  visualFile(detailPage.name, "order-detail", posNew(240, 258, 1024, 142), tableVisual("Pedido", [
+  visualFile(detailPage.name, "detail-header", posNew(244, 88, 1020, 120), htmlVisual("HTML | Detalhe Pedido")),
+  visualFile(detailPage.name, "order-detail", posNew(244, 224, 1020, 160), tableVisual("Pedido", [
     { table: "Pedido", property: "Pedido ID", kind: "column" },
     { table: "Pedidos", property: "Status Pedido", kind: "column" },
     { table: "Lojas", property: "Loja", kind: "column" },
@@ -1634,7 +1702,7 @@ const detailVisuals = [
     { table: "Pedidos", property: "Pedido Finalizado Em", kind: "column" },
     { table: "Pedidos", property: "Tempo Ciclo", kind: "column" }
   ])),
-  visualFile(detailPage.name, "delivery-detail", posNew(240, 416, 500, 288), tableVisual("Tentativas de entrega", [
+  visualFile(detailPage.name, "delivery-detail", posNew(244, 400, 500, 304), tableVisual("Tentativas de entrega", [
     { table: "Entregas", property: "Entrega ID", kind: "column" },
     { table: "Entregas", property: "Status Entrega", kind: "column" },
     { table: "Entregadores", property: "Modal Entregador", kind: "column" },
@@ -1642,7 +1710,7 @@ const detailVisuals = [
     { table: "Entregas", property: "É Última Tentativa", kind: "column" },
     { table: "Entregas", property: "Distância Entrega (m)", kind: "column" }
   ])),
-  visualFile(detailPage.name, "payment-detail", posNew(756, 416, 508, 288), tableVisual("Transações de pagamento", [
+  visualFile(detailPage.name, "payment-detail", posNew(760, 400, 504, 304), tableVisual("Transações de pagamento", [
     { table: "Pagamentos", property: "Pagamento ID", kind: "column" },
     { table: "Pagamentos", property: "Meio Pagamento", kind: "column" },
     { table: "Pagamentos", property: "Status Pagamento", kind: "column" },

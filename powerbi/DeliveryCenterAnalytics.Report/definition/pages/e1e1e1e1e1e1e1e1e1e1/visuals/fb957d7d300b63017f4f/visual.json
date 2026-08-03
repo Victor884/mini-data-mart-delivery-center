@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
   "name": "fb957d7d300b63017f4f",
   "position": {
-    "x": 16,
-    "y": 82,
-    "z": 6000,
-    "height": 34,
-    "width": 208,
-    "tabOrder": 6000
+    "x": 20,
+    "y": 252,
+    "z": 5000,
+    "height": 28,
+    "width": 196,
+    "tabOrder": 5000
   },
   "visual": {
     "visualType": "textbox",
@@ -19,12 +19,12 @@
               {
                 "textRuns": [
                   {
-                    "value": "Filtros",
+                    "value": "FILTROS",
                     "textStyle": {
                       "fontFamily": "Segoe UI Semibold",
-                      "fontSize": "15px",
+                      "fontSize": "11px",
                       "fontWeight": "bold",
-                      "color": "#172033"
+                      "color": "#F5F7FF"
                     }
                   }
                 ],
@@ -36,8 +36,8 @@
                     "value": "Contexto da página",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
-                      "fontSize": "9px",
-                      "color": "#64748B"
+                      "fontSize": "8px",
+                      "color": "#9BA8C7"
                     }
                   }
                 ],
@@ -77,7 +77,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#FFFFFF'"
+                      "Value": "'#141B2F'"
                     }
                   }
                 }
@@ -108,7 +108,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#DDE5EF'"
+                      "Value": "'#293451'"
                     }
                   }
                 }
@@ -194,7 +194,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#172033'"
+                      "Value": "'#020617'"
                     }
                   }
                 }
@@ -203,21 +203,21 @@
             "transparency": {
               "expr": {
                 "Literal": {
-                  "Value": "90D"
+                  "Value": "68D"
                 }
               }
             },
             "shadowBlur": {
               "expr": {
                 "Literal": {
-                  "Value": "8D"
+                  "Value": "12D"
                 }
               }
             },
             "shadowDistance": {
               "expr": {
                 "Literal": {
-                  "Value": "2D"
+                  "Value": "4D"
                 }
               }
             }
@@ -239,7 +239,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#64748B'"
+                      "Value": "'#9BA8C7'"
                     }
                   }
                 }
@@ -261,7 +261,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Filtros. Contexto da página'"
+                  "Value": "'FILTROS. Contexto da página'"
                 }
               }
             }

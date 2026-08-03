@@ -89,11 +89,13 @@ let pageNavigators = 0;
 let clearFilterButtons = 0;
 let canvasTooltips = 0;
 let donutVisuals = 0;
+let sidebarShapes = 0;
 for (const path of visualFiles) {
   const visual = JSON.parse(readFileSync(path, "utf8"));
   const type = visual.visual?.visualType;
   if (type === "htmlContent443BE3AD55E043BF878BED274D3A6865") htmlVisuals += 1;
   if (type === "pageNavigator") pageNavigators += 1;
+  if (type === "shape") sidebarShapes += 1;
   if (type === "donutChart" || type === "pieChart") donutVisuals += 1;
   const linkType = visual.visual?.visualContainerObjects?.visualLink?.[0]?.properties?.type?.expr?.Literal?.Value;
   if (linkType === "'ClearAllSlicers'") clearFilterButtons += 1;
@@ -123,7 +125,7 @@ for (const path of visualFiles) {
   assert(position.x + position.width <= page.width, `Visual ultrapassa a largura da página em ${path}`);
   assert(position.y + position.height <= page.height, `Visual ultrapassa a altura da página em ${path}`);
   const pageLayouts = visualLayoutsByPage.get(pageName) ?? [];
-  pageLayouts.push({ path, position });
+  pageLayouts.push({ path, position, visualType: visual.visual?.visualType });
   visualLayoutsByPage.set(pageName, pageLayouts);
 
   if (visual.visual?.visualType === "pageNavigator") {
@@ -144,7 +146,8 @@ for (const [pageName, layouts] of visualLayoutsByPage) {
     for (let right = left + 1; right < layouts.length; right += 1) {
       const a = layouts[left].position;
       const b = layouts[right].position;
-      const overlaps = a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
+      const isBackgroundShape = layouts[left].visualType === "shape" || layouts[right].visualType === "shape";
+      const overlaps = !isBackgroundShape && a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
       assert(!overlaps, `Visuais sobrepostos na página ${pageName}: ${layouts[left].path} e ${layouts[right].path}`);
     }
   }
@@ -156,8 +159,9 @@ assert(pageFiles.length === 9, `Esperadas 9 páginas; encontradas ${pageFiles.le
 assert(pages.filter((page) => page.type === "Tooltip").length === 4, "Esperadas 4 páginas de tooltip");
 assert(pages.filter((page) => page.visibility !== "HiddenInViewMode").length === 5, "Esperadas 5 páginas visíveis");
 assert(pages.filter((page) => page.type === "Tooltip").every((page) => page.width === 320 && page.height === 240), "Tooltip fora do tamanho 320 × 240");
-assert(visualFiles.length === 97, `Esperados 97 visuais; encontrados ${visualFiles.length}`);
+assert(visualFiles.length === 102, `Esperados 102 visuais; encontrados ${visualFiles.length}`);
 assert(htmlVisuals === 7, `Esperados 7 visuais HTML; encontrados ${htmlVisuals}`);
+assert(sidebarShapes === 5, `Esperados 5 painéis laterais; encontrados ${sidebarShapes}`);
 assert(pageNavigators === 5, `Esperados 5 navegadores de página; encontrados ${pageNavigators}`);
 assert(clearFilterButtons === 5, `Esperados 5 botões de limpeza; encontrados ${clearFilterButtons}`);
 assert(canvasTooltips >= 8, `Esperados ao menos 8 gráficos com tooltip de página; encontrados ${canvasTooltips}`);

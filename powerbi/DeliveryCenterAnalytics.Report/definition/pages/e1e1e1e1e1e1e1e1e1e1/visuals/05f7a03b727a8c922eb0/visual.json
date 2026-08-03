@@ -3,11 +3,11 @@
   "name": "05f7a03b727a8c922eb0",
   "position": {
     "x": 20,
-    "y": 12,
-    "z": 2000,
+    "y": 18,
+    "z": 3000,
     "height": 42,
-    "width": 290,
-    "tabOrder": 2000
+    "width": 196,
+    "tabOrder": 3000
   },
   "visual": {
     "visualType": "textbox",
@@ -19,12 +19,12 @@
               {
                 "textRuns": [
                   {
-                    "value": "Delivery Center Analytics",
+                    "value": "Delivery Center",
                     "textStyle": {
                       "fontFamily": "Segoe UI Semibold",
-                      "fontSize": "20px",
+                      "fontSize": "17px",
                       "fontWeight": "bold",
-                      "color": "#172033"
+                      "color": "#F5F7FF"
                     }
                   }
                 ],
@@ -33,11 +33,11 @@
               {
                 "textRuns": [
                   {
-                    "value": "PostgreSQL · schema mart",
+                    "value": "ANALYTICS · POSTGRESQL",
                     "textStyle": {
                       "fontFamily": "Segoe UI",
-                      "fontSize": "9px",
-                      "color": "#64748B"
+                      "fontSize": "8px",
+                      "color": "#9BA8C7"
                     }
                   }
                 ],
@@ -77,7 +77,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#FFFFFF'"
+                      "Value": "'#141B2F'"
                     }
                   }
                 }
@@ -108,7 +108,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#DDE5EF'"
+                      "Value": "'#293451'"
                     }
                   }
                 }
@@ -194,7 +194,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#172033'"
+                      "Value": "'#020617'"
                     }
                   }
                 }
@@ -203,21 +203,21 @@
             "transparency": {
               "expr": {
                 "Literal": {
-                  "Value": "90D"
+                  "Value": "68D"
                 }
               }
             },
             "shadowBlur": {
               "expr": {
                 "Literal": {
-                  "Value": "8D"
+                  "Value": "12D"
                 }
               }
             },
             "shadowDistance": {
               "expr": {
                 "Literal": {
-                  "Value": "2D"
+                  "Value": "4D"
                 }
               }
             }
@@ -239,7 +239,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#64748B'"
+                      "Value": "'#9BA8C7'"
                     }
                   }
                 }
@@ -261,7 +261,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Delivery Center Analytics. PostgreSQL · schema mart'"
+                  "Value": "'Delivery Center. ANALYTICS · POSTGRESQL'"
                 }
               }
             }

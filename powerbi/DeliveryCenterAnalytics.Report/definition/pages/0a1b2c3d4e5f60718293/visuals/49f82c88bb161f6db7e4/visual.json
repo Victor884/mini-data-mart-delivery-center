@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
   "name": "49f82c88bb161f6db7e4",
   "position": {
-    "x": 330,
-    "y": 10,
-    "z": 3000,
-    "height": 46,
-    "width": 750,
-    "tabOrder": 3000
+    "x": 16,
+    "y": 74,
+    "z": 4000,
+    "height": 166,
+    "width": 208,
+    "tabOrder": 4000
   },
   "visual": {
     "visualType": "pageNavigator",
@@ -18,14 +18,14 @@
             "rowCount": {
               "expr": {
                 "Literal": {
-                  "Value": "1L"
+                  "Value": "5L"
                 }
               }
             },
             "cellPadding": {
               "expr": {
                 "Literal": {
-                  "Value": "5L"
+                  "Value": "4L"
                 }
               }
             }
@@ -97,7 +97,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#FFFFFF'"
+                      "Value": "'#101627'"
                     }
                   }
                 }
@@ -129,7 +129,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#F8FAFC'"
+                      "Value": "'#1A2340'"
                     }
                   }
                 }
@@ -161,7 +161,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#E8F0FF'"
+                      "Value": "'#28204A'"
                     }
                   }
                 }
@@ -195,7 +195,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#DDE5EF'"
+                      "Value": "'#293451'"
                     }
                   }
                 }
@@ -234,7 +234,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#2563EB'"
+                      "Value": "'#8B5CF6'"
                     }
                   }
                 }
@@ -280,7 +280,7 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "10D"
+                  "Value": "9D"
                 }
               }
             },
@@ -296,7 +296,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#64748B'"
+                      "Value": "'#9BA8C7'"
                     }
                   }
                 }
@@ -305,7 +305,7 @@
             "horizontalAlignment": {
               "expr": {
                 "Literal": {
-                  "Value": "'center'"
+                  "Value": "'left'"
                 }
               }
             },
@@ -340,7 +340,7 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "10D"
+                  "Value": "9D"
                 }
               }
             },
@@ -356,7 +356,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#2563EB'"
+                      "Value": "'#F5F7FF'"
                     }
                   }
                 }
@@ -365,7 +365,7 @@
             "horizontalAlignment": {
               "expr": {
                 "Literal": {
-                  "Value": "'center'"
+                  "Value": "'left'"
                 }
               }
             },
@@ -395,7 +395,7 @@
             "position": {
               "expr": {
                 "Literal": {
-                  "Value": "'Bottom'"
+                  "Value": "'Left'"
                 }
               }
             },
@@ -404,7 +404,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#2563EB'"
+                      "Value": "'#22D3EE'"
                     }
                   }
                 }
@@ -420,7 +420,7 @@
             "width": {
               "expr": {
                 "Literal": {
-                  "Value": "3D"
+                  "Value": "4D"
                 }
               }
             }
@@ -457,7 +457,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#FFFFFF'"
+                      "Value": "'#141B2F'"
                     }
                   }
                 }
@@ -488,7 +488,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#DDE5EF'"
+                      "Value": "'#293451'"
                     }
                   }
                 }
@@ -574,7 +574,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#172033'"
+                      "Value": "'#020617'"
                     }
                   }
                 }
@@ -583,21 +583,21 @@
             "transparency": {
               "expr": {
                 "Literal": {
-                  "Value": "90D"
+                  "Value": "68D"
                 }
               }
             },
             "shadowBlur": {
               "expr": {
                 "Literal": {
-                  "Value": "8D"
+                  "Value": "12D"
                 }
               }
             },
             "shadowDistance": {
               "expr": {
                 "Literal": {
-                  "Value": "2D"
+                  "Value": "4D"
                 }
               }
             }
@@ -619,7 +619,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#64748B'"
+                      "Value": "'#9BA8C7'"
                     }
                   }
                 }

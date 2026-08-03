@@ -1,16 +1,16 @@
 # Páginas e experiência analítica
 
-As cinco páginas visíveis usam canvas `1280 × 720`, modo `FitToPage`, tema claro e uma grade comum: marca e navegação no topo, título e contexto, faixa de filtros, KPIs e análise detalhada. As quatro páginas de tooltip usam `320 × 240` em tamanho real.
+As cinco páginas visíveis usam canvas `1280 × 720`, modo `FitToPage` e tema dark premium. A grade comum combina sidebar fixa de 224 px com navegação e filtros, enquanto o conteúdo à direita segue `título → KPIs → tendência → diagnóstico → detalhe`. As quatro páginas de tooltip usam `320 × 240` em tamanho real.
 
 ## Elementos comuns
 
-- navegador de páginas com estado ativo e páginas de tooltip ocultas;
+- navegador vertical na sidebar, com estado ativo ciano/roxo e páginas de tooltip ocultas;
 - botão `Limpar filtros` com ação nativa `ClearAllSlicers`;
-- filtros com fonte e altura padronizadas e busca visual configurada;
+- filtros na sidebar com altura mínima de 76 px e busca visual configurada;
 - títulos, unidades, moeda, percentual e casas decimais consistentes;
 - descrições alternativas em todos os visuais;
 - gráficos nativos para interação; HTML apenas para síntese;
-- bordas discretas, sombras leves e cores semânticas constantes.
+- superfícies azul-marinho, bordas frias, sombras profundas e cores semânticas constantes.
 
 ## 01 Visão Executiva
 

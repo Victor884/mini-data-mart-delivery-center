@@ -8,14 +8,14 @@ Data da execução: **2 de agosto de 2026**.
 - 10 de 10 consultas M executadas no PostgreSQL: **OK**;
 - validação estática própria: **OK**;
 - schemas oficiais PBIR/JSON: **0 erros**;
-- 11 tabelas, 20 relacionamentos, 54 medidas, 9 páginas e 97 visuais;
+- 11 tabelas, 20 relacionamentos, 54 medidas, 9 páginas e 102 visuais;
 - 5 páginas visíveis e 4 páginas de tooltip em `320 × 240`;
-- 7 componentes HTML/CSS, 5 navegadores e 5 botões para limpar slicers;
-- todos os 97 visuais dentro do canvas, sem sobreposição geométrica;
+- 7 componentes HTML/CSS, 5 sidebars, 5 navegadores e 5 botões para limpar slicers;
+- todos os 102 visuais dentro do canvas; sobreposição permitida somente para a forma de fundo da sidebar;
 - navegadores sem páginas ocultas/tooltips e referências de tooltip válidas;
 - credenciais armazenadas: **nenhuma**.
 
-O validador oficial retorna sete avisos `PBIR_VISUAL_TYPE_UNKNOWN`, um para cada instância de **HTML Content (lite)**. É um aviso de catálogo do CLI para o visual customizado; não há erro de schema ou estrutura.
+O validador oficial retorna sete avisos `PBIR_VISUAL_TYPE_UNKNOWN`, um para cada instância de **HTML Content (lite)**. É um aviso de catálogo do CLI para o visual customizado; não há erro de schema, formatação ou estrutura.
 
 ## Baselines principais
 

@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
   "name": "32fbc7e8db6668fe6d1c",
   "position": {
-    "x": 240,
-    "y": 74,
-    "z": 5000,
-    "height": 46,
-    "width": 1024,
-    "tabOrder": 5000
+    "x": 244,
+    "y": 20,
+    "z": 7000,
+    "height": 50,
+    "width": 1020,
+    "tabOrder": 7000
   },
   "visual": {
     "visualType": "textbox",
@@ -22,9 +22,9 @@
                     "value": "Pedidos & Operação",
                     "textStyle": {
                       "fontFamily": "Segoe UI Semibold",
-                      "fontSize": "21px",
+                      "fontSize": "23px",
                       "fontWeight": "bold",
-                      "color": "#172033"
+                      "color": "#F5F7FF"
                     }
                   }
                 ],
@@ -37,7 +37,7 @@
                     "textStyle": {
                       "fontFamily": "Segoe UI",
                       "fontSize": "10px",
-                      "color": "#64748B"
+                      "color": "#9BA8C7"
                     }
                   }
                 ],
@@ -77,7 +77,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#FFFFFF'"
+                      "Value": "'#141B2F'"
                     }
                   }
                 }
@@ -108,7 +108,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#DDE5EF'"
+                      "Value": "'#293451'"
                     }
                   }
                 }
@@ -194,7 +194,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#172033'"
+                      "Value": "'#020617'"
                     }
                   }
                 }
@@ -203,21 +203,21 @@
             "transparency": {
               "expr": {
                 "Literal": {
-                  "Value": "90D"
+                  "Value": "68D"
                 }
               }
             },
             "shadowBlur": {
               "expr": {
                 "Literal": {
-                  "Value": "8D"
+                  "Value": "12D"
                 }
               }
             },
             "shadowDistance": {
               "expr": {
                 "Literal": {
-                  "Value": "2D"
+                  "Value": "4D"
                 }
               }
             }
@@ -239,7 +239,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#64748B'"
+                      "Value": "'#9BA8C7'"
                     }
                   }
                 }

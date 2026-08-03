@@ -1,16 +1,18 @@
 :root {
-  --dc-canvas: #f4f7fb;
-  --dc-surface: #ffffff;
-  --dc-surface-alt: #f8fafc;
-  --dc-border: #dde5ef;
-  --dc-text: #172033;
-  --dc-muted: #64748b;
-  --dc-teal: #0f766e;
-  --dc-blue: #2563eb;
-  --dc-purple: #6d5bd0;
-  --dc-green: #15803d;
-  --dc-amber: #d97706;
-  --dc-red: #be123c;
+  --dc-canvas: #090d18;
+  --dc-sidebar: #101627;
+  --dc-surface: #141b2f;
+  --dc-surface-alt: #1a2340;
+  --dc-border: #293451;
+  --dc-text: #f5f7ff;
+  --dc-muted: #9ba8c7;
+  --dc-teal: #22d3ee;
+  --dc-blue: #3b82f6;
+  --dc-purple: #8b5cf6;
+  --dc-magenta: #d946ef;
+  --dc-green: #10b981;
+  --dc-amber: #f59e0b;
+  --dc-red: #fb7185;
 }
 
 .dc-panel {
@@ -23,7 +25,7 @@
   background: var(--dc-surface);
   border: 1px solid var(--dc-border);
   border-radius: 12px;
-  box-shadow: 0 4px 16px rgb(23 32 51 / 8%);
+  box-shadow: 0 8px 24px rgb(2 6 23 / 32%);
 }
 
 .dc-kpi-grid {

@@ -1,77 +1,89 @@
-# Contrato visual — redesign 2026
+# Contrato visual — dark premium 2026
 
 ## Aprovação
 
 - Status: **aprovado**.
-- Resposta registrada: `sim`.
+- Resposta registrada: `pode aplicar`.
 - Data: 02/08/2026.
-- Escopo aprovado: direção visual desktop, continuação mobile e implementação integral do relatório.
-- Conceito desktop: [`assets/redesign-desktop-approved.png`](assets/redesign-desktop-approved.png).
-- Conceito mobile: [`assets/redesign-mobile-approved.png`](assets/redesign-mobile-approved.png).
+- Escopo: identidade dark premium, menu lateral, cards, gráficos e continuidade mobile.
+- Referências fornecidas pelo usuário:
+  - [`assets/reference-dark-crm.png`](assets/reference-dark-crm.png);
+  - [`assets/reference-dark-admin.png`](assets/reference-dark-admin.png);
+  - [`assets/reference-dark-neon.png`](assets/reference-dark-neon.png).
+- Continuidade mobile: estrutura do conceito [`assets/redesign-mobile-approved.png`](assets/redesign-mobile-approved.png), recolorida e reorganizada com os tokens dark.
 
-Os conceitos são referências de composição. Valores, rótulos, eixos, tabelas, filtros e estados são implementados como elementos editáveis e vinculados ao modelo, nunca como imagem de fundo.
+As referências são estudos de princípios, não modelos para cópia. Marca, conteúdo fictício, avatares, ícones decorativos e dados rasterizados não entram no relatório.
 
 ## Evidência protegida
 
-O relatório deve responder, em ordem: qual é o resultado geral, como ele evolui, onde existe desvio e qual registro explica o desvio.
+O relatório deve responder, nesta ordem: qual é o resultado, como ele evolui, onde existe desvio e qual registro explica o desvio.
 
-Invariantes que a implementação não pode violar:
+Invariantes:
 
 - valor transacionado considera pedidos finalizados;
 - ticket médio é valor transacionado dividido por pedidos finalizados;
 - margem de entrega é monetária e pode ser negativa;
-- percentuais são calculados a partir dos numeradores e denominadores, sem média de percentuais;
-- entregas usam a última tentativa por pedido quando indicado pelas medidas;
-- conciliação mantém uma linha por pedido, sem fanout de pagamentos;
-- P50 e P90 são percentis históricos em minutos e não representam SLA;
-- o período disponível é de 01/01/2021 a 30/04/2021;
-- as 20 relações existentes e suas direções permanecem inalteradas.
+- percentuais usam numerador e denominador no contexto atual;
+- logística usa a última tentativa quando a medida exige desfecho por pedido;
+- conciliação mantém uma linha por pedido, sem fanout;
+- P50 e P90 são percentis históricos, não SLA;
+- período disponível: 01/01/2021 a 30/04/2021;
+- as 20 relações e suas direções permanecem inalteradas.
 
 ## Elementos bloqueados
 
-- Página 16:9 com cabeçalho, navegação superior, trilho de filtros e conteúdo analítico.
-- Leitura `resumo → tendência → diagnóstico → detalhe`.
-- Quatro KPIs dominantes no topo das páginas principais.
-- Linha para séries temporais e barras horizontais para rankings ou categorias extensas.
-- Ausência de pizza, donut, velocímetro, 3D, gradientes decorativos e animação ornamental.
-- Paleta com neutros claros, azul para foco, teal para desempenho, âmbar para atenção e rosa para desvio.
-- Margens, espaçamento e alinhamentos consistentes; valores importantes visíveis sem tooltip.
-- Navegação global, limpeza de filtros, drill-through e tooltip de página.
-- Tooltip não interativo, pequeno e complementar; detalhamento interativo fica no drill-through.
+- canvas 16:9 com sidebar escura fixa e conteúdo analítico à direita;
+- menu vertical com página ativa destacada em roxo/ciano;
+- filtros na sidebar e ação explícita para limpar o contexto;
+- KPIs no topo, tendência no centro, diagnóstico e tabela na base;
+- superfícies azul-marinho, bordas frias discretas e sombras profundas;
+- ciano como foco principal, roxo como comparação e rosa/âmbar para risco ou atenção;
+- linhas temporais suaves e barras horizontais para rankings;
+- dados, títulos, eixos, rótulos, tabelas e filtros editáveis e vinculados ao modelo;
+- tooltips de página, filtros cruzados e drill-through por pedido;
+- valores essenciais visíveis sem depender de hover.
 
 ## Elementos flexíveis
 
-- Medidas exatas das colunas da grade e dos cards.
-- Quantidade final de linhas exibidas em cada tabela.
-- Pequenos ajustes de tipografia, altura e espaçamento exigidos pelo renderizador do Power BI.
-- Uso de cartão nativo ou HTML quando ambos preservarem acessibilidade, consulta e hierarquia.
-- Comparação com período anterior apenas quando o contexto possuir base válida; caso contrário, o valor fica ausente, sem inferência.
+- espaçamento exato, tamanho final das fontes e largura relativa dos cards;
+- quantidade de linhas mostradas nas tabelas;
+- intensidade da sombra e saturação dos acentos dentro dos limites de contraste;
+- pequenos ajustes exigidos pelo renderizador do Power BI.
 
-## Sistema visual
+## Paleta
 
 | Papel | Cor | Uso |
 |---|---:|---|
-| Canvas | `#F4F7FB` | plano de fundo |
-| Superfície | `#FFFFFF` | cartões, gráficos e tabelas |
-| Texto principal | `#172033` | títulos e valores |
-| Texto secundário | `#64748B` | contexto e unidades |
-| Borda | `#DDE5EF` | separação discreta |
-| Foco | `#2563EB` | série principal e página ativa |
-| Desempenho | `#0F766E` | taxa positiva ou comparação secundária |
-| Atenção | `#D97706` | P90 e sinais que exigem leitura |
-| Desvio | `#BE123C` | cancelamento, chargeback e margem negativa |
+| Canvas | `#090D18` | fundo geral |
+| Sidebar | `#101627` | navegação e filtros |
+| Superfície | `#141B2F` | gráficos, tabelas e painéis |
+| Superfície elevada | `#1A2340` | KPIs e estados de seleção |
+| Texto | `#F5F7FF` | títulos e valores |
+| Texto secundário | `#9BA8C7` | eixos, contexto e unidades |
+| Borda | `#293451` | separação discreta |
+| Foco | `#22D3EE` | série principal e ícones funcionais |
+| Comparação | `#8B5CF6` | segunda série e página ativa |
+| Apoio | `#3B82F6` | séries auxiliares |
+| Destaque | `#D946EF` | destaque pontual, nunca estado de erro |
+| Favorável | `#10B981` | resultado positivo |
+| Atenção | `#F59E0B` | P90 e leitura cuidadosa |
+| Risco | `#FB7185` | cancelamento, chargeback e margem negativa |
 
-Cor nunca é o único portador de significado: sinal, unidade, rótulo e valor permanecem visíveis.
+Cor nunca é o único portador de significado: rótulo, sinal, unidade e valor permanecem visíveis.
 
 ## Continuação mobile
 
-- Viewport conceitual: 390 × 844 px.
-- Primeira leitura: período, filtro recolhido, KPIs 2 × 2 e tendência principal.
-- Filtros devem abrir em painel e devolver o foco ao visual afetado.
-- Alvos de interação de 44–48 px e nenhuma evidência essencial dependente de hover.
-- O [`mobileState.json` não recebe edição externa suportada](https://learn.microsoft.com/en-us/power-bi/developer/projects/projects-report). A composição mobile aprovada deve ser aplicada no Power BI Desktop/Service com [**Auto-create mobile layout**](https://learn.microsoft.com/en-us/power-bi/create-reports/power-bi-create-mobile-optimized-report-mobile-layout-view) e revisada contra o conceito depois de abrir o PBIP.
+- viewport conceitual: 390 × 844 px;
+- primeira dobra: título, período ativo, KPIs prioritários e tendência principal;
+- menu lateral vira drawer e filtros viram painel recolhível;
+- controles devem devolver o foco ao visual afetado após aplicar, cancelar ou limpar;
+- alvos de interação de 44–48 px e nenhuma evidência essencial dependente de hover;
+- o layout mobile nativo é aplicado no Desktop/Service, pois [`mobileState.json` não oferece edição externa suportada](https://learn.microsoft.com/en-us/power-bi/developer/projects/projects-report).
 
-## Desvios aprovados
+## Desvios deliberados das referências
 
-- O conceito mobile é preservado como referência e checklist, mas seu estado interno não é gerado por script porque a Microsoft não dá suporte à edição externa do arquivo de layout móvel.
-- Não há KPI “dentro do SLA”: o modelo não contém meta de SLA aprovada. A página usa conclusão de entrega, retentativas e P50/P90 sem renomeá-los como SLA.
+- donuts, medidores e barras decorativas não são copiados quando uma barra ou tabela permite comparação mais precisa;
+- não há busca global, notificações, avatar ou download fictício sem função no relatório;
+- glow e gradientes atmosféricos foram substituídos por acentos sólidos e sombra funcional;
+- nenhuma animação ornamental foi adicionada;
+- nenhum KPI de SLA foi criado sem meta aprovada.

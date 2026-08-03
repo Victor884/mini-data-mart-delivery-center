@@ -22,7 +22,7 @@
 | Tooltip apenas padrão | pouco contexto para diagnóstico | página oculta de tooltip e medidas de comparação/participação |
 | Duas medidas HTML começam com `RETURN` sem `VAR` | DAX inválido no Power BI | expressão HTML direta e regra de validação específica |
 | Gradientes nos rankings HTML | cor decorativa e contraste inconsistente | cores sólidas com papéis semânticos |
-| Tema escuro denso para portfólio | reduz espaço aparente e legibilidade de tabelas | tema claro com contraste alto e superfícies discretas |
+| Tema escuro original sem hierarquia suficiente | cards e canvas pareciam uma única massa visual | dark premium com três níveis de superfície, sidebar e acentos funcionais |
 | Títulos descritivos, pouco orientados à pergunta | baixa hierarquia narrativa | título, subtítulo e propósito por página |
 | Ausência de meta de SLA no modelo | risco de interpretação incorreta | não criar `% no SLA`; documentar P50/P90 como percentis |
 
@@ -44,11 +44,11 @@ As medidas e relações existentes devem ser preservadas. Novas medidas podem se
 ## Resultado implementado
 
 - 5 páginas analíticas visíveis e 4 tooltips ocultos;
-- 97 visuais em grade, sem elementos fora do canvas ou sobrepostos;
+- 102 visuais em grade, incluindo cinco formas de fundo para a sidebar;
 - 54 medidas, sendo 7 HTML e 47 analíticas/contextuais;
 - 20 relações preservadas, todas unidirecionais;
 - navegação global, limpeza de slicers e drill-through por pedido;
 - rankings migrados para barras horizontais nativas;
-- tema claro, estados de seleção e texto alternativo em todos os visuais;
+- tema dark premium, estados de seleção e texto alternativo em todos os visuais;
 - 43 baselines e 10 consultas M validados no PostgreSQL;
 - nenhum KPI de SLA inventado.

@@ -42,7 +42,7 @@ A estrutura de dados está implementada e validada até a camada de consumo anal
 | `stg` | 7 tabelas carregadas diretamente dos CSVs |
 | `dw` | 8 dimensões conformadas e 3 tabelas fato |
 | `mart` | 3 views detalhadas e 5 views agregadas |
-| Power BI | 6 dimensões, 4 fatos, 54 medidas, 5 páginas analíticas, 4 tooltips e 97 visuais |
+| Power BI | 6 dimensões, 4 fatos, 54 medidas, 5 páginas analíticas, 4 tooltips e 102 visuais |
 
 Volumes reconciliados entre staging, DW e data marts:
 
@@ -155,7 +155,7 @@ O projeto está em [`powerbi/`](powerbi/README.md) e contém:
 - **04 Entregas & Qualidade**: conclusão, retentativas, ciclo P50/P90, distância e modalidades;
 - **05 Detalhamento**: drill-through com pedido, tentativas de entrega e pagamentos;
 - quatro tooltips dedicados com período anterior, variações e participação;
-- navegação nativa, limpeza de filtros, tema claro em JSON e sete componentes HTML/CSS.
+- sidebar com navegação nativa e filtros, tema dark neon em JSON e sete componentes HTML/CSS.
 
 A estrutura PBIP/PBIR foi validada com **0 erros**. As **10 consultas M** executaram no PostgreSQL e **43 de 43** baselines conferiram. Os 20 relacionamentos e as regras originais de negócio foram preservados. A renderização final ainda deve ser homologada no Power BI Desktop, que não está instalado no ambiente de geração.
 

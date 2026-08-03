@@ -8,8 +8,8 @@ Projeto Power BI em formato PBIP/PBIR, versionável como texto, conectado às vi
 - conexão Import parametrizada, sem credenciais versionadas;
 - 54 medidas DAX, incluindo 7 componentes HTML/CSS;
 - 5 páginas analíticas visíveis e 4 páginas ocultas de tooltip;
-- 97 visuais: KPIs, linhas, barras horizontais, tabelas, filtros, botões e navegação;
-- tema claro `DeliveryCenterPortfolio-20260802.json`;
+- 102 visuais: KPIs, linhas, barras horizontais, tabelas, filtros, botões, sidebar e navegação;
+- tema dark premium `DeliveryCenterDarkNeon-20260802.json`;
 - drill-through por pedido e botão nativo de retorno;
 - tooltips com contexto, período anterior, variação absoluta/percentual e participação;
 - gerador determinístico e três níveis de validação.
@@ -67,6 +67,6 @@ O gerador reconstrói somente os artefatos PBIP/PBIR/TMDL. Documentação, conce
 
 ## Decisões preservadas
 
-O redesign não alterou os 20 relacionamentos, o grão das tabelas nem as medidas existentes de negócio. As medidas adicionadas servem a comparação temporal, participação, tooltips e leitura de etapas. P90 continua sendo um percentil descritivo, não um SLA; nenhum alvo foi inventado sem regra aprovada.
+O redesign não alterou os 20 relacionamentos, o grão das tabelas nem as medidas existentes de negócio. A nova identidade usa sidebar, superfícies azul-marinho e acentos em ciano, roxo e rosa, sem copiar elementos fictícios das referências. P90 continua sendo um percentil descritivo, não um SLA; nenhum alvo foi inventado sem regra aprovada.
 
 O visual HTML customizado emite apenas conteúdo estático. Os elementos que exigem interação ou auditabilidade continuam nativos, mantendo filtros cruzados, drill-through e exportação.

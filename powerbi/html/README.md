@@ -16,7 +16,7 @@ O relatório usa sete medidas HTML na tabela `Métricas`, exibidas pelo visual *
 
 - somente HTML e CSS estáticos;
 - sem JavaScript, formulários, hyperlinks ou recursos externos;
-- cores sólidas e contraste compatível com o tema claro;
+- cores sólidas e contraste compatível com o tema dark premium;
 - valores e rótulos explícitos, sem depender exclusivamente de cor;
 - CSS inline nas medidas, pois o Power BI não carrega esta folha externa.
 
