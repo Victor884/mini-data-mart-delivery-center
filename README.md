@@ -157,20 +157,73 @@ O projeto está em [`powerbi/`](powerbi/README.md) e contém:
 - quatro tooltips HTML dedicados com período anterior, variações e participação;
 - sidebar com navegação vertical nativa e filtros, tema dark neon em JSON e onze componentes HTML/CSS.
 
-A estrutura PBIP/PBIR foi validada com **0 erros**. As **10 consultas M** executaram no PostgreSQL e **43 de 43** baselines conferiram. Os 20 relacionamentos e as regras originais de negócio foram preservados. A renderização final ainda deve ser homologada no Power BI Desktop, que não está instalado no ambiente de geração.
+<p align="center">
+  <img src="powerbi/docs/assets/screenshots/portfolio-cover.png" alt="Delivery Center Analytics — visão executiva do dashboard Power BI" width="100%">
+</p>
+
+<p align="center"><em>Projeto analítico ponta a ponta: PostgreSQL, Data Warehouse dimensional, data marts e Power BI.</em></p>
+
+### Páginas analíticas
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="powerbi/docs/assets/screenshots/executive-overview.png" alt="Página Visão Executiva do Delivery Center Analytics" width="100%"><br>
+      <strong>Visão Executiva</strong><br>
+      Resultado comercial, tendências, ranking de hubs e sinais de saúde operacional.
+    </td>
+    <td width="50%" valign="top">
+      <img src="powerbi/docs/assets/screenshots/orders-overview.png" alt="Página Pedidos e Operação do Delivery Center Analytics" width="100%"><br>
+      <strong>Pedidos &amp; Operação</strong><br>
+      Volume, status, decomposição do ciclo e desempenho operacional por hub.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="powerbi/docs/assets/screenshots/finance-overview.png" alt="Página Desempenho Financeiro do Delivery Center Analytics" width="100%"><br>
+      <strong>Desempenho Financeiro</strong><br>
+      Valor transacionado e pago, conciliação, meios de pagamento e margem de entrega.
+    </td>
+    <td width="50%" valign="top">
+      <img src="powerbi/docs/assets/screenshots/delivery-overview.png" alt="Página Entregas e Qualidade do Delivery Center Analytics" width="100%"><br>
+      <strong>Entregas &amp; Qualidade</strong><br>
+      Conclusão, retentativas, ciclo P50/P90, modalidades e hubs críticos.
+    </td>
+  </tr>
+</table>
+
+<details>
+  <summary><strong>Ver os tooltips analíticos</strong></summary>
+  <br>
+  <table>
+    <tr>
+      <td width="50%"><img src="powerbi/docs/assets/screenshots/executive-tooltip.png" alt="Tooltip analítico da Visão Executiva" width="100%"></td>
+      <td width="50%"><img src="powerbi/docs/assets/screenshots/orders-tooltip.png" alt="Tooltip analítico de Pedidos e Operação" width="100%"></td>
+    </tr>
+    <tr>
+      <td width="50%"><img src="powerbi/docs/assets/screenshots/finance-tooltip.png" alt="Tooltip analítico de Desempenho Financeiro" width="100%"></td>
+      <td width="50%"><img src="powerbi/docs/assets/screenshots/delivery-tooltip.png" alt="Tooltip analítico de Entregas e Qualidade" width="100%"></td>
+    </tr>
+  </table>
+</details>
+
+> A capa possui apenas tratamento editorial de apresentação. As capturas da galeria são imagens originais do Power BI Desktop, preservadas sem alteração de valores ou elementos do relatório.
+
+A estrutura PBIP/PBIR foi validada com **0 erros**. As **10 consultas M** executaram no PostgreSQL e **43 de 43** baselines conferiram. Os 20 relacionamentos e as regras originais de negócio foram preservados. A homologação visual no Power BI Desktop confirmou a renderização das páginas, a sidebar corrigida e os tooltips contextuais.
+
+O texto, a seleção de imagens e o checklist para divulgação estão em [`docs/LINKEDIN_PUBLICACAO.md`](docs/LINKEDIN_PUBLICACAO.md).
 
 ---
 
 ## 🚀 Próximos Passos
 
-1. **Homologar no Power BI Desktop**:
-   * Atualizar o modelo com as credenciais locais.
-   * Conferir HTML Content (lite), navegação, limpeza de filtros, tooltips, cross-filter e drill-through.
-   * Criar o layout mobile nativo a partir do conceito aprovado e registrar capturas das cinco páginas.
-2. **Preparar a publicação**:
+1. **Preparar a publicação no Power BI Service/Fabric**:
    * Configurar gateway para o PostgreSQL.
    * Definir atualização agendada e política do visual customizado no tenant.
    * Implementar RLS quando houver uma regra de acesso aprovada.
+2. **Concluir a experiência multiplataforma**:
+   * Criar e homologar o layout mobile nativo das cinco páginas.
+   * Validar navegação, filtros, tooltips e drill-through após a publicação no tenant.
 3. **Definir metas operacionais**:
    * Avaliar as séries semanais e mensais dos KPIs.
    * Aprovar limites de SLA e metas por hub antes de classificar performance.
