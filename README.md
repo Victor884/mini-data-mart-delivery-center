@@ -211,8 +211,6 @@ O projeto está em [`powerbi/`](powerbi/README.md) e contém:
 
 A estrutura PBIP/PBIR foi validada com **0 erros**. As **10 consultas M** executaram no PostgreSQL e **43 de 43** baselines conferiram. Os 20 relacionamentos e as regras originais de negócio foram preservados. A homologação visual no Power BI Desktop confirmou a renderização das páginas, a sidebar corrigida e os tooltips contextuais.
 
-O texto, a seleção de imagens e o checklist para divulgação estão em [`docs/LINKEDIN_PUBLICACAO.md`](docs/LINKEDIN_PUBLICACAO.md).
-
 ---
 
 ## 🚀 Próximos Passos
