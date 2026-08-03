@@ -1,10 +1,11 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
   "name": "102030405060708090ab",
-  "displayName": "02 Logística",
+  "displayName": "04 Entregas & Qualidade",
   "displayOption": "FitToPage",
   "height": 720,
   "width": 1280,
+  "visibility": "AlwaysVisible",
   "objects": {
     "background": [
       {
@@ -14,7 +15,7 @@
               "color": {
                 "expr": {
                   "Literal": {
-                    "Value": "'#08111F'"
+                    "Value": "'#F4F7FB'"
                   }
                 }
               }
@@ -38,7 +39,7 @@
               "color": {
                 "expr": {
                   "Literal": {
-                    "Value": "'#050A12'"
+                    "Value": "'#E8EEF6'"
                   }
                 }
               }

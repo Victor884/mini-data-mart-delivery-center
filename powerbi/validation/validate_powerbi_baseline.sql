@@ -3,7 +3,10 @@
 -- Taxas são armazenadas como frações, assim como no DAX.
 
 SET TIME ZONE 'America/Sao_Paulo';
+SET max_parallel_workers_per_gather = 0;
+SET work_mem = '4MB';
 
+CREATE TEMP TABLE powerbi_validation_results AS
 WITH
 pedidos AS (
     SELECT
@@ -21,6 +24,56 @@ tempos AS (
     FROM mart.vw_pedidos_enriquecidos
     WHERE order_status = 'FINISHED'
       AND tempo_ciclo_total_minutos >= 0
+),
+etapas AS (
+    SELECT
+        AVG(tempo_producao_minutos)
+            FILTER (WHERE order_status = 'FINISHED' AND tempo_producao_minutos >= 0) AS producao_media,
+        AVG(tempo_transito_minutos)
+            FILTER (WHERE order_status = 'FINISHED' AND tempo_transito_minutos >= 0) AS transito_medio
+    FROM mart.vw_pedidos_enriquecidos
+),
+periodo_anterior AS (
+    SELECT
+        COUNT(*)::numeric AS pedidos,
+        SUM(valor_total_pedido) FILTER (WHERE order_status = 'FINISHED') AS valor_transacionado
+    FROM mart.vw_pedidos_enriquecidos
+    WHERE data_completa BETWEEN DATE '2021-01-01' AND DATE '2021-03-31'
+),
+pagamento_anterior AS (
+    SELECT SUM(valor_pagamento) FILTER (WHERE payment_status = 'PAID') AS valor_pago
+    FROM mart.vw_pagamentos_enriquecidos
+    WHERE data_completa BETWEEN DATE '2021-01-01' AND DATE '2021-03-31'
+),
+participacoes AS (
+    SELECT
+        (
+            SELECT SUM(valor_total_pedido) FILTER (WHERE order_status = 'FINISHED')
+            FROM mart.vw_pedidos_enriquecidos
+            WHERE hub_name = 'GOLDEN SHOPPING'
+        ) / NULLIF((SELECT valor_transacionado FROM pedidos), 0) AS participacao_valor_hub,
+        (
+            SELECT COUNT(*)::numeric
+            FROM mart.vw_pedidos_enriquecidos
+            WHERE hub_name = 'GOLDEN SHOPPING'
+        ) / NULLIF((SELECT pedidos_criados FROM pedidos), 0) AS participacao_pedidos_hub,
+        (
+            SELECT COUNT(DISTINCT sk_pedido)::numeric
+            FROM mart.vw_entregas_enriquecidas
+            WHERE eh_ultima_tentativa AND hub_name = 'GOLDEN SHOPPING'
+        ) / NULLIF((
+            SELECT COUNT(DISTINCT sk_pedido)::numeric
+            FROM mart.vw_entregas_enriquecidas
+            WHERE eh_ultima_tentativa
+        ), 0) AS participacao_entregas_hub,
+        (
+            SELECT SUM(valor_pagamento) FILTER (WHERE payment_status = 'PAID')
+            FROM mart.vw_pagamentos_enriquecidos
+            WHERE payment_method = 'ONLINE'
+        ) / NULLIF((
+            SELECT SUM(valor_pagamento) FILTER (WHERE payment_status = 'PAID')
+            FROM mart.vw_pagamentos_enriquecidos
+        ), 0) AS participacao_pago_online
 ),
 entregas AS (
     SELECT
@@ -77,6 +130,14 @@ observado AS (
             ('Margem Entrega', (SELECT margem_entrega FROM pedidos)),
             ('Tempo Ciclo P50', (SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY ciclo) FROM tempos)),
             ('Tempo Ciclo P90', (SELECT PERCENTILE_CONT(0.9) WITHIN GROUP (ORDER BY ciclo) FROM tempos)),
+            ('Tempo Produção Médio', (SELECT producao_media FROM etapas)),
+            ('Tempo Trânsito Médio', (SELECT transito_medio FROM etapas)),
+            ('Valor Transacionado Mês Anterior', (SELECT valor_transacionado FROM periodo_anterior)),
+            ('Variação Absoluta Valor Mensal', (SELECT valor_transacionado FROM pedidos) - (SELECT valor_transacionado FROM periodo_anterior)),
+            ('Variação Valor Mensal', ((SELECT valor_transacionado FROM pedidos) - (SELECT valor_transacionado FROM periodo_anterior)) / NULLIF((SELECT valor_transacionado FROM periodo_anterior), 0)),
+            ('Pedidos Mês Anterior', (SELECT pedidos FROM periodo_anterior)),
+            ('Variação Absoluta Pedidos Mensal', (SELECT pedidos_criados FROM pedidos) - (SELECT pedidos FROM periodo_anterior)),
+            ('Variação Pedidos Mensal', ((SELECT pedidos_criados FROM pedidos) - (SELECT pedidos FROM periodo_anterior)) / NULLIF((SELECT pedidos FROM periodo_anterior), 0)),
             ('Pedidos com Entrega', (SELECT pedidos_com_entrega FROM entregas)),
             ('Entregas Concluídas', (SELECT entregas_concluidas FROM entregas)),
             ('Taxa Entrega Concluída', (SELECT entregas_concluidas / NULLIF(pedidos_com_entrega, 0) FROM entregas)),
@@ -89,11 +150,18 @@ observado AS (
             ('Valor Líquido Pago', (SELECT valor_liquido_pago FROM pagamentos)),
             ('Chargebacks', (SELECT chargebacks FROM pagamentos)),
             ('Valor Chargeback', (SELECT valor_chargeback FROM pagamentos)),
+            ('Valor Pago Mês Anterior', (SELECT valor_pago FROM pagamento_anterior)),
+            ('Variação Absoluta Valor Pago Mensal', (SELECT valor_pago FROM pagamentos) - (SELECT valor_pago FROM pagamento_anterior)),
+            ('Variação Valor Pago Mensal', ((SELECT valor_pago FROM pagamentos) - (SELECT valor_pago FROM pagamento_anterior)) / NULLIF((SELECT valor_pago FROM pagamento_anterior), 0)),
             ('Pedidos Finalizados Conciliação', (SELECT pedidos_finalizados FROM conciliacao)),
             ('Pedidos Conciliados', (SELECT pedidos_conciliados FROM conciliacao)),
             ('Taxa Conciliação', (SELECT pedidos_conciliados / NULLIF(pedidos_finalizados, 0) FROM conciliacao)),
             ('Diferença Absoluta Conciliação', (SELECT diferenca_absoluta FROM conciliacao)),
-            ('Pedidos sem Pagamento Pago', (SELECT pedidos_sem_pagamento_pago FROM conciliacao))
+            ('Pedidos sem Pagamento Pago', (SELECT pedidos_sem_pagamento_pago FROM conciliacao)),
+            ('Participação Valor Transacionado', (SELECT participacao_valor_hub FROM participacoes)),
+            ('Participação Pedidos', (SELECT participacao_pedidos_hub FROM participacoes)),
+            ('Participação Pedidos com Entrega', (SELECT participacao_entregas_hub FROM participacoes)),
+            ('Participação Valor Pago', (SELECT participacao_pago_online FROM participacoes))
     ) AS v(medida, valor)
 ),
 referencia AS (
@@ -111,6 +179,14 @@ referencia AS (
             ('Margem Entrega', -434905.63, 0.01),
             ('Tempo Ciclo P50', 42.18, 0.001),
             ('Tempo Ciclo P90', 83.17, 0.001),
+            ('Tempo Produção Médio', 61.7122888708, 0.000001),
+            ('Tempo Trânsito Médio', 46.5463322280, 0.000001),
+            ('Valor Transacionado Mês Anterior', 26007185.14, 0.01),
+            ('Variação Absoluta Valor Mensal', 11474173.83, 0.01),
+            ('Variação Valor Mensal', 0.4411924539, 0.0000001),
+            ('Pedidos Mês Anterior', 260165.0, 0.0),
+            ('Variação Absoluta Pedidos Mensal', 108834.0, 0.0),
+            ('Variação Pedidos Mensal', 0.4183268310, 0.0000001),
             ('Pedidos com Entrega', 358654.0, 0.0),
             ('Entregas Concluídas', 351310.0, 0.0),
             ('Taxa Entrega Concluída', 0.979523, 0.000001),
@@ -123,11 +199,18 @@ referencia AS (
             ('Valor Líquido Pago', 36550868.93, 0.01),
             ('Chargebacks', 438.0, 0.0),
             ('Valor Chargeback', 7160.50, 0.01),
+            ('Valor Pago Mês Anterior', 25891039.08, 0.01),
+            ('Variação Absoluta Valor Pago Mensal', 11413193.70, 0.01),
+            ('Variação Valor Pago Mensal', 0.4408163637, 0.0000001),
             ('Pedidos Finalizados Conciliação', 352020.0, 0.0),
             ('Pedidos Conciliados', 340056.0, 0.0),
             ('Taxa Conciliação', 0.9660132947, 0.0000001),
             ('Diferença Absoluta Conciliação', 465576.41, 0.01),
-            ('Pedidos sem Pagamento Pago', 2133.0, 0.0)
+            ('Pedidos sem Pagamento Pago', 2133.0, 0.0),
+            ('Participação Valor Transacionado', 0.1058636378, 0.0000001),
+            ('Participação Pedidos', 0.1215938255, 0.0000001),
+            ('Participação Pedidos com Entrega', 0.1217635939, 0.0000001),
+            ('Participação Valor Pago', 0.8539071399, 0.0000001)
     ) AS v(medida, esperado, tolerancia)
 )
 SELECT
@@ -144,6 +227,8 @@ FROM observado AS o
 INNER JOIN referencia AS r USING (medida)
 ORDER BY o.medida;
 
+TABLE powerbi_validation_results ORDER BY medida;
+
 -- Toda medida deve retornar OK. Este bloco interrompe a execução se houver desvio.
 DO $$
 DECLARE
@@ -158,5 +243,13 @@ BEGIN
             'Baseline inválido: pedidos=%, conciliação=%',
             qtd_pedidos,
             qtd_conciliacao;
+    END IF;
+
+    IF EXISTS (
+        SELECT 1
+        FROM powerbi_validation_results
+        WHERE resultado <> 'OK'
+    ) THEN
+        RAISE EXCEPTION 'Há baselines Power BI divergentes';
     END IF;
 END $$;

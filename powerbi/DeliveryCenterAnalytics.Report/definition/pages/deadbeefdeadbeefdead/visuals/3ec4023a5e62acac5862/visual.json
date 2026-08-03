@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
   "name": "3ec4023a5e62acac5862",
   "position": {
-    "x": 648,
-    "y": 400,
-    "z": 7000,
-    "height": 296,
-    "width": 608,
-    "tabOrder": 7000
+    "x": 756,
+    "y": 416,
+    "z": 13000,
+    "height": 288,
+    "width": 508,
+    "tabOrder": 13000
   },
   "visual": {
     "visualType": "tableEx",
@@ -133,7 +133,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#15233A'"
+                      "Value": "'#F8FAFC'"
                     }
                   }
                 }
@@ -144,7 +144,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#F8FAFC'"
+                      "Value": "'#172033'"
                     }
                   }
                 }
@@ -168,7 +168,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#F8FAFC'"
+                      "Value": "'#172033'"
                     }
                   }
                 }
@@ -179,7 +179,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#F8FAFC'"
+                      "Value": "'#172033'"
                     }
                   }
                 }
@@ -190,7 +190,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#101B2D'"
+                      "Value": "'#FFFFFF'"
                     }
                   }
                 }
@@ -201,7 +201,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#15233A'"
+                      "Value": "'#F8FAFC'"
                     }
                   }
                 }
@@ -241,7 +241,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#F8FAFC'"
+                      "Value": "'#172033'"
                     }
                   }
                 }
@@ -286,7 +286,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#101B2D'"
+                      "Value": "'#FFFFFF'"
                     }
                   }
                 }
@@ -317,7 +317,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#263A56'"
+                      "Value": "'#DDE5EF'"
                     }
                   }
                 }
@@ -368,6 +368,109 @@
               "expr": {
                 "Literal": {
                   "Value": "8D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dropShadow": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "preset": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Bottom'"
+                }
+              }
+            },
+            "position": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Outer'"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#172033'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "90D"
+                }
+              }
+            },
+            "shadowBlur": {
+              "expr": {
+                "Literal": {
+                  "Value": "8D"
+                }
+              }
+            },
+            "shadowDistance": {
+              "expr": {
+                "Literal": {
+                  "Value": "2D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualHeader": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "foreground": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#64748B'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "100D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Transações de pagamento. Tabela para consulta detalhada.'"
                 }
               }
             }

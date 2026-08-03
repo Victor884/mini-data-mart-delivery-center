@@ -2,17 +2,20 @@
 
 Data da execução: **2 de agosto de 2026**.
 
-## Resultado
+## Resultado final
 
-- 28 de 28 baselines SQL: **OK**.
-- 10 de 10 consultas M executadas no PostgreSQL: **OK**.
-- Validação estrutural PBIR: **0 erros**.
-- Schemas oficiais PBIR/JSON: acessíveis e válidos.
-- 4 páginas e 36 visuais reconhecidos pelo inventário do validador.
-- 1 tema customizado registrado e reconhecido.
-- Credenciais armazenadas no projeto: **nenhuma**.
+- 43 de 43 baselines SQL: **OK**;
+- 10 de 10 consultas M executadas no PostgreSQL: **OK**;
+- validação estática própria: **OK**;
+- schemas oficiais PBIR/JSON: **0 erros**;
+- 11 tabelas, 20 relacionamentos, 54 medidas, 9 páginas e 97 visuais;
+- 5 páginas visíveis e 4 páginas de tooltip em `320 × 240`;
+- 7 componentes HTML/CSS, 5 navegadores e 5 botões para limpar slicers;
+- todos os 97 visuais dentro do canvas, sem sobreposição geométrica;
+- navegadores sem páginas ocultas/tooltips e referências de tooltip válidas;
+- credenciais armazenadas: **nenhuma**.
 
-O validador retorna sete avisos `PBIR_VISUAL_TYPE_UNKNOWN`, um para cada instância de HTML Content (lite). Isso é esperado: o catálogo do CLI reconhece os visuais nativos, mas não resolve o tipo do visual público do AppSource durante a análise estática.
+O validador oficial retorna sete avisos `PBIR_VISUAL_TYPE_UNKNOWN`, um para cada instância de **HTML Content (lite)**. É um aviso de catálogo do CLI para o visual customizado; não há erro de schema ou estrutura.
 
 ## Baselines principais
 
@@ -25,8 +28,9 @@ O validador retorna sete avisos `PBIR_VISUAL_TYPE_UNKNOWN`, um para cada instân
 | Valor transacionado | R$ 37.481.358,97 |
 | Ticket médio | R$ 106,48 |
 | Margem de entrega | -R$ 434.905,63 |
-| Tempo de ciclo P50 | 42,18 min |
-| Tempo de ciclo P90 | 83,17 min |
+| Tempo de produção médio | 61,71 min |
+| Tempo de trânsito médio | 46,55 min |
+| Tempo de ciclo P50 / P90 | 42,18 / 83,17 min |
 | Pedidos com entrega | 358.654 |
 | Taxa de entrega concluída | 97,95% |
 | Taxa de múltiplas tentativas | 5,22% |
@@ -37,9 +41,30 @@ O validador retorna sete avisos `PBIR_VISUAL_TYPE_UNKNOWN`, um para cada instân
 | Diferença absoluta de conciliação | R$ 465.576,41 |
 | Chargebacks | 438 / R$ 7.160,50 |
 
+Também foram validadas as medidas de mês anterior, variações absoluta e percentual e participações usadas nos tooltips.
+
+## Integridade semântica
+
+- os 20 relacionamentos continuam `1:*`, unidirecionais e sem fatos relacionadas diretamente;
+- as fórmulas originais de negócio foram preservadas;
+- os acréscimos DAX servem a comparação temporal, participação, etapas e contexto de tooltip;
+- percentis são calculados sobre observações, não somados nem promediados;
+- pagamentos e conciliação permanecem protegidos contra fanout;
+- P90 permanece descritivo, sem ser classificado como SLA.
+
 ## Como repetir
 
-Banco e dados:
+```powershell
+node powerbi\scripts\generate-pbip.mjs
+node powerbi\scripts\validate-pbip.mjs
+node powerbi\scripts\validate-m-queries.mjs
+powerbi-report-author validate powerbi\DeliveryCenterAnalytics.Report --pretty
+powerbi-report-author preview-pages powerbi\DeliveryCenterAnalytics.Report --with-derived
+powerbi-report-author preview-visuals powerbi\DeliveryCenterAnalytics.Report --with-derived
+powerbi-report-author preview-themes powerbi\DeliveryCenterAnalytics.Report --with-derived
+```
+
+Baselines PostgreSQL:
 
 ```powershell
 Get-Content powerbi\validation\validate_powerbi_baseline.sql -Raw -Encoding utf8 |
@@ -50,32 +75,16 @@ Get-Content powerbi\validation\validate_powerbi_baseline.sql -Raw -Encoding utf8
     -P pager=off
 ```
 
-Estrutura PBIR:
+## Limitação e homologação final
 
-```powershell
-powerbi-report-author validate powerbi\DeliveryCenterAnalytics.Report --pretty
-powerbi-report-author preview-pages powerbi\DeliveryCenterAnalytics.Report --pretty
-powerbi-report-author preview-visuals powerbi\DeliveryCenterAnalytics.Report --pretty
-powerbi-report-author preview-themes powerbi\DeliveryCenterAnalytics.Report --pretty
-```
+O ambiente de geração não possui Power BI Desktop. Portanto, estrutura, consultas e números têm confiança alta, enquanto a inspeção do render final tem confiança média até a abertura no Desktop.
 
-## Metodologia
+Checklist de homologação:
 
-- A consulta de validação parte das views detalhadas, assim como as medidas DAX.
-- Cada taxa é recalculada com seu numerador e denominador.
-- Percentis são calculados sobre as observações de pedido; percentis de grupos não são somados nem promediados.
-- Valores financeiros admitem tolerância de R$ 0,01.
-- Contagens exigem igualdade exata.
-- A conciliação usa uma linha por pedido para impedir fanout de pagamentos.
-
-## Limitação restante
-
-O ambiente usado para gerar o projeto não possui Power BI Desktop. Assim, a estrutura PBIP/PBIR e os dados foram validados, mas o refresh do modelo TMDL e a renderização final do visual HTML ainda precisam de uma abertura no Desktop. A checagem final deve:
-
-1. abrir `DeliveryCenterAnalytics.pbip`;
-2. informar as credenciais do PostgreSQL;
+1. abrir `DeliveryCenterAnalytics.pbip` e informar as credenciais do PostgreSQL;
+2. atualizar o modelo e conferir os baselines;
 3. confirmar o carregamento do HTML Content (lite);
-4. atualizar o modelo;
-5. comparar os cartões com esta tabela;
-6. testar filtros, cross-filter e drill-through;
-7. publicar somente depois de definir gateway, RLS e política do visual customizado.
+4. testar filtros cruzados, limpar filtros, navegação, tooltips e drill-through;
+5. verificar valores truncados em 100% de zoom e tela de apresentação;
+6. usar `Auto-create mobile layout` e ajustar conforme o conceito aprovado;
+7. publicar somente após configurar gateway, atualização, política do visual customizado e eventual RLS.

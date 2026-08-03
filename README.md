@@ -42,7 +42,7 @@ A estrutura de dados está implementada e validada até a camada de consumo anal
 | `stg` | 7 tabelas carregadas diretamente dos CSVs |
 | `dw` | 8 dimensões conformadas e 3 tabelas fato |
 | `mart` | 3 views detalhadas e 5 views agregadas |
-| Power BI | 6 dimensões, 4 fatos, 40 medidas, 4 páginas e 36 visuais |
+| Power BI | 6 dimensões, 4 fatos, 54 medidas, 5 páginas analíticas, 4 tooltips e 97 visuais |
 
 Volumes reconciliados entre staging, DW e data marts:
 
@@ -149,14 +149,15 @@ Os cartões e rankings em HTML/CSS usam o visual certificado **HTML Content (lit
 
 O projeto está em [`powerbi/`](powerbi/README.md) e contém:
 
-- **01 Executivo**: valor transacionado, pedidos, ticket, cancelamento, margem, tendência e ranking;
-- **02 Logística**: conclusão, retentativas, ciclo P50/P90, distância e análise por hub/modal;
-- **03 Financeiro**: pagamentos, conciliação, chargebacks, mix e diferenças;
-- **04 Detalhe do Pedido**: drill-through com pedido, entregas e pagamentos;
-- filtros por período e dimensões conformadas;
-- tema escuro em JSON e sete componentes HTML/CSS orientados por medidas DAX.
+- **01 Visão Executiva**: resultado comercial, tendências, ranking de hubs e saúde do negócio;
+- **02 Pedidos & Operação**: volume, status, tempos de produção/trânsito e análise por hub;
+- **03 Financeiro**: pagamentos, conciliação, chargebacks, segmentos e variação mensal;
+- **04 Entregas & Qualidade**: conclusão, retentativas, ciclo P50/P90, distância e modalidades;
+- **05 Detalhamento**: drill-through com pedido, tentativas de entrega e pagamentos;
+- quatro tooltips dedicados com período anterior, variações e participação;
+- navegação nativa, limpeza de filtros, tema claro em JSON e sete componentes HTML/CSS.
 
-A estrutura PBIP/PBIR foi validada com **0 erros**, e **28 de 28** baselines conferiram com o PostgreSQL. A renderização final ainda deve ser aberta e atualizada no Power BI Desktop, que não está instalado no ambiente usado para gerar os arquivos.
+A estrutura PBIP/PBIR foi validada com **0 erros**. As **10 consultas M** executaram no PostgreSQL e **43 de 43** baselines conferiram. Os 20 relacionamentos e as regras originais de negócio foram preservados. A renderização final ainda deve ser homologada no Power BI Desktop, que não está instalado no ambiente de geração.
 
 ---
 
@@ -164,16 +165,17 @@ A estrutura PBIP/PBIR foi validada com **0 erros**, e **28 de 28** baselines con
 
 1. **Homologar no Power BI Desktop**:
    * Atualizar o modelo com as credenciais locais.
-   * Conferir o carregamento do HTML Content (lite), responsividade, cross-filter e drill-through.
-   * Registrar capturas das quatro páginas no README.
+   * Conferir HTML Content (lite), navegação, limpeza de filtros, tooltips, cross-filter e drill-through.
+   * Criar o layout mobile nativo a partir do conceito aprovado e registrar capturas das cinco páginas.
 2. **Preparar a publicação**:
    * Configurar gateway para o PostgreSQL.
    * Definir atualização agendada e política do visual customizado no tenant.
    * Implementar RLS quando houver uma regra de acesso aprovada.
-3. **Definir Metas Operacionais**:
+3. **Definir metas operacionais**:
    * Avaliar as séries semanais e mensais dos KPIs.
    * Aprovar limites de SLA e metas por hub antes de classificar performance.
 4. **Evoluir a análise**:
-   * Adicionar metas, tooltips dedicados e bookmarks após homologação visual.
-   * Avaliar agregações/import incremental se o volume crescer.
-   * Documentar os principais insights e decisões de negócio após uso pelos stakeholders.
+   * Adicionar metas somente depois de aprovar definições de SLA e margem-alvo.
+   * Avaliar bookmarks apenas quando existir uma visão alternativa necessária.
+   * Avaliar agregações ou refresh incremental se o volume crescer.
+   * Documentar insights e decisões de negócio após o uso pelos stakeholders.

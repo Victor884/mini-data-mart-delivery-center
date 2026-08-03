@@ -34,6 +34,8 @@ erDiagram
 
 Todas as relações são `1:*`, com filtro em sentido único da dimensão para a fato. Não há relações bidirecionais nem relações fato-fato.
 
+O redesign de agosto de 2026 preservou integralmente essas 20 relações, os grãos e as fontes. As novas medidas de período anterior, variação, participação e contexto de tooltip não criam caminhos de filtro adicionais.
+
 ## Tabelas e fontes
 
 | Tabela no modelo | Tipo/grão | Fonte PostgreSQL |
@@ -69,3 +71,4 @@ Usuário e senha não ficam versionados. O Power BI Desktop solicita as credenci
 - Percentuais são divisões de numeradores e denominadores no contexto atual, nunca médias de percentuais.
 - Medidas logísticas consideram a última tentativa quando a regra de negócio exige um desfecho por pedido.
 - Não há RLS porque o projeto não recebeu uma regra de acesso por usuário; ela deve ser definida antes da publicação organizacional.
+- P90 é mantido como estatística descritiva; sem meta formal, o relatório não o chama de SLA nem classifica hubs como dentro/fora do SLA.

@@ -85,6 +85,48 @@ table 'Métricas'
 		formatString: 0.00%
 		displayFolder: "01 Comercial\Inteligência de Tempo"
 
+	/// Diferença absoluta do valor transacionado contra o mês anterior.
+	measure 'Variação Absoluta Valor Mensal' = ```
+			[Valor Transacionado] - [Valor Transacionado Mês Anterior]
+		```
+		formatString: R$ #,##0.00
+		displayFolder: "01 Comercial\Inteligência de Tempo"
+
+	/// Participação do ponto atual no valor do contexto selecionado, preservando os filtros externos.
+	measure 'Participação Valor Transacionado' = ```
+			DIVIDE([Valor Transacionado], CALCULATE([Valor Transacionado], ALLSELECTED('Calendário'[Data]), ALLSELECTED('Hubs'), ALLSELECTED('Lojas'), ALLSELECTED('Canais')))
+		```
+		formatString: 0.00%
+		displayFolder: "01 Comercial\Tooltips"
+
+	/// Quantidade de pedidos deslocada em um mês.
+	measure 'Pedidos Mês Anterior' = ```
+			CALCULATE([Pedidos Criados], DATEADD('Calendário'[Data], -1, MONTH))
+		```
+		formatString: #,##0
+		displayFolder: "01 Comercial\Inteligência de Tempo"
+
+	/// Diferença absoluta de pedidos contra o mês anterior.
+	measure 'Variação Absoluta Pedidos Mensal' = ```
+			[Pedidos Criados] - [Pedidos Mês Anterior]
+		```
+		formatString: #,##0
+		displayFolder: "01 Comercial\Inteligência de Tempo"
+
+	/// Variação percentual de pedidos contra o mês anterior.
+	measure 'Variação Pedidos Mensal' = ```
+			DIVIDE([Pedidos Criados] - [Pedidos Mês Anterior], [Pedidos Mês Anterior])
+		```
+		formatString: 0.00%
+		displayFolder: "01 Comercial\Inteligência de Tempo"
+
+	/// Participação do ponto atual nos pedidos do contexto selecionado.
+	measure 'Participação Pedidos' = ```
+			DIVIDE([Pedidos Criados], CALCULATE([Pedidos Criados], ALLSELECTED('Calendário'[Data]), ALLSELECTED('Hubs'), ALLSELECTED('Lojas'), ALLSELECTED('Canais'), ALLSELECTED('Pedidos'[Status Pedido])))
+		```
+		formatString: 0.00%
+		displayFolder: "01 Comercial\Tooltips"
+
 	/// Pedidos representados pela última tentativa de entrega.
 	measure 'Pedidos com Entrega' = ```
 			CALCULATE(DISTINCTCOUNT('Entregas'[Chave Pedido]), KEEPFILTERS('Entregas'[É Última Tentativa] = TRUE()))
@@ -147,6 +189,27 @@ table 'Métricas'
 		```
 		formatString: #,##0.00
 		displayFolder: "02 Logística"
+
+	/// Tempo médio de produção dos pedidos finalizados com duração válida.
+	measure 'Tempo Produção Médio' = ```
+			AVERAGEX(FILTER('Pedidos', 'Pedidos'[Status Pedido] = "FINISHED" && 'Pedidos'[Tempo Produção] >= 0), 'Pedidos'[Tempo Produção])
+		```
+		formatString: #,##0.00
+		displayFolder: "02 Logística\Etapas"
+
+	/// Tempo médio de trânsito dos pedidos finalizados com duração válida.
+	measure 'Tempo Trânsito Médio' = ```
+			AVERAGEX(FILTER('Pedidos', 'Pedidos'[Status Pedido] = "FINISHED" && 'Pedidos'[Tempo Trânsito] >= 0), 'Pedidos'[Tempo Trânsito])
+		```
+		formatString: #,##0.00
+		displayFolder: "02 Logística\Etapas"
+
+	/// Participação do ponto atual entre os pedidos com entrega do contexto selecionado.
+	measure 'Participação Pedidos com Entrega' = ```
+			DIVIDE([Pedidos com Entrega], CALCULATE([Pedidos com Entrega], ALLSELECTED('Calendário'[Data]), ALLSELECTED('Hubs'), ALLSELECTED('Lojas'), ALLSELECTED('Entregadores')))
+		```
+		formatString: 0.00%
+		displayFolder: "02 Logística\Tooltips"
 
 	/// Quantidade de transações com status PAID.
 	measure 'Transações Pagas' = ```
@@ -232,82 +295,124 @@ table 'Métricas'
 		formatString: #,##0
 		displayFolder: "03 Financeiro"
 
-	/// Painel HTML/CSS com os KPIs comerciais principais.
+	/// Valor pago deslocado em um mês.
+	measure 'Valor Pago Mês Anterior' = ```
+			CALCULATE([Valor Pago], DATEADD('Calendário'[Data], -1, MONTH))
+		```
+		formatString: R$ #,##0.00
+		displayFolder: "03 Financeiro\Inteligência de Tempo"
+
+	/// Diferença absoluta do valor pago contra o mês anterior.
+	measure 'Variação Absoluta Valor Pago Mensal' = ```
+			[Valor Pago] - [Valor Pago Mês Anterior]
+		```
+		formatString: R$ #,##0.00
+		displayFolder: "03 Financeiro\Inteligência de Tempo"
+
+	/// Variação percentual do valor pago contra o mês anterior.
+	measure 'Variação Valor Pago Mensal' = ```
+			DIVIDE([Valor Pago] - [Valor Pago Mês Anterior], [Valor Pago Mês Anterior])
+		```
+		formatString: 0.00%
+		displayFolder: "03 Financeiro\Inteligência de Tempo"
+
+	/// Participação do ponto atual no valor pago do contexto selecionado.
+	measure 'Participação Valor Pago' = ```
+			DIVIDE([Valor Pago], CALCULATE([Valor Pago], ALLSELECTED('Calendário'[Data]), ALLSELECTED('Hubs'), ALLSELECTED('Lojas'), ALLSELECTED('Canais'), ALLSELECTED('Pagamentos'[Meio Pagamento])))
+		```
+		formatString: 0.00%
+		displayFolder: "03 Financeiro\Tooltips"
+
+	/// Rótulo do ponto, período ou categoria recebido pela página de tooltip.
+	measure 'Contexto Tooltip' = ```
+			VAR DataSelecionada = SELECTEDVALUE('Calendário'[Data]) VAR Hub = SELECTEDVALUE('Hubs'[Hub]) VAR Loja = SELECTEDVALUE('Lojas'[Loja]) VAR Canal = SELECTEDVALUE('Canais'[Canal]) VAR Modal = SELECTEDVALUE('Entregadores'[Modal Entregador]) VAR Pagamento = SELECTEDVALUE('Pagamentos'[Meio Pagamento]) VAR StatusPedido = SELECTEDVALUE('Pedidos'[Status Pedido]) VAR StatusConcil = SELECTEDVALUE('Conciliação'[Status Conciliação]) RETURN COALESCE(IF(NOT ISBLANK(DataSelecionada), FORMAT(DataSelecionada, "dd/MM/yyyy")), Hub, Loja, Canal, Modal, Pagamento, StatusPedido, StatusConcil, "Contexto selecionado")
+		```
+		formatString: General
+		displayFolder: "90 Tooltips"
+
+	/// Quatro KPIs executivos em HTML/CSS, com unidade e período explícitos.
 	measure 'HTML | KPIs Executivos' = ```
 			VAR Periodo = FORMAT(MIN('Calendário'[Data]), "dd/MM/yyyy") & " a " & FORMAT(MAX('Calendário'[Data]), "dd/MM/yyyy")
-			VAR CorMargem = IF([Margem Entrega] >= 0, "#4ADE80", "#FB7185")
+			VAR CorMargem = IF([Margem Entrega] >= 0, "#0F766E", "#BE123C")
 			RETURN
-			"<div style='font-family:Segoe UI,Arial,sans-serif;color:#F8FAFC;background:#101B2D;border:1px solid #263A56;border-radius:14px;padding:14px 16px;box-sizing:border-box;width:100%;height:100%;'>" &
-			"<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;'><div style='font-size:13px;font-weight:700;letter-spacing:.04em;'>VISÃO EXECUTIVA</div><div style='font-size:10px;color:#9FB0C7;'>" & Periodo & "</div></div>" &
-			"<div style='display:flex;gap:10px;height:86px;'>" &
-			"<div style='flex:1;background:#15233A;border-top:3px solid #2DD4BF;border-radius:10px;padding:10px;box-sizing:border-box;'><div style='font-size:10px;color:#9FB0C7;'>VALOR TRANSACIONADO</div><div style='font-size:22px;font-weight:750;margin-top:7px;'>" & FORMAT([Valor Transacionado], "R$ #,##0.00", "pt-BR") & "</div></div>" &
-			"<div style='flex:1;background:#15233A;border-top:3px solid #60A5FA;border-radius:10px;padding:10px;box-sizing:border-box;'><div style='font-size:10px;color:#9FB0C7;'>PEDIDOS FINALIZADOS</div><div style='font-size:22px;font-weight:750;margin-top:7px;'>" & FORMAT([Pedidos Finalizados], "#,##0", "pt-BR") & "</div></div>" &
-			"<div style='flex:1;background:#15233A;border-top:3px solid #A78BFA;border-radius:10px;padding:10px;box-sizing:border-box;'><div style='font-size:10px;color:#9FB0C7;'>TICKET MÉDIO</div><div style='font-size:22px;font-weight:750;margin-top:7px;'>" & FORMAT([Ticket Médio], "R$ #,##0.00", "pt-BR") & "</div></div>" &
-			"<div style='flex:1;background:#15233A;border-top:3px solid #FBBF24;border-radius:10px;padding:10px;box-sizing:border-box;'><div style='font-size:10px;color:#9FB0C7;'>CANCELAMENTO</div><div style='font-size:22px;font-weight:750;margin-top:7px;'>" & FORMAT([Taxa Cancelamento], "0.00%", "pt-BR") & "</div></div>" &
-			"<div style='flex:1;background:#15233A;border-top:3px solid " & CorMargem & ";border-radius:10px;padding:10px;box-sizing:border-box;'><div style='font-size:10px;color:#9FB0C7;'>MARGEM ENTREGA</div><div style='font-size:22px;font-weight:750;margin-top:7px;color:" & CorMargem & ";'>" & FORMAT([Margem Entrega], "R$ #,##0.00", "pt-BR") & "</div></div>" &
+			"<div style='font-family:Segoe UI,Arial,sans-serif;color:#172033;background:#FFFFFF;border:1px solid #DDE5EF;border-radius:12px;padding:12px 14px;box-sizing:border-box;width:100%;height:100%;'>" &
+			"<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;'><b style='font-size:12px;letter-spacing:.03em;'>RESULTADO DO PERÍODO</b><span style='font-size:10px;color:#64748B;'>" & Periodo & "</span></div>" &
+			"<div style='display:flex;gap:10px;height:76px;'>" &
+			"<div style='flex:1;background:#F8FAFC;border-left:4px solid #2563EB;border-radius:9px;padding:10px;box-sizing:border-box;'><div style='font-size:10px;color:#64748B;'>VALOR TRANSACIONADO</div><div style='font-size:21px;font-weight:750;margin-top:6px;'>" & FORMAT([Valor Transacionado], "R$ #,##0.00", "pt-BR") & "</div></div>" &
+			"<div style='flex:1;background:#F8FAFC;border-left:4px solid #0F766E;border-radius:9px;padding:10px;box-sizing:border-box;'><div style='font-size:10px;color:#64748B;'>PEDIDOS FINALIZADOS</div><div style='font-size:21px;font-weight:750;margin-top:6px;'>" & FORMAT([Pedidos Finalizados], "#,##0", "pt-BR") & "</div></div>" &
+			"<div style='flex:1;background:#F8FAFC;border-left:4px solid #6D5BD0;border-radius:9px;padding:10px;box-sizing:border-box;'><div style='font-size:10px;color:#64748B;'>TICKET MÉDIO</div><div style='font-size:21px;font-weight:750;margin-top:6px;'>" & FORMAT([Ticket Médio], "R$ #,##0.00", "pt-BR") & "</div></div>" &
+			"<div style='flex:1;background:#F8FAFC;border-left:4px solid " & CorMargem & ";border-radius:9px;padding:10px;box-sizing:border-box;'><div style='font-size:10px;color:#64748B;'>MARGEM DE ENTREGA</div><div style='font-size:21px;font-weight:750;margin-top:6px;color:" & CorMargem & ";'>" & FORMAT([Margem Entrega], "R$ #,##0.00", "pt-BR") & "</div></div>" &
 			"</div></div>"
 		```
 		formatString: General
 		displayFolder: "90 HTML"
 
-	/// Ranking HTML/CSS dos cinco hubs com maior valor transacionado.
-	measure 'HTML | Ranking Hubs' = ```
-			VAR Base = FILTER(ADDCOLUMNS(VALUES('Hubs'[Hub]), "Valor", [Valor Transacionado]), NOT ISBLANK('Hubs'[Hub]))
-			VAR TopHubs = TOPN(5, Base, [Valor], DESC, 'Hubs'[Hub], ASC)
-			VAR Maximo = MAXX(TopHubs, [Valor])
-			VAR Linhas = CONCATENATEX(TopHubs, "<div style='margin-top:10px;'><div style='display:flex;justify-content:space-between;font-size:11px;'><span>" & 'Hubs'[Hub] & "</span><span style='color:#9FB0C7;'>" & FORMAT([Valor], "R$ #,##0", "pt-BR") & "</span></div><div style='height:7px;background:#263A56;border-radius:7px;margin-top:4px;overflow:hidden;'><div style='height:7px;width:" & FORMAT(DIVIDE([Valor], Maximo), "0.0%", "en-US") & ";background:linear-gradient(90deg,#2DD4BF,#60A5FA);border-radius:7px;'></div></div></div>", "", [Valor], DESC)
-			RETURN "<div style='font-family:Segoe UI,Arial,sans-serif;color:#F8FAFC;background:#101B2D;border:1px solid #263A56;border-radius:14px;padding:15px 18px;box-sizing:border-box;width:100%;height:100%;'><div style='font-size:13px;font-weight:700;'>TOP 5 HUBS POR VALOR</div><div style='font-size:10px;color:#9FB0C7;margin-top:2px;'>Responde aos filtros da página</div>" & Linhas & "</div>"
+	/// Painel de saúde operacional que não apresenta P90 como SLA.
+	measure 'HTML | Saúde Executiva' = ```
+			VAR CorMargem = IF([Margem Entrega] >= 0, "#0F766E", "#BE123C")
+			RETURN
+			"<div style='font-family:Segoe UI,Arial,sans-serif;color:#172033;background:#FFFFFF;border:1px solid #DDE5EF;border-radius:12px;padding:13px 15px;box-sizing:border-box;width:100%;height:100%;'>" &
+			"<div style='font-size:12px;font-weight:700;margin-bottom:9px;'>SAÚDE OPERACIONAL</div>" &
+			"<div style='display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #DDE5EF;font-size:11px;'><span>Taxa de cancelamento</span><b style='color:#BE123C;'>" & FORMAT([Taxa Cancelamento], "0.00%", "pt-BR") & "</b></div>" &
+			"<div style='display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #DDE5EF;font-size:11px;'><span>Ciclo P90 <small style='color:#64748B;'>(percentil)</small></span><b style='color:#D97706;'>" & FORMAT([Tempo Ciclo P90], "0.00", "pt-BR") & " min</b></div>" &
+			"<div style='display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #DDE5EF;font-size:11px;'><span>Taxa de conciliação</span><b style='color:#0F766E;'>" & FORMAT([Taxa Conciliação], "0.00%", "pt-BR") & "</b></div>" &
+			"<div style='display:flex;justify-content:space-between;padding:7px 0;font-size:11px;'><span>Margem de entrega</span><b style='color:" & CorMargem & ";'>" & FORMAT([Margem Entrega], "R$ #,##0.00", "pt-BR") & "</b></div>" &
+			"</div>"
 		```
 		formatString: General
 		displayFolder: "90 HTML"
 
-	/// Painel HTML/CSS com os KPIs logísticos principais.
-	measure 'HTML | KPIs Logística' = ```
-			RETURN
-			"<div style='font-family:Segoe UI,Arial,sans-serif;color:#F8FAFC;background:#101B2D;border:1px solid #263A56;border-radius:14px;padding:14px 16px;box-sizing:border-box;width:100%;height:100%;'>" &
-			"<div style='font-size:13px;font-weight:700;letter-spacing:.04em;margin-bottom:10px;'>PERFORMANCE LOGÍSTICA</div><div style='display:flex;gap:10px;height:86px;'>" &
-			"<div style='flex:1;background:#15233A;border-top:3px solid #4ADE80;border-radius:10px;padding:10px;'><div style='font-size:10px;color:#9FB0C7;'>ENTREGA CONCLUÍDA</div><div style='font-size:22px;font-weight:750;margin-top:7px;'>" & FORMAT([Taxa Entrega Concluída], "0.00%", "pt-BR") & "</div></div>" &
-			"<div style='flex:1;background:#15233A;border-top:3px solid #FBBF24;border-radius:10px;padding:10px;'><div style='font-size:10px;color:#9FB0C7;'>MÚLTIPLAS TENTATIVAS</div><div style='font-size:22px;font-weight:750;margin-top:7px;'>" & FORMAT([Taxa Múltiplas Tentativas], "0.00%", "pt-BR") & "</div></div>" &
-			"<div style='flex:1;background:#15233A;border-top:3px solid #2DD4BF;border-radius:10px;padding:10px;'><div style='font-size:10px;color:#9FB0C7;'>CICLO P50</div><div style='font-size:22px;font-weight:750;margin-top:7px;'>" & FORMAT([Tempo Ciclo P50], "0.00", "pt-BR") & " min</div></div>" &
-			"<div style='flex:1;background:#15233A;border-top:3px solid #A78BFA;border-radius:10px;padding:10px;'><div style='font-size:10px;color:#9FB0C7;'>CICLO P90</div><div style='font-size:22px;font-weight:750;margin-top:7px;'>" & FORMAT([Tempo Ciclo P90], "0.00", "pt-BR") & " min</div></div>" &
-			"<div style='flex:1;background:#15233A;border-top:3px solid #60A5FA;border-radius:10px;padding:10px;'><div style='font-size:10px;color:#9FB0C7;'>DISTÂNCIA MÉDIA</div><div style='font-size:22px;font-weight:750;margin-top:7px;'>" & FORMAT([Distância Média Entrega (km)], "0.00", "pt-BR") & " km</div></div>" &
+	/// Quatro KPIs de pedidos e operação em HTML/CSS.
+	measure 'HTML | KPIs Pedidos' = ```
+			"<div style='font-family:Segoe UI,Arial,sans-serif;color:#172033;background:#FFFFFF;border:1px solid #DDE5EF;border-radius:12px;padding:12px 14px;box-sizing:border-box;width:100%;height:100%;'>" &
+			"<div style='font-size:12px;font-weight:700;margin-bottom:8px;'>PEDIDOS E OPERAÇÃO</div><div style='display:flex;gap:10px;height:76px;'>" &
+			"<div style='flex:1;background:#F8FAFC;border-left:4px solid #2563EB;border-radius:9px;padding:10px;'><div style='font-size:10px;color:#64748B;'>PEDIDOS CRIADOS</div><div style='font-size:21px;font-weight:750;margin-top:6px;'>" & FORMAT([Pedidos Criados], "#,##0", "pt-BR") & "</div></div>" &
+			"<div style='flex:1;background:#F8FAFC;border-left:4px solid #0F766E;border-radius:9px;padding:10px;'><div style='font-size:10px;color:#64748B;'>FINALIZADOS</div><div style='font-size:21px;font-weight:750;margin-top:6px;'>" & FORMAT([Pedidos Finalizados], "#,##0", "pt-BR") & "</div></div>" &
+			"<div style='flex:1;background:#F8FAFC;border-left:4px solid #BE123C;border-radius:9px;padding:10px;'><div style='font-size:10px;color:#64748B;'>CANCELAMENTO</div><div style='font-size:21px;font-weight:750;margin-top:6px;color:#BE123C;'>" & FORMAT([Taxa Cancelamento], "0.00%", "pt-BR") & "</div></div>" &
+			"<div style='flex:1;background:#F8FAFC;border-left:4px solid #D97706;border-radius:9px;padding:10px;'><div style='font-size:10px;color:#64748B;'>CICLO MÉDIO</div><div style='font-size:21px;font-weight:750;margin-top:6px;'>" & FORMAT([Tempo Ciclo Médio], "0.00", "pt-BR") & " min</div></div>" &
 			"</div></div>"
 		```
 		formatString: General
 		displayFolder: "90 HTML"
 
-	/// Ranking HTML/CSS dos hubs com maior taxa de múltiplas tentativas.
-	measure 'HTML | Ranking Tentativas' = ```
-			VAR Base = FILTER(ADDCOLUMNS(VALUES('Hubs'[Hub]), "Taxa", [Taxa Múltiplas Tentativas]), NOT ISBLANK('Hubs'[Hub]))
-			VAR TopHubs = TOPN(5, Base, [Taxa], DESC, 'Hubs'[Hub], ASC)
-			VAR Maximo = MAXX(TopHubs, [Taxa])
-			VAR Linhas = CONCATENATEX(TopHubs, "<div style='margin-top:10px;'><div style='display:flex;justify-content:space-between;font-size:11px;'><span>" & 'Hubs'[Hub] & "</span><span style='color:#9FB0C7;'>" & FORMAT([Taxa], "0.00%", "pt-BR") & "</span></div><div style='height:7px;background:#263A56;border-radius:7px;margin-top:4px;overflow:hidden;'><div style='height:7px;width:" & FORMAT(DIVIDE([Taxa], Maximo), "0.0%", "en-US") & ";background:linear-gradient(90deg,#FBBF24,#FB7185);border-radius:7px;'></div></div></div>", "", [Taxa], DESC)
-			RETURN "<div style='font-family:Segoe UI,Arial,sans-serif;color:#F8FAFC;background:#101B2D;border:1px solid #263A56;border-radius:14px;padding:15px 18px;box-sizing:border-box;width:100%;height:100%;'><div style='font-size:13px;font-weight:700;'>HUBS COM MAIS RETENTATIVAS</div><div style='font-size:10px;color:#9FB0C7;margin-top:2px;'>Última tentativa registrada por pedido</div>" & Linhas & "</div>"
+	/// Resumo HTML/CSS das etapas de produção, trânsito e ciclo.
+	measure 'HTML | Etapas Operacionais' = ```
+			"<div style='font-family:Segoe UI,Arial,sans-serif;color:#172033;background:#FFFFFF;border:1px solid #DDE5EF;border-radius:12px;padding:13px 15px;box-sizing:border-box;width:100%;height:100%;'>" &
+			"<div style='font-size:12px;font-weight:700;margin-bottom:10px;'>DECOMPOSIÇÃO DO CICLO</div>" &
+			"<div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;'>" &
+			"<div style='background:#F8FAFC;border-radius:8px;padding:9px;'><small style='color:#64748B;'>Produção média</small><div style='font-size:18px;font-weight:700;margin-top:4px;'>" & FORMAT([Tempo Produção Médio], "0.00", "pt-BR") & " min</div></div>" &
+			"<div style='background:#F8FAFC;border-radius:8px;padding:9px;'><small style='color:#64748B;'>Trânsito médio</small><div style='font-size:18px;font-weight:700;margin-top:4px;'>" & FORMAT([Tempo Trânsito Médio], "0.00", "pt-BR") & " min</div></div>" &
+			"<div style='background:#F8FAFC;border-radius:8px;padding:9px;'><small style='color:#64748B;'>Ciclo P50</small><div style='font-size:18px;font-weight:700;margin-top:4px;'>" & FORMAT([Tempo Ciclo P50], "0.00", "pt-BR") & " min</div></div>" &
+			"<div style='background:#F8FAFC;border-radius:8px;padding:9px;'><small style='color:#64748B;'>Ciclo P90 · não é SLA</small><div style='font-size:18px;font-weight:700;margin-top:4px;color:#D97706;'>" & FORMAT([Tempo Ciclo P90], "0.00", "pt-BR") & " min</div></div>" &
+			"</div></div>"
 		```
 		formatString: General
 		displayFolder: "90 HTML"
 
-	/// Painel HTML/CSS com os KPIs financeiros e de conciliação.
+	/// Quatro KPIs financeiros em HTML/CSS.
 	measure 'HTML | KPIs Financeiros' = ```
+			VAR CorMargem = IF([Margem Entrega] >= 0, "#0F766E", "#BE123C")
 			RETURN
-			"<div style='font-family:Segoe UI,Arial,sans-serif;color:#F8FAFC;background:#101B2D;border:1px solid #263A56;border-radius:14px;padding:14px 16px;box-sizing:border-box;width:100%;height:100%;'>" &
-			"<div style='font-size:13px;font-weight:700;letter-spacing:.04em;margin-bottom:10px;'>FINANCEIRO E CONCILIAÇÃO</div><div style='display:flex;gap:10px;height:86px;'>" &
-			"<div style='flex:1;background:#15233A;border-top:3px solid #2DD4BF;border-radius:10px;padding:10px;'><div style='font-size:10px;color:#9FB0C7;'>VALOR PAGO</div><div style='font-size:22px;font-weight:750;margin-top:7px;'>" & FORMAT([Valor Pago], "R$ #,##0.00", "pt-BR") & "</div></div>" &
-			"<div style='flex:1;background:#15233A;border-top:3px solid #4ADE80;border-radius:10px;padding:10px;'><div style='font-size:10px;color:#9FB0C7;'>CONCILIAÇÃO</div><div style='font-size:22px;font-weight:750;margin-top:7px;'>" & FORMAT([Taxa Conciliação], "0.00%", "pt-BR") & "</div></div>" &
-			"<div style='flex:1;background:#15233A;border-top:3px solid #60A5FA;border-radius:10px;padding:10px;'><div style='font-size:10px;color:#9FB0C7;'>TRANSAÇÕES PAGAS</div><div style='font-size:22px;font-weight:750;margin-top:7px;'>" & FORMAT([Transações Pagas], "#,##0", "pt-BR") & "</div></div>" &
-			"<div style='flex:1;background:#15233A;border-top:3px solid #FB7185;border-radius:10px;padding:10px;'><div style='font-size:10px;color:#9FB0C7;'>CHARGEBACK</div><div style='font-size:22px;font-weight:750;margin-top:7px;'>" & FORMAT([Valor Chargeback], "R$ #,##0.00", "pt-BR") & "</div></div>" &
-			"<div style='flex:1;background:#15233A;border-top:3px solid #FBBF24;border-radius:10px;padding:10px;'><div style='font-size:10px;color:#9FB0C7;'>DIFERENÇA ABSOLUTA</div><div style='font-size:22px;font-weight:750;margin-top:7px;'>" & FORMAT([Diferença Absoluta Conciliação], "R$ #,##0.00", "pt-BR") & "</div></div>" &
+			"<div style='font-family:Segoe UI,Arial,sans-serif;color:#172033;background:#FFFFFF;border:1px solid #DDE5EF;border-radius:12px;padding:12px 14px;box-sizing:border-box;width:100%;height:100%;'>" &
+			"<div style='font-size:12px;font-weight:700;margin-bottom:8px;'>DESEMPENHO FINANCEIRO</div><div style='display:flex;gap:10px;height:76px;'>" &
+			"<div style='flex:1;background:#F8FAFC;border-left:4px solid #2563EB;border-radius:9px;padding:10px;'><div style='font-size:10px;color:#64748B;'>VALOR TRANSACIONADO</div><div style='font-size:21px;font-weight:750;margin-top:6px;'>" & FORMAT([Valor Transacionado], "R$ #,##0.00", "pt-BR") & "</div></div>" &
+			"<div style='flex:1;background:#F8FAFC;border-left:4px solid #0F766E;border-radius:9px;padding:10px;'><div style='font-size:10px;color:#64748B;'>VALOR PAGO</div><div style='font-size:21px;font-weight:750;margin-top:6px;'>" & FORMAT([Valor Pago], "R$ #,##0.00", "pt-BR") & "</div></div>" &
+			"<div style='flex:1;background:#F8FAFC;border-left:4px solid #6D5BD0;border-radius:9px;padding:10px;'><div style='font-size:10px;color:#64748B;'>TICKET MÉDIO</div><div style='font-size:21px;font-weight:750;margin-top:6px;'>" & FORMAT([Ticket Médio], "R$ #,##0.00", "pt-BR") & "</div></div>" &
+			"<div style='flex:1;background:#F8FAFC;border-left:4px solid " & CorMargem & ";border-radius:9px;padding:10px;'><div style='font-size:10px;color:#64748B;'>MARGEM DE ENTREGA</div><div style='font-size:21px;font-weight:750;margin-top:6px;color:" & CorMargem & ";'>" & FORMAT([Margem Entrega], "R$ #,##0.00", "pt-BR") & "</div></div>" &
 			"</div></div>"
 		```
 		formatString: General
 		displayFolder: "90 HTML"
 
-	/// Distribuição HTML/CSS dos pedidos por status de conciliação.
-	measure 'HTML | Status Conciliação' = ```
-			VAR Base = FILTER(ADDCOLUMNS(VALUES('Conciliação'[Status Conciliação]), "Pedidos", [Pedidos na Conciliação]), NOT ISBLANK('Conciliação'[Status Conciliação]))
-			VAR TotalPedidos = SUMX(Base, [Pedidos])
-			VAR Linhas = CONCATENATEX(Base, "<div style='margin-top:9px;'><div style='display:flex;justify-content:space-between;font-size:10px;'><span>" & SUBSTITUTE('Conciliação'[Status Conciliação], "_", " ") & "</span><span style='color:#9FB0C7;'>" & FORMAT([Pedidos], "#,##0", "pt-BR") & " · " & FORMAT(DIVIDE([Pedidos], TotalPedidos), "0.0%", "pt-BR") & "</span></div><div style='height:6px;background:#263A56;border-radius:6px;margin-top:3px;overflow:hidden;'><div style='height:6px;width:" & FORMAT(DIVIDE([Pedidos], TotalPedidos), "0.0%", "en-US") & ";background:#A78BFA;border-radius:6px;'></div></div></div>", "", [Pedidos], DESC)
-			RETURN "<div style='font-family:Segoe UI,Arial,sans-serif;color:#F8FAFC;background:#101B2D;border:1px solid #263A56;border-radius:14px;padding:15px 18px;box-sizing:border-box;width:100%;height:100%;'><div style='font-size:13px;font-weight:700;'>STATUS DE CONCILIAÇÃO</div><div style='font-size:10px;color:#9FB0C7;margin-top:2px;'>Uma linha por pedido, sem fanout de pagamentos</div>" & Linhas & "</div>"
+	/// Quatro KPIs logísticos em HTML/CSS; P90 permanece percentil.
+	measure 'HTML | KPIs Logística' = ```
+			"<div style='font-family:Segoe UI,Arial,sans-serif;color:#172033;background:#FFFFFF;border:1px solid #DDE5EF;border-radius:12px;padding:12px 14px;box-sizing:border-box;width:100%;height:100%;'>" &
+			"<div style='font-size:12px;font-weight:700;margin-bottom:8px;'>ENTREGAS E QUALIDADE</div><div style='display:flex;gap:10px;height:76px;'>" &
+			"<div style='flex:1;background:#F8FAFC;border-left:4px solid #0F766E;border-radius:9px;padding:10px;'><div style='font-size:10px;color:#64748B;'>ENTREGA CONCLUÍDA</div><div style='font-size:21px;font-weight:750;margin-top:6px;'>" & FORMAT([Taxa Entrega Concluída], "0.00%", "pt-BR") & "</div></div>" &
+			"<div style='flex:1;background:#F8FAFC;border-left:4px solid #BE123C;border-radius:9px;padding:10px;'><div style='font-size:10px;color:#64748B;'>MÚLTIPLAS TENTATIVAS</div><div style='font-size:21px;font-weight:750;margin-top:6px;color:#BE123C;'>" & FORMAT([Taxa Múltiplas Tentativas], "0.00%", "pt-BR") & "</div></div>" &
+			"<div style='flex:1;background:#F8FAFC;border-left:4px solid #2563EB;border-radius:9px;padding:10px;'><div style='font-size:10px;color:#64748B;'>CICLO P50</div><div style='font-size:21px;font-weight:750;margin-top:6px;'>" & FORMAT([Tempo Ciclo P50], "0.00", "pt-BR") & " min</div></div>" &
+			"<div style='flex:1;background:#F8FAFC;border-left:4px solid #D97706;border-radius:9px;padding:10px;'><div style='font-size:10px;color:#64748B;'>CICLO P90 · PERCENTIL</div><div style='font-size:21px;font-weight:750;margin-top:6px;color:#D97706;'>" & FORMAT([Tempo Ciclo P90], "0.00", "pt-BR") & " min</div></div>" &
+			"</div></div>"
 		```
 		formatString: General
 		displayFolder: "90 HTML"
@@ -319,7 +424,7 @@ table 'Métricas'
 			VAR Loja = SELECTEDVALUE('Lojas'[Loja], "Várias")
 			VAR Canal = SELECTEDVALUE('Canais'[Canal], "Vários")
 			RETURN
-			"<div style='font-family:Segoe UI,Arial,sans-serif;color:#F8FAFC;background:#101B2D;border:1px solid #263A56;border-radius:14px;padding:18px 20px;box-sizing:border-box;width:100%;height:100%;'><div style='display:flex;justify-content:space-between;align-items:flex-start;'><div><div style='font-size:10px;color:#9FB0C7;letter-spacing:.08em;'>PEDIDO SELECIONADO</div><div style='font-size:28px;font-weight:800;margin-top:4px;'>#" & COALESCE(FORMAT(PedidoId, "0"), "—") & "</div></div><div style='background:#15233A;border:1px solid #263A56;border-radius:999px;padding:7px 12px;font-size:11px;font-weight:700;'>" & StatusPedido & "</div></div><div style='display:flex;gap:26px;margin-top:15px;font-size:11px;color:#9FB0C7;'><span>Loja: <b style='color:#F8FAFC;'>" & Loja & "</b></span><span>Canal: <b style='color:#F8FAFC;'>" & Canal & "</b></span><span>Valor: <b style='color:#F8FAFC;'>" & FORMAT([Valor Transacionado], "R$ #,##0.00", "pt-BR") & "</b></span></div></div>"
+			"<div style='font-family:Segoe UI,Arial,sans-serif;color:#172033;background:#FFFFFF;border:1px solid #DDE5EF;border-radius:12px;padding:15px 18px;box-sizing:border-box;width:100%;height:100%;'><div style='display:flex;justify-content:space-between;align-items:flex-start;'><div><div style='font-size:10px;color:#64748B;letter-spacing:.07em;'>PEDIDO SELECIONADO</div><div style='font-size:26px;font-weight:800;margin-top:3px;'>#" & COALESCE(FORMAT(PedidoId, "0"), "—") & "</div></div><div style='background:#F8FAFC;border:1px solid #DDE5EF;border-radius:999px;padding:7px 12px;font-size:11px;font-weight:700;'>" & StatusPedido & "</div></div><div style='display:flex;gap:24px;margin-top:12px;font-size:11px;color:#64748B;'><span>Loja: <b style='color:#172033;'>" & Loja & "</b></span><span>Canal: <b style='color:#172033;'>" & Canal & "</b></span><span>Valor: <b style='color:#172033;'>" & FORMAT([Valor Transacionado], "R$ #,##0.00", "pt-BR") & "</b></span></div></div>"
 		```
 		formatString: General
 		displayFolder: "90 HTML"

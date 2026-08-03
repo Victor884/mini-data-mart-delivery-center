@@ -24,18 +24,18 @@ const schemas = {
 };
 
 const colors = {
-  canvas: "#08111F",
-  surface: "#101B2D",
-  surfaceAlt: "#15233A",
-  border: "#263A56",
-  text: "#F8FAFC",
-  muted: "#9FB0C7",
-  teal: "#2DD4BF",
-  blue: "#60A5FA",
-  purple: "#A78BFA",
-  green: "#4ADE80",
-  amber: "#FBBF24",
-  red: "#FB7185"
+  canvas: "#F4F7FB",
+  surface: "#FFFFFF",
+  surfaceAlt: "#F8FAFC",
+  border: "#DDE5EF",
+  text: "#172033",
+  muted: "#64748B",
+  teal: "#0F766E",
+  blue: "#2563EB",
+  purple: "#6D5BD0",
+  green: "#15803D",
+  amber: "#D97706",
+  red: "#BE123C"
 };
 
 const htmlVisualType = "htmlContent443BE3AD55E043BF878BED274D3A6865";
@@ -109,7 +109,7 @@ function projection(field, table, property, displayName) {
   };
 }
 
-function chrome(title, { padding = 8, background = true, border = true } = {}) {
+function chrome(title, { padding = 8, background = true, border = true, altText = title } = {}) {
   const result = {
     title: [{
       properties: {
@@ -145,7 +145,26 @@ function chrome(title, { padding = 8, background = true, border = true } = {}) {
         left: number(padding),
         right: number(padding)
       }
-    }]
+    }],
+    dropShadow: [{
+      properties: {
+        show: bool(background),
+        preset: text("Bottom"),
+        position: text("Outer"),
+        color: fill("#172033"),
+        transparency: number(90),
+        shadowBlur: number(8),
+        shadowDistance: number(2)
+      }
+    }],
+    visualHeader: [{
+      properties: {
+        show: bool(false),
+        foreground: fill(colors.muted),
+        transparency: number(100)
+      }
+    }],
+    general: [{ properties: { altText: text(altText || title || "Visual analítico") } }]
   };
   return result;
 }
@@ -170,13 +189,13 @@ function visualFile(pageName, key, position, visual) {
   };
 }
 
-function textboxVisual(title, subtitle = "") {
+function textboxVisual(title, subtitle = "", { titleSize = 24, subtitleSize = 10 } = {}) {
   const paragraphs = [{
     textRuns: [{
       value: title,
       textStyle: {
         fontFamily: "Segoe UI Semibold",
-        fontSize: "24px",
+        fontSize: `${titleSize}px`,
         fontWeight: "bold",
         color: colors.text
       }
@@ -190,7 +209,7 @@ function textboxVisual(title, subtitle = "") {
         value: subtitle,
         textStyle: {
           fontFamily: "Segoe UI",
-          fontSize: "10px",
+          fontSize: `${subtitleSize}px`,
           color: colors.muted
         }
       }],
@@ -201,7 +220,34 @@ function textboxVisual(title, subtitle = "") {
   return {
     visualType: "textbox",
     objects: { general: [{ properties: { paragraphs } }] },
-    visualContainerObjects: chrome("", { padding: 0, background: false, border: false })
+    visualContainerObjects: chrome("", { padding: 0, background: false, border: false, altText: subtitle ? `${title}. ${subtitle}` : title })
+  };
+}
+
+function pageNavigatorVisual() {
+  const state = (id) => ({ id });
+  return {
+    visualType: "pageNavigator",
+    objects: {
+      layout: [{ properties: { rowCount: number(1, true), cellPadding: number(5, true) } }],
+      pages: [{ properties: { showHiddenPages: bool(false), showTooltipPages: bool(false), showByDefault: bool(true) } }],
+      shape: [{ properties: { tileShape: text("rectangleRounded"), rectangleRoundedCurve: number(8, true) } }],
+      fill: [
+        { selector: state("default"), properties: { show: bool(true), fillColor: fill(colors.surface), transparency: number(100) } },
+        { selector: state("hover"), properties: { show: bool(true), fillColor: fill(colors.surfaceAlt), transparency: number(0) } },
+        { selector: state("selected"), properties: { show: bool(true), fillColor: fill("#E8F0FF"), transparency: number(0) } }
+      ],
+      outline: [
+        { selector: state("default"), properties: { show: bool(false), lineColor: fill(colors.border), transparency: number(100), weight: number(0) } },
+        { selector: state("selected"), properties: { show: bool(true), lineColor: fill(colors.blue), transparency: number(0), weight: number(1) } }
+      ],
+      text: [
+        { selector: state("default"), properties: { show: bool(true), fontFamily: text("Segoe UI Semibold"), fontSize: number(10), bold: bool(false), fontColor: fill(colors.muted), horizontalAlignment: text("center"), verticalAlignment: text("middle") } },
+        { selector: state("selected"), properties: { show: bool(true), fontFamily: text("Segoe UI Semibold"), fontSize: number(10), bold: bool(true), fontColor: fill(colors.blue), horizontalAlignment: text("center"), verticalAlignment: text("middle") } }
+      ],
+      accentBar: [{ selector: state("selected"), properties: { show: bool(true), position: text("Bottom"), color: fill(colors.blue), transparency: number(0), width: number(3) } }]
+    },
+    visualContainerObjects: chrome("", { padding: 0, background: false, border: false, altText: "Navegação entre as páginas do relatório" })
   };
 }
 
@@ -218,6 +264,23 @@ function backButtonVisual() {
     visualContainerObjects: {
       ...chrome("", { padding: 0, background: false, border: false }),
       visualLink: [{ properties: { show: bool(true), type: text("Back"), enabledTooltip: text("Voltar para a página anterior"), showDefaultTooltip: bool(true) } }]
+    }
+  };
+}
+
+function clearFiltersButtonVisual() {
+  return {
+    visualType: "actionButton",
+    objects: {
+      shape: [{ properties: { tileShape: text("rectangleRounded"), rectangleRoundedCurve: number(10) } }],
+      fill: [{ properties: { show: bool(true), fillColor: fill(colors.surface), transparency: number(0) } }],
+      outline: [{ properties: { show: bool(true), lineColor: fill(colors.blue), transparency: number(0), weight: number(1) } }],
+      text: [{ properties: { show: bool(true), text: text("Limpar filtros"), fontFamily: text("Segoe UI Semibold"), fontSize: number(10), bold: bool(true), fontColor: fill(colors.blue), horizontalAlignment: text("center") } }],
+      icon: [{ properties: { show: bool(true), shapeType: text("clearAllSlicers"), lineColor: fill(colors.blue), lineWeight: number(2), placement: text("left"), iconSize: number(16) } }]
+    },
+    visualContainerObjects: {
+      ...chrome("", { padding: 0, background: false, border: false, altText: "Limpar todas as segmentações desta página" }),
+      visualLink: [{ properties: { show: bool(true), type: text("ClearAllSlicers"), enabledTooltip: text("Limpar todas as segmentações da página"), showDefaultTooltip: bool(true) } }]
     }
   };
 }
@@ -240,11 +303,17 @@ function slicerVisual(table, property, label, mode = "Dropdown") {
           text: text(label),
           fontColor: fill(colors.text),
           background: fill(colors.surface),
-          bold: bool(true)
+          fontFamily: text("Segoe UI Semibold"),
+          textSize: number(10),
+          bold: bool(true),
+          showRestatement: bool(true)
         }
-      }]
+      }],
+      items: [{ properties: { fontFamily: text("Segoe UI"), textSize: number(10), fontColor: fill(colors.text), background: fill(colors.surface), padding: number(6) } }],
+      selection: [{ properties: { selectAllCheckboxEnabled: bool(true), singleSelect: bool(false), strictSingleSelect: bool(false) } }],
+      searchBox: [{ properties: { borderColor: fill(colors.border), background: fill(colors.surfaceAlt) } }]
     },
-    visualContainerObjects: chrome("", { padding: 8, background: true, border: true })
+    visualContainerObjects: chrome("", { padding: 7, background: true, border: true, altText: `Segmentação ${label}` })
   };
 }
 
@@ -269,11 +338,11 @@ function htmlVisual(measure) {
         }
       }]
     },
-    visualContainerObjects: chrome("", { padding: 0, background: false, border: false })
+    visualContainerObjects: chrome("", { padding: 0, background: false, border: false, altText: `Resumo em HTML: ${measure}` })
   };
 }
 
-function cartesianVisual(type, title, category, measures, tooltips = []) {
+function cartesianVisual(type, title, category, measures, { tooltips = [], tooltipPage, sortMeasure, sortDirection = "Descending", altText } = {}) {
   const queryState = {
     Category: {
       projections: [projection(columnField(category.table, category.property), category.table, category.property)]
@@ -297,33 +366,44 @@ function cartesianVisual(type, title, category, measures, tooltips = []) {
     };
   }
 
+  const query = { queryState };
+  if (sortMeasure) {
+    query.sortDefinition = {
+      sort: [{ field: measureField("Métricas", sortMeasure), direction: sortDirection }],
+      isDefaultSort: true
+    };
+  }
+
   return {
     visualType: type,
-    query: { queryState },
+    query,
     visualContainerObjects: {
-      ...chrome(title),
-      visualTooltip: [{ properties: { show: bool(true) } }]
+      ...chrome(title, { altText: altText || title }),
+      visualTooltip: [{
+        properties: {
+          show: bool(true),
+          type: text(tooltipPage ? "Canvas" : "Default"),
+          ...(tooltipPage ? { section: text(tooltipPage) } : {})
+        }
+      }]
     }
   };
 }
 
-function donutVisual(title, category, measure, tooltips = []) {
-  return cartesianVisual("donutChart", title, category, [measure], tooltips);
-}
-
 function tableVisual(title, fields, sortMeasure) {
-  const projections = fields.map((field) => projection(
-    field.kind === "measure"
-      ? measureField("Métricas", field.property)
-      : columnField(field.table, field.property),
+  const dimensions = fields.filter((field) => field.kind !== "measure");
+  const measures = fields.filter((field) => field.kind === "measure");
+  const project = (field) => projection(
+    field.kind === "measure" ? measureField("Métricas", field.property) : columnField(field.table, field.property),
     field.kind === "measure" ? "Métricas" : field.table,
     field.property,
     field.displayName
-  ));
+  );
 
-  const query = {
-    queryState: { Values: { projections } }
-  };
+  const usePivot = dimensions.length > 0 && measures.length > 0;
+  const query = usePivot
+    ? { queryState: { Rows: { projections: dimensions.map(project) }, Values: { projections: measures.map(project) } } }
+    : { queryState: { Values: { projections: fields.map(project) } } };
 
   if (sortMeasure) {
     query.sortDefinition = {
@@ -336,9 +416,14 @@ function tableVisual(title, fields, sortMeasure) {
   }
 
   return {
-    visualType: "tableEx",
+    visualType: usePivot ? "pivotTable" : "tableEx",
     query,
-    objects: {
+    objects: usePivot ? {
+      rowHeaders: [{ properties: { fontFamily: text("Segoe UI"), fontSize: number(9), fontColor: fill(colors.text), backColor: fill(colors.surface), stepped: bool(false), wordWrap: bool(false), showExpandCollapseButtons: bool(false), repeatRowHeaders: bool(true) } }],
+      columnHeaders: [{ properties: { fontFamily: text("Segoe UI Semibold"), fontSize: number(9), backColor: fill(colors.surfaceAlt), fontColor: fill(colors.text), bold: bool(true), wordWrap: bool(true) } }],
+      values: [{ properties: { fontFamily: text("Segoe UI"), fontSize: number(9), fontColorPrimary: fill(colors.text), fontColorSecondary: fill(colors.text), backColorPrimary: fill(colors.surface), backColorSecondary: fill(colors.surfaceAlt), wordWrap: bool(false), bandedRowHeaders: bool(true) } }],
+      total: [{ properties: { applyToHeaders: bool(true), fontColor: fill(colors.text), backColor: fill(colors.surfaceAlt), bold: bool(true) } }]
+    } : {
       columnHeaders: [{
         properties: {
           autoSizeColumnWidth: bool(true),
@@ -360,20 +445,33 @@ function tableVisual(title, fields, sortMeasure) {
       }]
     },
     visualContainerObjects: {
-      ...chrome(title),
+      ...chrome(title, { altText: `${title}. Tabela para consulta detalhada.` }),
       stylePreset: [{ properties: { name: text("None") } }]
     }
   };
 }
 
-function pageDefinition(name, displayName, { drillthrough = false } = {}) {
+function cardVisual(measure, title) {
+  return {
+    visualType: "cardVisual",
+    query: {
+      queryState: {
+        Data: { projections: [projection(measureField("Métricas", measure), "Métricas", measure, title)] }
+      }
+    },
+    visualContainerObjects: chrome(title, { padding: 5, altText: `${title}: medida ${measure}` })
+  };
+}
+
+function pageDefinition(name, displayName, { drillthrough = false, tooltip = false } = {}) {
   const value = {
     $schema: schemas.page,
     name,
     displayName,
-    displayOption: "FitToPage",
-    height: 720,
-    width: 1280,
+    displayOption: tooltip ? "ActualSize" : "FitToPage",
+    height: tooltip ? 240 : 720,
+    width: tooltip ? 320 : 1280,
+    visibility: tooltip ? "HiddenInViewMode" : "AlwaysVisible",
     objects: {
       background: [{
         properties: {
@@ -383,7 +481,7 @@ function pageDefinition(name, displayName, { drillthrough = false } = {}) {
       }],
       outspace: [{
         properties: {
-          color: fill("#050A12"),
+          color: fill("#E8EEF6"),
           transparency: number(0)
         }
       }]
@@ -391,6 +489,7 @@ function pageDefinition(name, displayName, { drillthrough = false } = {}) {
   };
 
   if (drillthrough) {
+    value.type = "Drillthrough";
     const filterName = "Filter0d4e9c1284f75d3b9a21e7ff";
     value.filterConfig = {
       filters: [{
@@ -408,6 +507,15 @@ function pageDefinition(name, displayName, { drillthrough = false } = {}) {
         boundFilter: filterName,
         fieldExpr: columnField("Pedido", "Pedido ID")
       }]
+    };
+  }
+
+  if (tooltip) {
+    value.type = "Tooltip";
+    value.pageBinding = {
+      name: stableId("tooltip-binding", name),
+      type: "Tooltip",
+      parameters: []
     };
   }
 
@@ -651,6 +759,12 @@ const daxMeasures = [
   { name: "Margem sobre Taxa Entrega", folder: "01 Comercial", format: "0.00%", description: "Margem de entrega dividida pelas taxas de entrega cobradas.", dax: "DIVIDE([Margem Entrega], [Taxas de Entrega])" },
   { name: "Valor Transacionado Mês Anterior", folder: "01 Comercial\\Inteligência de Tempo", format: "R$ #,##0.00", description: "Valor transacionado deslocado em um mês.", dax: "CALCULATE([Valor Transacionado], DATEADD('Calendário'[Data], -1, MONTH))" },
   { name: "Variação Valor Mensal", folder: "01 Comercial\\Inteligência de Tempo", format: "0.00%", description: "Variação do valor transacionado contra o mês anterior.", dax: "DIVIDE([Valor Transacionado] - [Valor Transacionado Mês Anterior], [Valor Transacionado Mês Anterior])" },
+  { name: "Variação Absoluta Valor Mensal", folder: "01 Comercial\\Inteligência de Tempo", format: "R$ #,##0.00", description: "Diferença absoluta do valor transacionado contra o mês anterior.", dax: "[Valor Transacionado] - [Valor Transacionado Mês Anterior]" },
+  { name: "Participação Valor Transacionado", folder: "01 Comercial\\Tooltips", format: "0.00%", description: "Participação do ponto atual no valor do contexto selecionado, preservando os filtros externos.", dax: "DIVIDE([Valor Transacionado], CALCULATE([Valor Transacionado], ALLSELECTED('Calendário'[Data]), ALLSELECTED('Hubs'), ALLSELECTED('Lojas'), ALLSELECTED('Canais')))" },
+  { name: "Pedidos Mês Anterior", folder: "01 Comercial\\Inteligência de Tempo", format: "#,##0", description: "Quantidade de pedidos deslocada em um mês.", dax: "CALCULATE([Pedidos Criados], DATEADD('Calendário'[Data], -1, MONTH))" },
+  { name: "Variação Absoluta Pedidos Mensal", folder: "01 Comercial\\Inteligência de Tempo", format: "#,##0", description: "Diferença absoluta de pedidos contra o mês anterior.", dax: "[Pedidos Criados] - [Pedidos Mês Anterior]" },
+  { name: "Variação Pedidos Mensal", folder: "01 Comercial\\Inteligência de Tempo", format: "0.00%", description: "Variação percentual de pedidos contra o mês anterior.", dax: "DIVIDE([Pedidos Criados] - [Pedidos Mês Anterior], [Pedidos Mês Anterior])" },
+  { name: "Participação Pedidos", folder: "01 Comercial\\Tooltips", format: "0.00%", description: "Participação do ponto atual nos pedidos do contexto selecionado.", dax: "DIVIDE([Pedidos Criados], CALCULATE([Pedidos Criados], ALLSELECTED('Calendário'[Data]), ALLSELECTED('Hubs'), ALLSELECTED('Lojas'), ALLSELECTED('Canais'), ALLSELECTED('Pedidos'[Status Pedido])))" },
 
   { name: "Pedidos com Entrega", folder: "02 Logística", format: "#,##0", description: "Pedidos representados pela última tentativa de entrega.", dax: "CALCULATE(DISTINCTCOUNT('Entregas'[Chave Pedido]), KEEPFILTERS('Entregas'[É Última Tentativa] = TRUE()))" },
   { name: "Entregas Concluídas", folder: "02 Logística", format: "#,##0", description: "Últimas tentativas com status DELIVERED.", dax: "CALCULATE(DISTINCTCOUNT('Entregas'[Chave Pedido]), KEEPFILTERS('Entregas'[É Última Tentativa] = TRUE()), KEEPFILTERS('Entregas'[Status Entrega] = \"DELIVERED\"))" },
@@ -661,6 +775,9 @@ const daxMeasures = [
   { name: "Tempo Ciclo Médio", folder: "02 Logística", format: "#,##0.00", description: "Tempo médio dos pedidos finalizados; ao filtrar entregadores, restringe aos pedidos das últimas tentativas selecionadas.", dax: "VAR PedidosEntrega = CALCULATETABLE(VALUES('Entregas'[Chave Pedido]), KEEPFILTERS('Entregas'[É Última Tentativa] = TRUE())) RETURN IF(ISCROSSFILTERED('Entregadores'), CALCULATE(AVERAGEX(FILTER('Pedidos', 'Pedidos'[Status Pedido] = \"FINISHED\" && 'Pedidos'[Tempo Ciclo] >= 0), 'Pedidos'[Tempo Ciclo]), TREATAS(PedidosEntrega, 'Pedidos'[Chave Pedido])), AVERAGEX(FILTER('Pedidos', 'Pedidos'[Status Pedido] = \"FINISHED\" && 'Pedidos'[Tempo Ciclo] >= 0), 'Pedidos'[Tempo Ciclo]))" },
   { name: "Tempo Ciclo P50", folder: "02 Logística", format: "#,##0.00", description: "Percentil 50 dos pedidos finalizados; ao filtrar entregadores, restringe aos pedidos das últimas tentativas selecionadas.", dax: "VAR PedidosEntrega = CALCULATETABLE(VALUES('Entregas'[Chave Pedido]), KEEPFILTERS('Entregas'[É Última Tentativa] = TRUE())) RETURN IF(ISCROSSFILTERED('Entregadores'), CALCULATE(PERCENTILEX.INC(FILTER('Pedidos', 'Pedidos'[Status Pedido] = \"FINISHED\" && 'Pedidos'[Tempo Ciclo] >= 0), 'Pedidos'[Tempo Ciclo], 0.5), TREATAS(PedidosEntrega, 'Pedidos'[Chave Pedido])), PERCENTILEX.INC(FILTER('Pedidos', 'Pedidos'[Status Pedido] = \"FINISHED\" && 'Pedidos'[Tempo Ciclo] >= 0), 'Pedidos'[Tempo Ciclo], 0.5))" },
   { name: "Tempo Ciclo P90", folder: "02 Logística", format: "#,##0.00", description: "Percentil 90 dos pedidos finalizados; ao filtrar entregadores, restringe aos pedidos das últimas tentativas selecionadas.", dax: "VAR PedidosEntrega = CALCULATETABLE(VALUES('Entregas'[Chave Pedido]), KEEPFILTERS('Entregas'[É Última Tentativa] = TRUE())) RETURN IF(ISCROSSFILTERED('Entregadores'), CALCULATE(PERCENTILEX.INC(FILTER('Pedidos', 'Pedidos'[Status Pedido] = \"FINISHED\" && 'Pedidos'[Tempo Ciclo] >= 0), 'Pedidos'[Tempo Ciclo], 0.9), TREATAS(PedidosEntrega, 'Pedidos'[Chave Pedido])), PERCENTILEX.INC(FILTER('Pedidos', 'Pedidos'[Status Pedido] = \"FINISHED\" && 'Pedidos'[Tempo Ciclo] >= 0), 'Pedidos'[Tempo Ciclo], 0.9))" },
+  { name: "Tempo Produção Médio", folder: "02 Logística\\Etapas", format: "#,##0.00", description: "Tempo médio de produção dos pedidos finalizados com duração válida.", dax: "AVERAGEX(FILTER('Pedidos', 'Pedidos'[Status Pedido] = \"FINISHED\" && 'Pedidos'[Tempo Produção] >= 0), 'Pedidos'[Tempo Produção])" },
+  { name: "Tempo Trânsito Médio", folder: "02 Logística\\Etapas", format: "#,##0.00", description: "Tempo médio de trânsito dos pedidos finalizados com duração válida.", dax: "AVERAGEX(FILTER('Pedidos', 'Pedidos'[Status Pedido] = \"FINISHED\" && 'Pedidos'[Tempo Trânsito] >= 0), 'Pedidos'[Tempo Trânsito])" },
+  { name: "Participação Pedidos com Entrega", folder: "02 Logística\\Tooltips", format: "0.00%", description: "Participação do ponto atual entre os pedidos com entrega do contexto selecionado.", dax: "DIVIDE([Pedidos com Entrega], CALCULATE([Pedidos com Entrega], ALLSELECTED('Calendário'[Data]), ALLSELECTED('Hubs'), ALLSELECTED('Lojas'), ALLSELECTED('Entregadores')))" },
 
   { name: "Transações Pagas", folder: "03 Financeiro", format: "#,##0", description: "Quantidade de transações com status PAID.", dax: "CALCULATE(COUNTROWS('Pagamentos'), KEEPFILTERS('Pagamentos'[Status Pagamento] = \"PAID\"))" },
   { name: "Valor Pago", folder: "03 Financeiro", format: "R$ #,##0.00", description: "Valor bruto de transações PAID.", dax: "CALCULATE(SUM('Pagamentos'[Valor Pagamento]), KEEPFILTERS('Pagamentos'[Status Pagamento] = \"PAID\"))" },
@@ -673,10 +790,16 @@ const daxMeasures = [
   { name: "Pedidos Finalizados Conciliação", folder: "03 Financeiro", format: "#,##0", description: "Denominador da taxa de conciliação: pedidos finalizados.", dax: "CALCULATE([Pedidos na Conciliação], KEEPFILTERS('Conciliação'[Status Pedido] = \"FINISHED\"))" },
   { name: "Taxa Conciliação", folder: "03 Financeiro", format: "0.00%", description: "Pedidos finalizados conciliados divididos pelos pedidos finalizados.", dax: "DIVIDE([Pedidos Conciliados], [Pedidos Finalizados Conciliação])" },
   { name: "Diferença Absoluta Conciliação", folder: "03 Financeiro", format: "R$ #,##0.00", description: "Soma do valor absoluto das diferenças dos pedidos finalizados.", dax: "CALCULATE(SUMX('Conciliação', ABS('Conciliação'[Diferença Conciliação])), KEEPFILTERS('Conciliação'[Status Pedido] = \"FINISHED\"))" },
-  { name: "Pedidos sem Pagamento Pago", folder: "03 Financeiro", format: "#,##0", description: "Pedidos finalizados sem transação PAID.", dax: "CALCULATE([Pedidos na Conciliação], KEEPFILTERS('Conciliação'[Status Pedido] = \"FINISHED\"), KEEPFILTERS('Conciliação'[Status Conciliação] IN { \"SEM_PAGAMENTO\", \"SEM_PAGAMENTO_PAGO\" }))" }
+  { name: "Pedidos sem Pagamento Pago", folder: "03 Financeiro", format: "#,##0", description: "Pedidos finalizados sem transação PAID.", dax: "CALCULATE([Pedidos na Conciliação], KEEPFILTERS('Conciliação'[Status Pedido] = \"FINISHED\"), KEEPFILTERS('Conciliação'[Status Conciliação] IN { \"SEM_PAGAMENTO\", \"SEM_PAGAMENTO_PAGO\" }))" },
+  { name: "Valor Pago Mês Anterior", folder: "03 Financeiro\\Inteligência de Tempo", format: "R$ #,##0.00", description: "Valor pago deslocado em um mês.", dax: "CALCULATE([Valor Pago], DATEADD('Calendário'[Data], -1, MONTH))" },
+  { name: "Variação Absoluta Valor Pago Mensal", folder: "03 Financeiro\\Inteligência de Tempo", format: "R$ #,##0.00", description: "Diferença absoluta do valor pago contra o mês anterior.", dax: "[Valor Pago] - [Valor Pago Mês Anterior]" },
+  { name: "Variação Valor Pago Mensal", folder: "03 Financeiro\\Inteligência de Tempo", format: "0.00%", description: "Variação percentual do valor pago contra o mês anterior.", dax: "DIVIDE([Valor Pago] - [Valor Pago Mês Anterior], [Valor Pago Mês Anterior])" },
+  { name: "Participação Valor Pago", folder: "03 Financeiro\\Tooltips", format: "0.00%", description: "Participação do ponto atual no valor pago do contexto selecionado.", dax: "DIVIDE([Valor Pago], CALCULATE([Valor Pago], ALLSELECTED('Calendário'[Data]), ALLSELECTED('Hubs'), ALLSELECTED('Lojas'), ALLSELECTED('Canais'), ALLSELECTED('Pagamentos'[Meio Pagamento])))" },
+
+  { name: "Contexto Tooltip", folder: "90 Tooltips", format: "General", description: "Rótulo do ponto, período ou categoria recebido pela página de tooltip.", dax: "VAR DataSelecionada = SELECTEDVALUE('Calendário'[Data]) VAR Hub = SELECTEDVALUE('Hubs'[Hub]) VAR Loja = SELECTEDVALUE('Lojas'[Loja]) VAR Canal = SELECTEDVALUE('Canais'[Canal]) VAR Modal = SELECTEDVALUE('Entregadores'[Modal Entregador]) VAR Pagamento = SELECTEDVALUE('Pagamentos'[Meio Pagamento]) VAR StatusPedido = SELECTEDVALUE('Pedidos'[Status Pedido]) VAR StatusConcil = SELECTEDVALUE('Conciliação'[Status Conciliação]) RETURN COALESCE(IF(NOT ISBLANK(DataSelecionada), FORMAT(DataSelecionada, \"dd/MM/yyyy\")), Hub, Loja, Canal, Modal, Pagamento, StatusPedido, StatusConcil, \"Contexto selecionado\")" }
 ];
 
-const htmlMeasures = [
+const legacyHtmlMeasures = [
   {
     name: "HTML | KPIs Executivos",
     description: "Painel HTML/CSS com os KPIs comerciais principais.",
@@ -754,6 +877,94 @@ VAR Loja = SELECTEDVALUE('Lojas'[Loja], "Várias")
 VAR Canal = SELECTEDVALUE('Canais'[Canal], "Vários")
 RETURN
 "<div style=\"font-family:Segoe UI,Arial,sans-serif;color:${colors.text};background:${colors.surface};border:1px solid ${colors.border};border-radius:14px;padding:18px 20px;box-sizing:border-box;width:100%;height:100%;\"><div style=\"display:flex;justify-content:space-between;align-items:flex-start;\"><div><div style=\"font-size:10px;color:${colors.muted};letter-spacing:.08em;\">PEDIDO SELECIONADO</div><div style=\"font-size:28px;font-weight:800;margin-top:4px;\">#" & COALESCE(FORMAT(PedidoId, "0"), "—") & "</div></div><div style=\"background:${colors.surfaceAlt};border:1px solid ${colors.border};border-radius:999px;padding:7px 12px;font-size:11px;font-weight:700;\">" & StatusPedido & "</div></div><div style=\"display:flex;gap:26px;margin-top:15px;font-size:11px;color:${colors.muted};\"><span>Loja: <b style=\"color:${colors.text};\">" & Loja & "</b></span><span>Canal: <b style=\"color:${colors.text};\">" & Canal & "</b></span><span>Valor: <b style=\"color:${colors.text};\">" & FORMAT([Valor Transacionado], "R$ #,##0.00", "pt-BR") & "</b></span></div></div>"`
+  }
+];
+
+const htmlMeasures = [
+  {
+    name: "HTML | KPIs Executivos",
+    description: "Quatro KPIs executivos em HTML/CSS, com unidade e período explícitos.",
+    dax: `VAR Periodo = FORMAT(MIN('Calendário'[Data]), "dd/MM/yyyy") & " a " & FORMAT(MAX('Calendário'[Data]), "dd/MM/yyyy")
+VAR CorMargem = IF([Margem Entrega] >= 0, "${colors.teal}", "${colors.red}")
+RETURN
+"<div style=\"font-family:Segoe UI,Arial,sans-serif;color:${colors.text};background:${colors.surface};border:1px solid ${colors.border};border-radius:12px;padding:12px 14px;box-sizing:border-box;width:100%;height:100%;\">" &
+"<div style=\"display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;\"><b style=\"font-size:12px;letter-spacing:.03em;\">RESULTADO DO PERÍODO</b><span style=\"font-size:10px;color:${colors.muted};\">" & Periodo & "</span></div>" &
+"<div style=\"display:flex;gap:10px;height:76px;\">" &
+"<div style=\"flex:1;background:${colors.surfaceAlt};border-left:4px solid ${colors.blue};border-radius:9px;padding:10px;box-sizing:border-box;\"><div style=\"font-size:10px;color:${colors.muted};\">VALOR TRANSACIONADO</div><div style=\"font-size:21px;font-weight:750;margin-top:6px;\">" & FORMAT([Valor Transacionado], "R$ #,##0.00", "pt-BR") & "</div></div>" &
+"<div style=\"flex:1;background:${colors.surfaceAlt};border-left:4px solid ${colors.teal};border-radius:9px;padding:10px;box-sizing:border-box;\"><div style=\"font-size:10px;color:${colors.muted};\">PEDIDOS FINALIZADOS</div><div style=\"font-size:21px;font-weight:750;margin-top:6px;\">" & FORMAT([Pedidos Finalizados], "#,##0", "pt-BR") & "</div></div>" &
+"<div style=\"flex:1;background:${colors.surfaceAlt};border-left:4px solid ${colors.purple};border-radius:9px;padding:10px;box-sizing:border-box;\"><div style=\"font-size:10px;color:${colors.muted};\">TICKET MÉDIO</div><div style=\"font-size:21px;font-weight:750;margin-top:6px;\">" & FORMAT([Ticket Médio], "R$ #,##0.00", "pt-BR") & "</div></div>" &
+"<div style=\"flex:1;background:${colors.surfaceAlt};border-left:4px solid " & CorMargem & ";border-radius:9px;padding:10px;box-sizing:border-box;\"><div style=\"font-size:10px;color:${colors.muted};\">MARGEM DE ENTREGA</div><div style=\"font-size:21px;font-weight:750;margin-top:6px;color:" & CorMargem & ";\">" & FORMAT([Margem Entrega], "R$ #,##0.00", "pt-BR") & "</div></div>" &
+"</div></div>"`
+  },
+  {
+    name: "HTML | Saúde Executiva",
+    description: "Painel de saúde operacional que não apresenta P90 como SLA.",
+    dax: `VAR CorMargem = IF([Margem Entrega] >= 0, "${colors.teal}", "${colors.red}")
+RETURN
+"<div style=\"font-family:Segoe UI,Arial,sans-serif;color:${colors.text};background:${colors.surface};border:1px solid ${colors.border};border-radius:12px;padding:13px 15px;box-sizing:border-box;width:100%;height:100%;\">" &
+"<div style=\"font-size:12px;font-weight:700;margin-bottom:9px;\">SAÚDE OPERACIONAL</div>" &
+"<div style=\"display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid ${colors.border};font-size:11px;\"><span>Taxa de cancelamento</span><b style=\"color:${colors.red};\">" & FORMAT([Taxa Cancelamento], "0.00%", "pt-BR") & "</b></div>" &
+"<div style=\"display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid ${colors.border};font-size:11px;\"><span>Ciclo P90 <small style=\"color:${colors.muted};\">(percentil)</small></span><b style=\"color:${colors.amber};\">" & FORMAT([Tempo Ciclo P90], "0.00", "pt-BR") & " min</b></div>" &
+"<div style=\"display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid ${colors.border};font-size:11px;\"><span>Taxa de conciliação</span><b style=\"color:${colors.teal};\">" & FORMAT([Taxa Conciliação], "0.00%", "pt-BR") & "</b></div>" &
+"<div style=\"display:flex;justify-content:space-between;padding:7px 0;font-size:11px;\"><span>Margem de entrega</span><b style=\"color:" & CorMargem & ";\">" & FORMAT([Margem Entrega], "R$ #,##0.00", "pt-BR") & "</b></div>" &
+"</div>"`
+  },
+  {
+    name: "HTML | KPIs Pedidos",
+    description: "Quatro KPIs de pedidos e operação em HTML/CSS.",
+    dax: `"<div style=\"font-family:Segoe UI,Arial,sans-serif;color:${colors.text};background:${colors.surface};border:1px solid ${colors.border};border-radius:12px;padding:12px 14px;box-sizing:border-box;width:100%;height:100%;\">" &
+"<div style=\"font-size:12px;font-weight:700;margin-bottom:8px;\">PEDIDOS E OPERAÇÃO</div><div style=\"display:flex;gap:10px;height:76px;\">" &
+"<div style=\"flex:1;background:${colors.surfaceAlt};border-left:4px solid ${colors.blue};border-radius:9px;padding:10px;\"><div style=\"font-size:10px;color:${colors.muted};\">PEDIDOS CRIADOS</div><div style=\"font-size:21px;font-weight:750;margin-top:6px;\">" & FORMAT([Pedidos Criados], "#,##0", "pt-BR") & "</div></div>" &
+"<div style=\"flex:1;background:${colors.surfaceAlt};border-left:4px solid ${colors.teal};border-radius:9px;padding:10px;\"><div style=\"font-size:10px;color:${colors.muted};\">FINALIZADOS</div><div style=\"font-size:21px;font-weight:750;margin-top:6px;\">" & FORMAT([Pedidos Finalizados], "#,##0", "pt-BR") & "</div></div>" &
+"<div style=\"flex:1;background:${colors.surfaceAlt};border-left:4px solid ${colors.red};border-radius:9px;padding:10px;\"><div style=\"font-size:10px;color:${colors.muted};\">CANCELAMENTO</div><div style=\"font-size:21px;font-weight:750;margin-top:6px;color:${colors.red};\">" & FORMAT([Taxa Cancelamento], "0.00%", "pt-BR") & "</div></div>" &
+"<div style=\"flex:1;background:${colors.surfaceAlt};border-left:4px solid ${colors.amber};border-radius:9px;padding:10px;\"><div style=\"font-size:10px;color:${colors.muted};\">CICLO MÉDIO</div><div style=\"font-size:21px;font-weight:750;margin-top:6px;\">" & FORMAT([Tempo Ciclo Médio], "0.00", "pt-BR") & " min</div></div>" &
+"</div></div>"`
+  },
+  {
+    name: "HTML | Etapas Operacionais",
+    description: "Resumo HTML/CSS das etapas de produção, trânsito e ciclo.",
+    dax: `"<div style=\"font-family:Segoe UI,Arial,sans-serif;color:${colors.text};background:${colors.surface};border:1px solid ${colors.border};border-radius:12px;padding:13px 15px;box-sizing:border-box;width:100%;height:100%;\">" &
+"<div style=\"font-size:12px;font-weight:700;margin-bottom:10px;\">DECOMPOSIÇÃO DO CICLO</div>" &
+"<div style=\"display:grid;grid-template-columns:1fr 1fr;gap:8px;\">" &
+"<div style=\"background:${colors.surfaceAlt};border-radius:8px;padding:9px;\"><small style=\"color:${colors.muted};\">Produção média</small><div style=\"font-size:18px;font-weight:700;margin-top:4px;\">" & FORMAT([Tempo Produção Médio], "0.00", "pt-BR") & " min</div></div>" &
+"<div style=\"background:${colors.surfaceAlt};border-radius:8px;padding:9px;\"><small style=\"color:${colors.muted};\">Trânsito médio</small><div style=\"font-size:18px;font-weight:700;margin-top:4px;\">" & FORMAT([Tempo Trânsito Médio], "0.00", "pt-BR") & " min</div></div>" &
+"<div style=\"background:${colors.surfaceAlt};border-radius:8px;padding:9px;\"><small style=\"color:${colors.muted};\">Ciclo P50</small><div style=\"font-size:18px;font-weight:700;margin-top:4px;\">" & FORMAT([Tempo Ciclo P50], "0.00", "pt-BR") & " min</div></div>" &
+"<div style=\"background:${colors.surfaceAlt};border-radius:8px;padding:9px;\"><small style=\"color:${colors.muted};\">Ciclo P90 · não é SLA</small><div style=\"font-size:18px;font-weight:700;margin-top:4px;color:${colors.amber};\">" & FORMAT([Tempo Ciclo P90], "0.00", "pt-BR") & " min</div></div>" &
+"</div></div>"`
+  },
+  {
+    name: "HTML | KPIs Financeiros",
+    description: "Quatro KPIs financeiros em HTML/CSS.",
+    dax: `VAR CorMargem = IF([Margem Entrega] >= 0, "${colors.teal}", "${colors.red}")
+RETURN
+"<div style=\"font-family:Segoe UI,Arial,sans-serif;color:${colors.text};background:${colors.surface};border:1px solid ${colors.border};border-radius:12px;padding:12px 14px;box-sizing:border-box;width:100%;height:100%;\">" &
+"<div style=\"font-size:12px;font-weight:700;margin-bottom:8px;\">DESEMPENHO FINANCEIRO</div><div style=\"display:flex;gap:10px;height:76px;\">" &
+"<div style=\"flex:1;background:${colors.surfaceAlt};border-left:4px solid ${colors.blue};border-radius:9px;padding:10px;\"><div style=\"font-size:10px;color:${colors.muted};\">VALOR TRANSACIONADO</div><div style=\"font-size:21px;font-weight:750;margin-top:6px;\">" & FORMAT([Valor Transacionado], "R$ #,##0.00", "pt-BR") & "</div></div>" &
+"<div style=\"flex:1;background:${colors.surfaceAlt};border-left:4px solid ${colors.teal};border-radius:9px;padding:10px;\"><div style=\"font-size:10px;color:${colors.muted};\">VALOR PAGO</div><div style=\"font-size:21px;font-weight:750;margin-top:6px;\">" & FORMAT([Valor Pago], "R$ #,##0.00", "pt-BR") & "</div></div>" &
+"<div style=\"flex:1;background:${colors.surfaceAlt};border-left:4px solid ${colors.purple};border-radius:9px;padding:10px;\"><div style=\"font-size:10px;color:${colors.muted};\">TICKET MÉDIO</div><div style=\"font-size:21px;font-weight:750;margin-top:6px;\">" & FORMAT([Ticket Médio], "R$ #,##0.00", "pt-BR") & "</div></div>" &
+"<div style=\"flex:1;background:${colors.surfaceAlt};border-left:4px solid " & CorMargem & ";border-radius:9px;padding:10px;\"><div style=\"font-size:10px;color:${colors.muted};\">MARGEM DE ENTREGA</div><div style=\"font-size:21px;font-weight:750;margin-top:6px;color:" & CorMargem & ";\">" & FORMAT([Margem Entrega], "R$ #,##0.00", "pt-BR") & "</div></div>" &
+"</div></div>"`
+  },
+  {
+    name: "HTML | KPIs Logística",
+    description: "Quatro KPIs logísticos em HTML/CSS; P90 permanece percentil.",
+    dax: `"<div style=\"font-family:Segoe UI,Arial,sans-serif;color:${colors.text};background:${colors.surface};border:1px solid ${colors.border};border-radius:12px;padding:12px 14px;box-sizing:border-box;width:100%;height:100%;\">" &
+"<div style=\"font-size:12px;font-weight:700;margin-bottom:8px;\">ENTREGAS E QUALIDADE</div><div style=\"display:flex;gap:10px;height:76px;\">" &
+"<div style=\"flex:1;background:${colors.surfaceAlt};border-left:4px solid ${colors.teal};border-radius:9px;padding:10px;\"><div style=\"font-size:10px;color:${colors.muted};\">ENTREGA CONCLUÍDA</div><div style=\"font-size:21px;font-weight:750;margin-top:6px;\">" & FORMAT([Taxa Entrega Concluída], "0.00%", "pt-BR") & "</div></div>" &
+"<div style=\"flex:1;background:${colors.surfaceAlt};border-left:4px solid ${colors.red};border-radius:9px;padding:10px;\"><div style=\"font-size:10px;color:${colors.muted};\">MÚLTIPLAS TENTATIVAS</div><div style=\"font-size:21px;font-weight:750;margin-top:6px;color:${colors.red};\">" & FORMAT([Taxa Múltiplas Tentativas], "0.00%", "pt-BR") & "</div></div>" &
+"<div style=\"flex:1;background:${colors.surfaceAlt};border-left:4px solid ${colors.blue};border-radius:9px;padding:10px;\"><div style=\"font-size:10px;color:${colors.muted};\">CICLO P50</div><div style=\"font-size:21px;font-weight:750;margin-top:6px;\">" & FORMAT([Tempo Ciclo P50], "0.00", "pt-BR") & " min</div></div>" &
+"<div style=\"flex:1;background:${colors.surfaceAlt};border-left:4px solid ${colors.amber};border-radius:9px;padding:10px;\"><div style=\"font-size:10px;color:${colors.muted};\">CICLO P90 · PERCENTIL</div><div style=\"font-size:21px;font-weight:750;margin-top:6px;color:${colors.amber};\">" & FORMAT([Tempo Ciclo P90], "0.00", "pt-BR") & " min</div></div>" &
+"</div></div>"`
+  },
+  {
+    name: "HTML | Detalhe Pedido",
+    description: "Cabeçalho HTML/CSS do pedido selecionado via drill-through.",
+    dax: `VAR PedidoId = SELECTEDVALUE('Pedido'[Pedido ID])
+VAR StatusPedido = SELECTEDVALUE('Pedidos'[Status Pedido], "Vários")
+VAR Loja = SELECTEDVALUE('Lojas'[Loja], "Várias")
+VAR Canal = SELECTEDVALUE('Canais'[Canal], "Vários")
+RETURN
+"<div style=\"font-family:Segoe UI,Arial,sans-serif;color:${colors.text};background:${colors.surface};border:1px solid ${colors.border};border-radius:12px;padding:15px 18px;box-sizing:border-box;width:100%;height:100%;\"><div style=\"display:flex;justify-content:space-between;align-items:flex-start;\"><div><div style=\"font-size:10px;color:${colors.muted};letter-spacing:.07em;\">PEDIDO SELECIONADO</div><div style=\"font-size:26px;font-weight:800;margin-top:3px;\">#" & COALESCE(FORMAT(PedidoId, "0"), "—") & "</div></div><div style=\"background:${colors.surfaceAlt};border:1px solid ${colors.border};border-radius:999px;padding:7px 12px;font-size:11px;font-weight:700;\">" & StatusPedido & "</div></div><div style=\"display:flex;gap:24px;margin-top:12px;font-size:11px;color:${colors.muted};\"><span>Loja: <b style=\"color:${colors.text};\">" & Loja & "</b></span><span>Canal: <b style=\"color:${colors.text};\">" & Canal & "</b></span><span>Valor: <b style=\"color:${colors.text};\">" & FORMAT([Valor Transacionado], "R$ #,##0.00", "pt-BR") & "</b></span></div></div>"`
   }
 ];
 
@@ -909,17 +1120,23 @@ ROW(
     "Margem Entrega", [Margem Entrega],
     "Tempo Ciclo P50", [Tempo Ciclo P50],
     "Tempo Ciclo P90", [Tempo Ciclo P90],
+    "Tempo Produção Médio", [Tempo Produção Médio],
+    "Tempo Trânsito Médio", [Tempo Trânsito Médio],
     "Taxa Entrega Concluída", [Taxa Entrega Concluída],
     "Taxa Múltiplas Tentativas", [Taxa Múltiplas Tentativas],
     "Valor Pago", [Valor Pago],
     "Valor Chargeback", [Valor Chargeback],
-    "Taxa Conciliação", [Taxa Conciliação]
+    "Taxa Conciliação", [Taxa Conciliação],
+    "Valor anterior", [Valor Transacionado Mês Anterior],
+    "Variação valor", [Variação Valor Mensal],
+    "Pedidos anteriores", [Pedidos Mês Anterior],
+    "Valor pago anterior", [Valor Pago Mês Anterior]
 )`);
 
-const themeFile = "DeliveryCenterDark-4f61c2a9.json";
+const themeFile = "DeliveryCenterPortfolio-20260802.json";
 writeJson(`${reportName}/StaticResources/RegisteredResources/${themeFile}`, {
   name: themeFile,
-  dataColors: [colors.teal, colors.blue, colors.purple, colors.green, colors.amber, colors.red, "#38BDF8", "#F472B6"],
+  dataColors: [colors.blue, colors.teal, colors.purple, colors.amber, colors.red, colors.green, "#0284C7", "#7C3AED"],
   good: colors.green,
   neutral: colors.amber,
   bad: colors.red,
@@ -932,7 +1149,7 @@ writeJson(`${reportName}/StaticResources/RegisteredResources/${themeFile}`, {
   background: colors.canvas,
   backgroundLight: colors.surface,
   backgroundNeutral: colors.surfaceAlt,
-  tableAccent: colors.teal,
+  tableAccent: colors.blue,
   textClasses: {
     callout: { fontFace: "Segoe UI Semibold", fontSize: 28, color: colors.text },
     title: { fontFace: "Segoe UI Semibold", fontSize: 13, color: colors.text },
@@ -945,7 +1162,7 @@ writeJson(`${reportName}/StaticResources/RegisteredResources/${themeFile}`, {
         title: [{ show: true, fontColor: { solid: { color: colors.text } }, fontFamily: "Segoe UI Semibold", fontSize: 12 }],
         background: [{ show: true, color: { solid: { color: colors.surface } }, transparency: 0 }],
         border: [{ show: true, color: { solid: { color: colors.border } }, radius: 12, width: 1 }],
-        visualHeader: [{ show: true, foreground: { solid: { color: colors.muted } }, transparency: 0 }]
+        visualHeader: [{ show: false, foreground: { solid: { color: colors.muted } }, transparency: 100 }]
       }
     }
   }
@@ -971,7 +1188,7 @@ writeJson(`${reportName}/definition/report.json`, {
     items: [{ name: themeFile, path: themeFile, type: "CustomTheme" }]
   }],
   settings: {
-    hideVisualContainerHeader: false,
+    hideVisualContainerHeader: true,
     useStylableVisualContainerHeader: true,
     exportDataMode: "AllowSummarized",
     defaultFilterActionIsDataFilter: true,
@@ -983,7 +1200,9 @@ writeJson(`${reportName}/definition/report.json`, {
   annotations: [
     { name: "owner", value: "Mini Data Mart Delivery Center" },
     { name: "source", value: "PostgreSQL mart views" },
-    { name: "htmlVisual", value: "HTML Content (lite) - AppSource" }
+    { name: "htmlVisual", value: "HTML Content (lite) - AppSource" },
+    { name: "designContract", value: "powerbi/docs/CONTRATO_VISUAL.md" },
+    { name: "redesign", value: "portfolio-2026" }
   ]
 });
 
@@ -992,6 +1211,7 @@ writeJson(`${reportName}/definition/version.json`, {
   version: "2.0.0"
 });
 
+if (false) { // layout legado preservado apenas como referência histórica do gerador
 const pages = {
   executive: { name: "e1e1e1e1e1e1e1e1e1e1", displayName: "01 Executivo" },
   logistics: { name: "102030405060708090ab", displayName: "02 Logística" },
@@ -1111,6 +1331,360 @@ const detailVisuals = [
   ]))
 ];
 addPage(detailPage, detailVisuals);
+
+}
+
+const pages = {
+  executive: { name: "e1e1e1e1e1e1e1e1e1e1", displayName: "01 Visão Executiva" },
+  orders: { name: "0a1b2c3d4e5f60718293", displayName: "02 Pedidos & Operação" },
+  finance: { name: "abcdef0123456789abcd", displayName: "03 Financeiro" },
+  delivery: { name: "102030405060708090ab", displayName: "04 Entregas & Qualidade" },
+  detail: { name: "deadbeefdeadbeefdead", displayName: "05 Detalhamento" },
+  tooltipCommercial: { name: "aa11bb22cc33dd44ee55", displayName: "Tooltip | Comercial" },
+  tooltipOrders: { name: "bb22cc33dd44ee55ff66", displayName: "Tooltip | Pedidos" },
+  tooltipFinance: { name: "cc33dd44ee55ff667788", displayName: "Tooltip | Financeiro" },
+  tooltipDelivery: { name: "dd44ee55ff6677889900", displayName: "Tooltip | Entregas" }
+};
+
+writeJson(`${reportName}/definition/pages/pages.json`, {
+  $schema: schemas.pages,
+  pageOrder: [
+    pages.executive.name,
+    pages.orders.name,
+    pages.finance.name,
+    pages.delivery.name,
+    pages.detail.name,
+    pages.tooltipCommercial.name,
+    pages.tooltipOrders.name,
+    pages.tooltipFinance.name,
+    pages.tooltipDelivery.name
+  ],
+  activePageName: pages.executive.name
+});
+
+let zNew = 1000;
+const posNew = (x, y, width, height) => ({ x, y, width, height, z: (zNew += 1000) });
+
+function reportShell(page, title, subtitle, filters, { detail = false } = {}) {
+  const visuals = [
+    visualFile(page.name, "brand", posNew(20, 12, 290, 42), textboxVisual("Delivery Center Analytics", "PostgreSQL · schema mart", { titleSize: 20, subtitleSize: 9 })),
+    visualFile(page.name, "navigation", posNew(330, 10, 750, 46), pageNavigatorVisual()),
+    visualFile(page.name, "model-status", posNew(1090, 17, 170, 30), textboxVisual("MODELO VALIDADO", "120 dias · 01/01 a 30/04/2021", { titleSize: 10, subtitleSize: 8 })),
+    visualFile(page.name, "page-title", posNew(240, 74, 1024, 46), textboxVisual(title, subtitle, { titleSize: 21, subtitleSize: 10 })),
+    visualFile(page.name, "filter-title", posNew(16, 82, 208, 34), textboxVisual("Filtros", "Contexto da página", { titleSize: 15, subtitleSize: 9 }))
+  ];
+
+  filters.forEach((filter, index) => {
+    visuals.push(visualFile(
+      page.name,
+      `filter-${filter.key}`,
+      posNew(16, 126 + (index * 82), 208, 78),
+      slicerVisual(filter.table, filter.property, filter.label, filter.mode || "Dropdown")
+    ));
+  });
+
+  if (detail) {
+    visuals.push(visualFile(page.name, "back", posNew(16, 570, 208, 48), backButtonVisual()));
+  }
+  visuals.push(visualFile(page.name, "clear-filters", posNew(16, 636, 208, 48), clearFiltersButtonVisual()));
+  return visuals;
+}
+
+function tooltipPage(page, measures) {
+  zNew = 1000;
+  const definition = { name: page.name, value: pageDefinition(page.name, page.displayName, { tooltip: true }) };
+  const visuals = [
+    visualFile(page.name, "context", posNew(8, 8, 304, 36), cardVisual("Contexto Tooltip", "Contexto"))
+  ];
+  const positions = measures.length === 5
+    ? [
+      [8, 50, 148, 80], [164, 50, 148, 80],
+      [8, 138, 96, 94], [112, 138, 96, 94], [216, 138, 96, 94]
+    ]
+    : [
+      [8, 50, 96, 82], [112, 50, 96, 82], [216, 50, 96, 82],
+      [8, 140, 96, 92], [112, 140, 96, 92], [216, 140, 96, 92]
+    ];
+  measures.forEach((measure, index) => {
+    const [x, y, width, height] = positions[index];
+    visuals.push(visualFile(page.name, `metric-${index + 1}`, posNew(x, y, width, height), cardVisual(measure.measure, measure.title)));
+  });
+  addPage(definition, visuals);
+}
+
+zNew = 1000;
+const executivePage = { name: pages.executive.name, value: pageDefinition(pages.executive.name, pages.executive.displayName) };
+const executiveVisuals = [
+  ...reportShell(executivePage, "Visão Executiva", "Resultado comercial, tendência e sinais que exigem ação", [
+    { key: "date", table: "Calendário", property: "Data", label: "Período", mode: "Between" },
+    { key: "hub", table: "Hubs", property: "Hub", label: "Hub" },
+    { key: "store", table: "Lojas", property: "Loja", label: "Loja" },
+    { key: "channel", table: "Canais", property: "Canal", label: "Canal" }
+  ]),
+  visualFile(executivePage.name, "kpis", posNew(240, 130, 1024, 118), htmlVisual("HTML | KPIs Executivos")),
+  visualFile(executivePage.name, "value-trend", posNew(240, 264, 620, 230), cartesianVisual(
+    "lineChart",
+    "Valor transacionado por dia",
+    { table: "Calendário", property: "Data" },
+    ["Valor Transacionado"],
+    {
+      tooltips: ["Pedidos Finalizados", "Ticket Médio", "Taxa Cancelamento", "Margem Entrega"],
+      tooltipPage: pages.tooltipCommercial.name,
+      altText: "Linha diária do valor transacionado no período selecionado."
+    }
+  )),
+  visualFile(executivePage.name, "hub-ranking", posNew(876, 264, 388, 230), cartesianVisual(
+    "clusteredBarChart",
+    "Hubs por valor transacionado",
+    { table: "Hubs", property: "Hub" },
+    ["Valor Transacionado"],
+    {
+      tooltips: ["Participação Valor Transacionado", "Pedidos Finalizados", "Ticket Médio", "Margem Entrega"],
+      tooltipPage: pages.tooltipCommercial.name,
+      sortMeasure: "Valor Transacionado",
+      altText: "Ranking horizontal dos hubs por valor transacionado, em ordem decrescente."
+    }
+  )),
+  visualFile(executivePage.name, "health", posNew(240, 510, 330, 194), htmlVisual("HTML | Saúde Executiva")),
+  visualFile(executivePage.name, "store-ranking", posNew(586, 510, 678, 194), tableVisual("Lojas com maior impacto", [
+    { table: "Lojas", property: "Loja", kind: "column" },
+    { property: "Valor Transacionado", kind: "measure" },
+    { property: "Pedidos Finalizados", kind: "measure" },
+    { property: "Ticket Médio", kind: "measure" },
+    { property: "Taxa Cancelamento", kind: "measure" },
+    { property: "Margem Entrega", kind: "measure" }
+  ], "Valor Transacionado"))
+];
+addPage(executivePage, executiveVisuals);
+
+zNew = 1000;
+const ordersPage = { name: pages.orders.name, value: pageDefinition(pages.orders.name, pages.orders.displayName) };
+const ordersVisuals = [
+  ...reportShell(ordersPage, "Pedidos & Operação", "Volume, status, ciclo operacional e hubs críticos", [
+    { key: "date", table: "Calendário", property: "Data", label: "Período", mode: "Between" },
+    { key: "hub", table: "Hubs", property: "Hub", label: "Hub" },
+    { key: "store", table: "Lojas", property: "Loja", label: "Loja" },
+    { key: "channel", table: "Canais", property: "Canal", label: "Canal" }
+  ]),
+  visualFile(ordersPage.name, "kpis", posNew(240, 130, 1024, 118), htmlVisual("HTML | KPIs Pedidos")),
+  visualFile(ordersPage.name, "orders-trend", posNew(240, 264, 620, 230), cartesianVisual(
+    "lineChart",
+    "Pedidos criados por dia",
+    { table: "Calendário", property: "Data" },
+    ["Pedidos Criados"],
+    {
+      tooltips: ["Pedidos Finalizados", "Pedidos Cancelados", "Taxa Cancelamento"],
+      tooltipPage: pages.tooltipOrders.name,
+      altText: "Linha diária do volume de pedidos criados."
+    }
+  )),
+  visualFile(ordersPage.name, "status", posNew(876, 264, 388, 230), cartesianVisual(
+    "clusteredBarChart",
+    "Composição por status",
+    { table: "Pedidos", property: "Status Pedido" },
+    ["Pedidos Criados"],
+    {
+      tooltips: ["Participação Pedidos", "Valor Transacionado", "Ticket Médio"],
+      tooltipPage: pages.tooltipOrders.name,
+      sortMeasure: "Pedidos Criados",
+      altText: "Barras horizontais com pedidos finalizados e cancelados."
+    }
+  )),
+  visualFile(ordersPage.name, "stages", posNew(240, 510, 330, 194), htmlVisual("HTML | Etapas Operacionais")),
+  visualFile(ordersPage.name, "hub-operations", posNew(586, 510, 678, 194), tableVisual("Operação por hub", [
+    { table: "Hubs", property: "Hub", kind: "column" },
+    { property: "Pedidos Criados", kind: "measure" },
+    { property: "Pedidos Finalizados", kind: "measure" },
+    { property: "Taxa Cancelamento", kind: "measure" },
+    { property: "Tempo Produção Médio", kind: "measure" },
+    { property: "Tempo Trânsito Médio", kind: "measure" },
+    { property: "Tempo Ciclo Médio", kind: "measure" }
+  ], "Pedidos Criados"))
+];
+addPage(ordersPage, ordersVisuals);
+
+zNew = 1000;
+const financePage = { name: pages.finance.name, value: pageDefinition(pages.finance.name, pages.finance.displayName) };
+const financeVisuals = [
+  ...reportShell(financePage, "Desempenho Financeiro", "Receita, pagamentos, conciliação e economia da entrega", [
+    { key: "date", table: "Calendário", property: "Data", label: "Período", mode: "Between" },
+    { key: "hub", table: "Hubs", property: "Hub", label: "Hub" },
+    { key: "channel", table: "Canais", property: "Canal", label: "Canal" },
+    { key: "method", table: "Pagamentos", property: "Meio Pagamento", label: "Meio de pagamento" }
+  ]),
+  visualFile(financePage.name, "kpis", posNew(240, 130, 1024, 118), htmlVisual("HTML | KPIs Financeiros")),
+  visualFile(financePage.name, "finance-trend", posNew(240, 264, 620, 230), cartesianVisual(
+    "lineChart",
+    "Valor transacionado e valor pago por dia",
+    { table: "Calendário", property: "Data" },
+    ["Valor Transacionado", "Valor Pago"],
+    {
+      tooltips: ["Ticket Médio", "Taxa Conciliação", "Valor Chargeback", "Margem Entrega"],
+      tooltipPage: pages.tooltipFinance.name,
+      altText: "Linhas diárias do valor transacionado e do valor pago."
+    }
+  )),
+  visualFile(financePage.name, "payment-ranking", posNew(876, 264, 388, 230), cartesianVisual(
+    "clusteredBarChart",
+    "Meios de pagamento por valor pago",
+    { table: "Pagamentos", property: "Meio Pagamento" },
+    ["Valor Pago"],
+    {
+      tooltips: ["Participação Valor Pago", "Transações Pagas", "Taxas Pagamento", "Valor Líquido Pago", "Valor Chargeback"],
+      tooltipPage: pages.tooltipFinance.name,
+      sortMeasure: "Valor Pago",
+      altText: "Ranking horizontal dos meios de pagamento por valor pago."
+    }
+  )),
+  visualFile(financePage.name, "reconciliation-status", posNew(240, 510, 330, 194), cartesianVisual(
+    "clusteredBarChart",
+    "Pedidos por status de conciliação",
+    { table: "Conciliação", property: "Status Conciliação" },
+    ["Pedidos na Conciliação"],
+    {
+      tooltips: ["Taxa Conciliação", "Diferença Absoluta Conciliação", "Pedidos sem Pagamento Pago"],
+      sortMeasure: "Pedidos na Conciliação",
+      altText: "Distribuição de pedidos pelos status de conciliação."
+    }
+  )),
+  visualFile(financePage.name, "segment-finance", posNew(586, 510, 678, 194), tableVisual("Resultado por segmento de loja", [
+    { table: "Lojas", property: "Segmento Loja", kind: "column" },
+    { property: "Valor Transacionado", kind: "measure" },
+    { property: "Valor Pago", kind: "measure" },
+    { property: "Ticket Médio", kind: "measure" },
+    { property: "Taxas de Entrega", kind: "measure" },
+    { property: "Custo de Entrega", kind: "measure" },
+    { property: "Margem Entrega", kind: "measure" }
+  ], "Valor Transacionado"))
+];
+addPage(financePage, financeVisuals);
+
+zNew = 1000;
+const deliveryPage = { name: pages.delivery.name, value: pageDefinition(pages.delivery.name, pages.delivery.displayName) };
+const deliveryVisuals = [
+  ...reportShell(deliveryPage, "Entregas & Qualidade", "Conclusão, retentativas, distância e percentis do ciclo", [
+    { key: "date", table: "Calendário", property: "Data", label: "Período", mode: "Between" },
+    { key: "hub", table: "Hubs", property: "Hub", label: "Hub" },
+    { key: "modal", table: "Entregadores", property: "Modal Entregador", label: "Modal" },
+    { key: "driver-type", table: "Entregadores", property: "Tipo Entregador", label: "Tipo de entregador" }
+  ]),
+  visualFile(deliveryPage.name, "kpis", posNew(240, 130, 1024, 118), htmlVisual("HTML | KPIs Logística")),
+  visualFile(deliveryPage.name, "cycle-trend", posNew(240, 264, 620, 230), cartesianVisual(
+    "lineChart",
+    "Ciclo P50 e P90 por dia · percentis, não SLA",
+    { table: "Calendário", property: "Data" },
+    ["Tempo Ciclo P50", "Tempo Ciclo P90"],
+    {
+      tooltips: ["Pedidos com Entrega", "Taxa Entrega Concluída", "Taxa Múltiplas Tentativas"],
+      tooltipPage: pages.tooltipDelivery.name,
+      altText: "Linhas diárias dos percentis 50 e 90 do tempo de ciclo, em minutos."
+    }
+  )),
+  visualFile(deliveryPage.name, "modal-quality", posNew(876, 264, 388, 230), cartesianVisual(
+    "clusteredBarChart",
+    "Conclusão por modal",
+    { table: "Entregadores", property: "Modal Entregador" },
+    ["Taxa Entrega Concluída"],
+    {
+      tooltips: ["Pedidos com Entrega", "Participação Pedidos com Entrega", "Taxa Múltiplas Tentativas", "Distância Média Entrega (km)"],
+      tooltipPage: pages.tooltipDelivery.name,
+      sortMeasure: "Taxa Entrega Concluída",
+      altText: "Barras horizontais com a taxa de conclusão por modal."
+    }
+  )),
+  visualFile(deliveryPage.name, "hub-retry", posNew(240, 510, 330, 194), cartesianVisual(
+    "clusteredBarChart",
+    "Hubs com mais retentativas",
+    { table: "Hubs", property: "Hub" },
+    ["Taxa Múltiplas Tentativas"],
+    {
+      tooltips: ["Pedidos com Entrega", "Taxa Entrega Concluída", "Tempo Ciclo P90"],
+      tooltipPage: pages.tooltipDelivery.name,
+      sortMeasure: "Taxa Múltiplas Tentativas",
+      altText: "Ranking horizontal dos hubs por taxa de múltiplas tentativas."
+    }
+  )),
+  visualFile(deliveryPage.name, "hub-delivery", posNew(586, 510, 678, 194), tableVisual("Qualidade por hub", [
+    { table: "Hubs", property: "Hub", kind: "column" },
+    { property: "Pedidos com Entrega", kind: "measure" },
+    { property: "Taxa Entrega Concluída", kind: "measure" },
+    { property: "Taxa Múltiplas Tentativas", kind: "measure" },
+    { property: "Distância Média Entrega (km)", kind: "measure" },
+    { property: "Tempo Ciclo P50", kind: "measure" },
+    { property: "Tempo Ciclo P90", kind: "measure" }
+  ], "Pedidos com Entrega"))
+];
+addPage(deliveryPage, deliveryVisuals);
+
+zNew = 1000;
+const detailPage = { name: pages.detail.name, value: pageDefinition(pages.detail.name, pages.detail.displayName, { drillthrough: true }) };
+const detailVisuals = [
+  ...reportShell(detailPage, "Detalhamento", "Use o drill-through ou selecione um pedido para investigar o registro", [
+    { key: "order", table: "Pedido", property: "Pedido ID", label: "Pedido ID" }
+  ], { detail: true }),
+  visualFile(detailPage.name, "detail-header", posNew(240, 130, 1024, 112), htmlVisual("HTML | Detalhe Pedido")),
+  visualFile(detailPage.name, "order-detail", posNew(240, 258, 1024, 142), tableVisual("Pedido", [
+    { table: "Pedido", property: "Pedido ID", kind: "column" },
+    { table: "Pedidos", property: "Status Pedido", kind: "column" },
+    { table: "Lojas", property: "Loja", kind: "column" },
+    { table: "Canais", property: "Canal", kind: "column" },
+    { table: "Pedidos", property: "Valor Total Pedido", kind: "column" },
+    { table: "Pedidos", property: "Margem Entrega", kind: "column" },
+    { table: "Pedidos", property: "Pedido Criado Em", kind: "column" },
+    { table: "Pedidos", property: "Pedido Finalizado Em", kind: "column" },
+    { table: "Pedidos", property: "Tempo Ciclo", kind: "column" }
+  ])),
+  visualFile(detailPage.name, "delivery-detail", posNew(240, 416, 500, 288), tableVisual("Tentativas de entrega", [
+    { table: "Entregas", property: "Entrega ID", kind: "column" },
+    { table: "Entregas", property: "Status Entrega", kind: "column" },
+    { table: "Entregadores", property: "Modal Entregador", kind: "column" },
+    { table: "Entregas", property: "Número Tentativa", kind: "column" },
+    { table: "Entregas", property: "É Última Tentativa", kind: "column" },
+    { table: "Entregas", property: "Distância Entrega (m)", kind: "column" }
+  ])),
+  visualFile(detailPage.name, "payment-detail", posNew(756, 416, 508, 288), tableVisual("Transações de pagamento", [
+    { table: "Pagamentos", property: "Pagamento ID", kind: "column" },
+    { table: "Pagamentos", property: "Meio Pagamento", kind: "column" },
+    { table: "Pagamentos", property: "Status Pagamento", kind: "column" },
+    { table: "Pagamentos", property: "Valor Pagamento", kind: "column" },
+    { table: "Pagamentos", property: "Taxa Pagamento", kind: "column" },
+    { table: "Pagamentos", property: "Valor Líquido Pagamento", kind: "column" }
+  ]))
+];
+addPage(detailPage, detailVisuals);
+
+tooltipPage(pages.tooltipCommercial, [
+  { measure: "Valor Transacionado", title: "Valor" },
+  { measure: "Valor Transacionado Mês Anterior", title: "Mês anterior" },
+  { measure: "Variação Absoluta Valor Mensal", title: "Variação R$" },
+  { measure: "Variação Valor Mensal", title: "Variação %" },
+  { measure: "Participação Valor Transacionado", title: "Participação" }
+]);
+
+tooltipPage(pages.tooltipOrders, [
+  { measure: "Pedidos Criados", title: "Pedidos" },
+  { measure: "Pedidos Mês Anterior", title: "Mês anterior" },
+  { measure: "Variação Absoluta Pedidos Mensal", title: "Variação" },
+  { measure: "Variação Pedidos Mensal", title: "Variação %" },
+  { measure: "Participação Pedidos", title: "Participação" }
+]);
+
+tooltipPage(pages.tooltipFinance, [
+  { measure: "Valor Pago", title: "Valor pago" },
+  { measure: "Valor Pago Mês Anterior", title: "Mês anterior" },
+  { measure: "Variação Absoluta Valor Pago Mensal", title: "Variação R$" },
+  { measure: "Variação Valor Pago Mensal", title: "Variação %" },
+  { measure: "Participação Valor Pago", title: "Participação" }
+]);
+
+tooltipPage(pages.tooltipDelivery, [
+  { measure: "Pedidos com Entrega", title: "Pedidos" },
+  { measure: "Taxa Entrega Concluída", title: "Concluída" },
+  { measure: "Taxa Múltiplas Tentativas", title: "Retentativas" },
+  { measure: "Tempo Ciclo P50", title: "Ciclo P50" },
+  { measure: "Tempo Ciclo P90", title: "Ciclo P90" },
+  { measure: "Participação Pedidos com Entrega", title: "Participação" }
+]);
 
 write(`${reportName}/CustomVisuals/README.md`, `# Visual HTML utilizado
 

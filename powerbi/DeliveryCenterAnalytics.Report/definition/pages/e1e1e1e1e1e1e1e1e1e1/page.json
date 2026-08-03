@@ -1,10 +1,11 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
   "name": "e1e1e1e1e1e1e1e1e1e1",
-  "displayName": "01 Executivo",
+  "displayName": "01 Visão Executiva",
   "displayOption": "FitToPage",
   "height": 720,
   "width": 1280,
+  "visibility": "AlwaysVisible",
   "objects": {
     "background": [
       {
@@ -14,7 +15,7 @@
               "color": {
                 "expr": {
                   "Literal": {
-                    "Value": "'#08111F'"
+                    "Value": "'#F4F7FB'"
                   }
                 }
               }
@@ -38,7 +39,7 @@
               "color": {
                 "expr": {
                   "Literal": {
-                    "Value": "'#050A12'"
+                    "Value": "'#E8EEF6'"
                   }
                 }
               }

@@ -1,17 +1,23 @@
 # HTML e CSS dos visuais
 
-Os sete componentes HTML do relatório são medidas DAX na tabela `Métricas` e são exibidos pelo visual certificado **HTML Content (lite)**.
+O relatório usa sete medidas HTML na tabela `Métricas`, exibidas pelo visual **HTML Content (lite)**. O HTML complementa os visuais nativos; gráficos, tabelas, filtros, navegação e drill-through continuam nativos do Power BI.
 
-O Power BI não carrega uma folha CSS externa no relatório. Por isso, as medidas usam CSS inline e este diretório mantém a referência legível dos tokens e componentes usados. A fonte de verdade executável está em `../DeliveryCenterAnalytics.SemanticModel/definition/tables/Métricas.tmdl`; a fonte geradora está em `../scripts/generate-pbip.mjs`.
+## Componentes implementados
 
-Componentes implementados:
+- `HTML | KPIs Executivos`: valor, pedidos, ticket, cancelamento e margem;
+- `HTML | Saúde Executiva`: leitura resumida dos principais sinais;
+- `HTML | KPIs Pedidos`: volume, conclusão, cancelamento e tempos operacionais;
+- `HTML | Etapas Operacionais`: preparação, trânsito e ciclo;
+- `HTML | KPIs Financeiros`: pagamentos, conciliação, chargeback e diferenças;
+- `HTML | KPIs Logística`: conclusão, retentativa, P50/P90 e distância;
+- `HTML | Detalhe Pedido`: contexto do pedido no drill-through.
 
-- faixa de KPIs executivos;
-- ranking dos cinco hubs por valor;
-- faixa de KPIs logísticos;
-- ranking de hubs por retentativa;
-- faixa de KPIs financeiros;
-- distribuição dos status de conciliação;
-- cabeçalho da página de drill-through.
+## Regras técnicas
 
-Somente HTML e CSS estáticos são emitidos. Scripts, imagens externas, formulários e hyperlinks ficam desabilitados no visual.
+- somente HTML e CSS estáticos;
+- sem JavaScript, formulários, hyperlinks ou recursos externos;
+- cores sólidas e contraste compatível com o tema claro;
+- valores e rótulos explícitos, sem depender exclusivamente de cor;
+- CSS inline nas medidas, pois o Power BI não carrega esta folha externa.
+
+Este diretório é a referência legível dos tokens. A fonte executável está em `../DeliveryCenterAnalytics.SemanticModel/definition/tables/Métricas.tmdl`, gerada por `../scripts/generate-pbip.mjs`.

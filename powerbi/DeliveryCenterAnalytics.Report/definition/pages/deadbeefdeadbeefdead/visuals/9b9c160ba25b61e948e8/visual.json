@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
   "name": "9b9c160ba25b61e948e8",
   "position": {
-    "x": 1120,
-    "y": 16,
-    "z": 3000,
-    "height": 56,
-    "width": 136,
-    "tabOrder": 3000
+    "x": 16,
+    "y": 570,
+    "z": 8000,
+    "height": 48,
+    "width": 208,
+    "tabOrder": 8000
   },
   "visual": {
     "visualType": "actionButton",
@@ -47,7 +47,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#15233A'"
+                      "Value": "'#F8FAFC'"
                     }
                   }
                 }
@@ -78,7 +78,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#263A56'"
+                      "Value": "'#DDE5EF'"
                     }
                   }
                 }
@@ -144,7 +144,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#F8FAFC'"
+                      "Value": "'#172033'"
                     }
                   }
                 }
@@ -182,7 +182,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#2DD4BF'"
+                      "Value": "'#0F766E'"
                     }
                   }
                 }
@@ -242,7 +242,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#101B2D'"
+                      "Value": "'#FFFFFF'"
                     }
                   }
                 }
@@ -273,7 +273,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#263A56'"
+                      "Value": "'#DDE5EF'"
                     }
                   }
                 }
@@ -324,6 +324,109 @@
               "expr": {
                 "Literal": {
                   "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dropShadow": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "preset": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Bottom'"
+                }
+              }
+            },
+            "position": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Outer'"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#172033'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "90D"
+                }
+              }
+            },
+            "shadowBlur": {
+              "expr": {
+                "Literal": {
+                  "Value": "8D"
+                }
+              }
+            },
+            "shadowDistance": {
+              "expr": {
+                "Literal": {
+                  "Value": "2D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualHeader": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "foreground": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#64748B'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "100D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Visual analítico'"
                 }
               }
             }
