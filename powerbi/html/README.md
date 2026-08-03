@@ -1,6 +1,6 @@
 # HTML e CSS dos visuais
 
-O relatório usa sete medidas HTML na tabela `Métricas`, exibidas pelo visual **HTML Content (lite)**. O HTML complementa os visuais nativos; gráficos, tabelas, filtros, navegação e drill-through continuam nativos do Power BI.
+O relatório usa onze medidas HTML na tabela `Métricas`, exibidas pelo visual **HTML Content (lite)**. Sete atendem às páginas analíticas e quatro consolidam os tooltips em uma grade legível de `320 × 240`. O HTML complementa os visuais nativos; gráficos, tabelas, filtros, navegação e drill-through continuam nativos do Power BI.
 
 ## Componentes implementados
 

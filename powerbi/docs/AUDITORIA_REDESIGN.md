@@ -44,11 +44,17 @@ As medidas e relações existentes devem ser preservadas. Novas medidas podem se
 ## Resultado implementado
 
 - 5 páginas analíticas visíveis e 4 tooltips ocultos;
-- 102 visuais em grade, incluindo cinco formas de fundo para a sidebar;
-- 54 medidas, sendo 7 HTML e 47 analíticas/contextuais;
+- 81 visuais em grade, incluindo cinco painéis de fundo estáveis para a sidebar;
+- 58 medidas, sendo 11 HTML e 47 analíticas/contextuais;
 - 20 relações preservadas, todas unidirecionais;
 - navegação global, limpeza de slicers e drill-through por pedido;
 - rankings migrados para barras horizontais nativas;
 - tema dark premium, estados de seleção e texto alternativo em todos os visuais;
 - 43 baselines e 10 consultas M validados no PostgreSQL;
 - nenhum KPI de SLA inventado.
+
+## Correções após homologação visual
+
+- os cartões nativos dos tooltips ocultavam os valores no canvas compacto; cada tooltip passou a usar um único painel HTML/CSS com contexto e grade de métricas;
+- a forma de fundo da sidebar herdava a primeira cor de dados do tema; ela foi substituída por um contêiner de texto com fundo explícito `#101627`;
+- o navegador estava assumindo orientação horizontal e quebrando os nomes das páginas; a orientação vertical passou a ser gravada explicitamente no PBIR.

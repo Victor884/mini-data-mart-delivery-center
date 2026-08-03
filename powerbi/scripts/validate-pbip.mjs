@@ -89,13 +89,12 @@ let pageNavigators = 0;
 let clearFilterButtons = 0;
 let canvasTooltips = 0;
 let donutVisuals = 0;
-let sidebarShapes = 0;
+let sidebarPanels = 0;
 for (const path of visualFiles) {
   const visual = JSON.parse(readFileSync(path, "utf8"));
   const type = visual.visual?.visualType;
   if (type === "htmlContent443BE3AD55E043BF878BED274D3A6865") htmlVisuals += 1;
   if (type === "pageNavigator") pageNavigators += 1;
-  if (type === "shape") sidebarShapes += 1;
   if (type === "donutChart" || type === "pieChart") donutVisuals += 1;
   const linkType = visual.visual?.visualContainerObjects?.visualLink?.[0]?.properties?.type?.expr?.Literal?.Value;
   if (linkType === "'ClearAllSlicers'") clearFilterButtons += 1;
@@ -103,6 +102,12 @@ for (const path of visualFiles) {
   if (tooltipType === "'Canvas'") canvasTooltips += 1;
   const altText = visual.visual?.visualContainerObjects?.general?.[0]?.properties?.altText;
   assert(Boolean(altText), `Visual sem texto alternativo em ${path}`);
+  const altTextLiteral = altText?.expr?.Literal?.Value ?? "";
+  if (type === "textbox" && altTextLiteral.includes("Painel lateral de navegação e filtros")) {
+    sidebarPanels += 1;
+    const sidebarColor = visual.visual?.visualContainerObjects?.background?.[0]?.properties?.color?.solid?.color?.expr?.Literal?.Value;
+    assert(sidebarColor === "'#101627'", `Sidebar sem fundo dark explícito em ${path}`);
+  }
   inspectFieldBindings(visual, path);
 }
 
@@ -125,13 +130,22 @@ for (const path of visualFiles) {
   assert(position.x + position.width <= page.width, `Visual ultrapassa a largura da página em ${path}`);
   assert(position.y + position.height <= page.height, `Visual ultrapassa a altura da página em ${path}`);
   const pageLayouts = visualLayoutsByPage.get(pageName) ?? [];
-  pageLayouts.push({ path, position, visualType: visual.visual?.visualType });
+  const altTextLiteral = visual.visual?.visualContainerObjects?.general?.[0]?.properties?.altText?.expr?.Literal?.Value ?? "";
+  pageLayouts.push({
+    path,
+    position,
+    visualType: visual.visual?.visualType,
+    isSidebarBackground: altTextLiteral.includes("Painel lateral de navegação e filtros"),
+    boundMeasure: visual.visual?.query?.queryState?.content?.projections?.[0]?.field?.Measure?.Property
+  });
   visualLayoutsByPage.set(pageName, pageLayouts);
 
   if (visual.visual?.visualType === "pageNavigator") {
     const pageSettings = visual.visual?.objects?.pages?.[0]?.properties;
+    const orientation = visual.visual?.objects?.layout?.[0]?.properties?.orientation?.expr?.Literal?.Value;
     assert(pageSettings?.showHiddenPages?.expr?.Literal?.Value === "false", `Navegador exibe páginas ocultas em ${path}`);
     assert(pageSettings?.showTooltipPages?.expr?.Literal?.Value === "false", `Navegador exibe páginas de tooltip em ${path}`);
+    assert(orientation === "1L", `Navegador não está em orientação vertical em ${path}`);
   }
 
   const tooltipSection = visual.visual?.visualContainerObjects?.visualTooltip?.[0]?.properties?.section?.expr?.Literal?.Value;
@@ -146,11 +160,28 @@ for (const [pageName, layouts] of visualLayoutsByPage) {
     for (let right = left + 1; right < layouts.length; right += 1) {
       const a = layouts[left].position;
       const b = layouts[right].position;
-      const isBackgroundShape = layouts[left].visualType === "shape" || layouts[right].visualType === "shape";
-      const overlaps = !isBackgroundShape && a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
+      const isBackgroundPanel = layouts[left].isSidebarBackground || layouts[right].isSidebarBackground;
+      const overlaps = !isBackgroundPanel && a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
       assert(!overlaps, `Visuais sobrepostos na página ${pageName}: ${layouts[left].path} e ${layouts[right].path}`);
     }
   }
+}
+
+for (const tooltipPageName of tooltipPageNames) {
+  const tooltipVisuals = visualLayoutsByPage.get(tooltipPageName) ?? [];
+  const expectedMeasureByPage = {
+    "Tooltip | Comercial": "HTML | Tooltip Comercial",
+    "Tooltip | Pedidos": "HTML | Tooltip Pedidos",
+    "Tooltip | Financeiro": "HTML | Tooltip Financeiro",
+    "Tooltip | Entregas": "HTML | Tooltip Entregas"
+  };
+  const tooltipPage = pagesByName.get(tooltipPageName);
+  const expectedMeasure = expectedMeasureByPage[tooltipPage?.displayName];
+  assert(tooltipVisuals.length === 1, `Tooltip ${tooltipPageName} deve conter um único visual; encontrados ${tooltipVisuals.length}`);
+  assert(tooltipVisuals[0]?.visualType === "htmlContent443BE3AD55E043BF878BED274D3A6865", `Tooltip ${tooltipPageName} não usa o painel HTML consolidado`);
+  assert(tooltipVisuals[0]?.boundMeasure === expectedMeasure, `Tooltip ${tooltipPageName} usa a medida incorreta: ${tooltipVisuals[0]?.boundMeasure}`);
+  const position = tooltipVisuals[0]?.position;
+  assert(position?.x === 8 && position?.y === 8 && position?.width === 304 && position?.height === 224, `Tooltip ${tooltipPageName} não ocupa o canvas útil de 320 × 240`);
 }
 
 const metricsText = readFileSync(join(tableDir, "Métricas.tmdl"), "utf8");
@@ -159,14 +190,14 @@ assert(pageFiles.length === 9, `Esperadas 9 páginas; encontradas ${pageFiles.le
 assert(pages.filter((page) => page.type === "Tooltip").length === 4, "Esperadas 4 páginas de tooltip");
 assert(pages.filter((page) => page.visibility !== "HiddenInViewMode").length === 5, "Esperadas 5 páginas visíveis");
 assert(pages.filter((page) => page.type === "Tooltip").every((page) => page.width === 320 && page.height === 240), "Tooltip fora do tamanho 320 × 240");
-assert(visualFiles.length === 102, `Esperados 102 visuais; encontrados ${visualFiles.length}`);
-assert(htmlVisuals === 7, `Esperados 7 visuais HTML; encontrados ${htmlVisuals}`);
-assert(sidebarShapes === 5, `Esperados 5 painéis laterais; encontrados ${sidebarShapes}`);
+assert(visualFiles.length === 81, `Esperados 81 visuais; encontrados ${visualFiles.length}`);
+assert(htmlVisuals === 11, `Esperados 11 visuais HTML; encontrados ${htmlVisuals}`);
+assert(sidebarPanels === 5, `Esperados 5 painéis laterais; encontrados ${sidebarPanels}`);
 assert(pageNavigators === 5, `Esperados 5 navegadores de página; encontrados ${pageNavigators}`);
 assert(clearFilterButtons === 5, `Esperados 5 botões de limpeza; encontrados ${clearFilterButtons}`);
 assert(canvasTooltips >= 8, `Esperados ao menos 8 gráficos com tooltip de página; encontrados ${canvasTooltips}`);
 assert(donutVisuals === 0, `Não são permitidos pizza ou donut; encontrados ${donutVisuals}`);
-assert(measureCount === 54, `Esperadas 54 medidas; encontradas ${measureCount}`);
+assert(measureCount === 58, `Esperadas 58 medidas; encontradas ${measureCount}`);
 assert(!metricsText.includes('style="'), "Há aspas HTML conflitantes com as strings DAX");
 assert(!metricsText.includes("linear-gradient"), "Há gradiente decorativo em medida HTML");
 
@@ -187,7 +218,11 @@ for (const requiredMeasure of [
   "Participação Valor Transacionado",
   "Participação Pedidos",
   "Participação Valor Pago",
-  "Contexto Tooltip"
+  "Contexto Tooltip",
+  "HTML | Tooltip Comercial",
+  "HTML | Tooltip Pedidos",
+  "HTML | Tooltip Financeiro",
+  "HTML | Tooltip Entregas"
 ]) {
   assert(tables.get("Métricas")?.has(requiredMeasure), `Medida obrigatória ausente: ${requiredMeasure}`);
 }

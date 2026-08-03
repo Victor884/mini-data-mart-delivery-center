@@ -15,10 +15,10 @@
       "layout": [
         {
           "properties": {
-            "rowCount": {
+            "orientation": {
               "expr": {
                 "Literal": {
-                  "Value": "5L"
+                  "Value": "1L"
                 }
               }
             },

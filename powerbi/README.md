@@ -6,9 +6,9 @@ Projeto Power BI em formato PBIP/PBIR, versionável como texto, conectado às vi
 
 - modelo estrela em TMDL com 6 dimensões, 4 fatos e 20 relacionamentos `1:*` unidirecionais;
 - conexão Import parametrizada, sem credenciais versionadas;
-- 54 medidas DAX, incluindo 7 componentes HTML/CSS;
+- 58 medidas DAX, incluindo 11 componentes HTML/CSS;
 - 5 páginas analíticas visíveis e 4 páginas ocultas de tooltip;
-- 102 visuais: KPIs, linhas, barras horizontais, tabelas, filtros, botões, sidebar e navegação;
+- 81 visuais: KPIs, linhas, barras horizontais, tabelas, filtros, botões, sidebar e navegação;
 - tema dark premium `DeliveryCenterDarkNeon-20260802.json`;
 - drill-through por pedido e botão nativo de retorno;
 - tooltips com contexto, período anterior, variação absoluta/percentual e participação;

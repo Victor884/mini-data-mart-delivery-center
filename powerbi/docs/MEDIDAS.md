@@ -1,6 +1,6 @@
 # Catálogo de medidas DAX
 
-Todas as 54 medidas são explícitas e ficam na tabela `Métricas`. Medidas implícitas estão desabilitadas para evitar agregações acidentais.
+Todas as 58 medidas são explícitas e ficam na tabela `Métricas`. Medidas implícitas estão desabilitadas para evitar agregações acidentais.
 
 ## Comercial e pedidos
 
@@ -79,5 +79,9 @@ As medidas de ciclo reagem ao filtro de entregador por `TREATAS`. P90 não é ro
 | `HTML | KPIs Financeiros` | KPIs financeiros |
 | `HTML | KPIs Logística` | KPIs de entregas |
 | `HTML | Detalhe Pedido` | cabeçalho do drill-through |
+| `HTML | Tooltip Comercial` | contexto e comparação comercial |
+| `HTML | Tooltip Pedidos` | contexto e comparação de pedidos |
+| `HTML | Tooltip Financeiro` | contexto e comparação financeira |
+| `HTML | Tooltip Entregas` | contexto, qualidade e ciclo logístico |
 
 O HTML é estático e contém CSS inline, sem scripts ou recursos externos. As expressões completas e os formatos estão em `DeliveryCenterAnalytics.SemanticModel/definition/tables/Métricas.tmdl`.

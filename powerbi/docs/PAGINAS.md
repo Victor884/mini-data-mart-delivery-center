@@ -78,7 +78,7 @@ Quatro páginas ocultas complementam os principais gráficos:
 - `Tooltip | Financeiro`;
 - `Tooltip | Entregas`.
 
-Cada tooltip mostra o contexto selecionado e, conforme a métrica, valor atual, período anterior, variação absoluta, variação percentual e participação no total. Assim, o tooltip acrescenta interpretação sem repetir apenas o rótulo do gráfico.
+Cada tooltip usa um único painel HTML/CSS no canvas `320 × 240` e mostra o contexto selecionado, valor atual, período anterior, variação absoluta, variação percentual e participação no total. A consolidação evita o comportamento responsivo dos cartões nativos que ocultava valores em áreas pequenas.
 
 ## Interações e navegação
 

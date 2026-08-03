@@ -111,7 +111,16 @@ function projection(field, table, property, displayName) {
   };
 }
 
-function chrome(title, { padding = 8, background = true, border = true, altText = title } = {}) {
+function chrome(title, {
+  padding = 8,
+  background = true,
+  border = true,
+  altText = title,
+  backgroundColor = colors.surface,
+  borderColor = colors.border,
+  radius = 12,
+  shadow = true
+} = {}) {
   const result = {
     title: [{
       properties: {
@@ -128,16 +137,16 @@ function chrome(title, { padding = 8, background = true, border = true, altText 
     background: [{
       properties: {
         show: bool(background),
-        color: fill(colors.surface),
+        color: fill(backgroundColor),
         transparency: number(0)
       }
     }],
     border: [{
       properties: {
         show: bool(border),
-        color: fill(colors.border),
+        color: fill(borderColor),
         width: number(1),
-        radius: number(12)
+        radius: number(radius)
       }
     }],
     padding: [{
@@ -150,7 +159,7 @@ function chrome(title, { padding = 8, background = true, border = true, altText 
     }],
     dropShadow: [{
       properties: {
-        show: bool(background),
+        show: bool(background && shadow),
         preset: text("Bottom"),
         position: text("Outer"),
         color: fill("#020617"),
@@ -228,13 +237,27 @@ function textboxVisual(title, subtitle = "", { titleSize = 24, subtitleSize = 10
 
 function sidebarVisual() {
   return {
-    visualType: "shape",
+    visualType: "textbox",
     objects: {
-      shape: [{ properties: { tileShape: text("rectangle") } }],
-      fill: [{ properties: { show: bool(true), fillColor: fill(colors.sidebar), transparency: number(0) } }],
-      outline: [{ properties: { show: bool(true), lineColor: fill(colors.border), transparency: number(35), weight: number(1) } }]
+      general: [{
+        properties: {
+          paragraphs: [{
+            textRuns: [{ value: "" }],
+            horizontalTextAlignment: "left"
+          }]
+        }
+      }]
     },
-    visualContainerObjects: chrome("", { padding: 0, background: false, border: false, altText: "Painel lateral de navegação e filtros" })
+    visualContainerObjects: chrome("", {
+      padding: 0,
+      background: true,
+      border: true,
+      altText: "Painel lateral de navegação e filtros",
+      backgroundColor: colors.sidebar,
+      borderColor: colors.border,
+      radius: 0,
+      shadow: false
+    })
   };
 }
 
@@ -243,7 +266,7 @@ function pageNavigatorVisual() {
   return {
     visualType: "pageNavigator",
     objects: {
-      layout: [{ properties: { rowCount: number(5, true), cellPadding: number(4, true) } }],
+      layout: [{ properties: { orientation: number(1, true), cellPadding: number(4, true) } }],
       pages: [{ properties: { showHiddenPages: bool(false), showTooltipPages: bool(false), showByDefault: bool(true) } }],
       shape: [{ properties: { tileShape: text("rectangleRounded"), rectangleRoundedCurve: number(8, true) } }],
       fill: [
@@ -1035,6 +1058,76 @@ RETURN
   }
 ];
 
+function tooltipHtmlDax(title, accent, metrics) {
+  const cells = metrics.map((metric, index) => {
+    const span = metrics.length % 2 === 1 && index === metrics.length - 1
+      ? "grid-column:span 2;"
+      : "";
+    const metricAccent = metric.accent ?? accent;
+    return `"<div style=\"${span}background:${colors.surfaceAlt};border:1px solid ${colors.border};border-left:3px solid ${metricAccent};border-radius:8px;padding:7px 9px;box-sizing:border-box;min-width:0;height:50px;\"><div style=\"font-size:9px;color:${colors.muted};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;\">${metric.label}</div><div style=\"font-size:15px;font-weight:750;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;\">" & IF(ISBLANK([${metric.measure}]), "—", FORMAT([${metric.measure}], "${metric.format}", "pt-BR") & "${metric.suffix ?? ""}") & "</div></div>"`;
+  }).join(" &\n");
+
+  return `VAR Contexto = COALESCE([Contexto Tooltip], "Contexto selecionado")
+RETURN
+"<div style=\"font-family:Segoe UI,Arial,sans-serif;color:${colors.text};background:${colors.canvas};border:1px solid ${colors.border};border-radius:10px;padding:9px;box-sizing:border-box;width:100%;height:100%;overflow:hidden;\">" &
+"<div style=\"height:38px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px;border-bottom:1px solid ${colors.border};\"><div><div style=\"font-size:9px;color:${accent};font-weight:700;letter-spacing:.06em;\">DETALHE DO PONTO</div><div style=\"font-size:12px;font-weight:700;margin-top:2px;\">${title}</div></div><div style=\"max-width:145px;font-size:10px;color:${colors.muted};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right;\">" & Contexto & "</div></div>" &
+"<div style=\"display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:7px;\">" &
+${cells} &
+"</div></div>"`;
+}
+
+htmlMeasures.push(
+  {
+    name: "HTML | Tooltip Comercial",
+    description: "Tooltip HTML/CSS comercial com contexto, comparação temporal e participação.",
+    folder: "90 HTML\\Tooltips",
+    dax: tooltipHtmlDax("Desempenho comercial", colors.blue, [
+      { measure: "Valor Transacionado", label: "Valor", format: "R$ #,##0.00" },
+      { measure: "Valor Transacionado Mês Anterior", label: "Mês anterior", format: "R$ #,##0.00" },
+      { measure: "Variação Absoluta Valor Mensal", label: "Variação absoluta", format: "R$ #,##0.00", accent: colors.purple },
+      { measure: "Variação Valor Mensal", label: "Variação percentual", format: "0.00%", accent: colors.purple },
+      { measure: "Participação Valor Transacionado", label: "Participação no total", format: "0.00%", accent: colors.teal }
+    ])
+  },
+  {
+    name: "HTML | Tooltip Pedidos",
+    description: "Tooltip HTML/CSS de pedidos com contexto, comparação temporal e participação.",
+    folder: "90 HTML\\Tooltips",
+    dax: tooltipHtmlDax("Pedidos e operação", colors.teal, [
+      { measure: "Pedidos Criados", label: "Pedidos", format: "#,##0" },
+      { measure: "Pedidos Mês Anterior", label: "Mês anterior", format: "#,##0" },
+      { measure: "Variação Absoluta Pedidos Mensal", label: "Variação absoluta", format: "#,##0", accent: colors.purple },
+      { measure: "Variação Pedidos Mensal", label: "Variação percentual", format: "0.00%", accent: colors.purple },
+      { measure: "Participação Pedidos", label: "Participação no total", format: "0.00%", accent: colors.blue }
+    ])
+  },
+  {
+    name: "HTML | Tooltip Financeiro",
+    description: "Tooltip HTML/CSS financeiro com contexto, comparação temporal e participação.",
+    folder: "90 HTML\\Tooltips",
+    dax: tooltipHtmlDax("Desempenho financeiro", colors.purple, [
+      { measure: "Valor Pago", label: "Valor pago", format: "R$ #,##0.00" },
+      { measure: "Valor Pago Mês Anterior", label: "Mês anterior", format: "R$ #,##0.00" },
+      { measure: "Variação Absoluta Valor Pago Mensal", label: "Variação absoluta", format: "R$ #,##0.00", accent: colors.blue },
+      { measure: "Variação Valor Pago Mensal", label: "Variação percentual", format: "0.00%", accent: colors.blue },
+      { measure: "Participação Valor Pago", label: "Participação no total", format: "0.00%", accent: colors.teal }
+    ])
+  },
+  {
+    name: "HTML | Tooltip Entregas",
+    description: "Tooltip HTML/CSS logístico com contexto, qualidade, ciclo e participação.",
+    folder: "90 HTML\\Tooltips",
+    dax: tooltipHtmlDax("Entregas e qualidade", colors.amber, [
+      { measure: "Pedidos com Entrega", label: "Pedidos com entrega", format: "#,##0", accent: colors.blue },
+      { measure: "Taxa Entrega Concluída", label: "Entrega concluída", format: "0.00%", accent: colors.teal },
+      { measure: "Taxa Múltiplas Tentativas", label: "Múltiplas tentativas", format: "0.00%", accent: colors.red },
+      { measure: "Tempo Ciclo P50", label: "Ciclo P50", format: "0.00", suffix: " min", accent: colors.blue },
+      { measure: "Tempo Ciclo P90", label: "Ciclo P90", format: "0.00", suffix: " min", accent: colors.amber },
+      { measure: "Participação Pedidos com Entrega", label: "Participação no total", format: "0.00%", accent: colors.purple }
+    ])
+  }
+);
+
 // DAX delimita textos com aspas duplas. Os atributos HTML usam aspas simples
 // para que o conteúdo CSS permaneça válido sem escapar as strings DAX.
 for (const measure of htmlMeasures) {
@@ -1458,25 +1551,12 @@ function reportShell(page, title, subtitle, filters, { detail = false } = {}) {
   return visuals;
 }
 
-function tooltipPage(page, measures) {
+function tooltipPage(page, htmlMeasure) {
   zNew = 1000;
   const definition = { name: page.name, value: pageDefinition(page.name, page.displayName, { tooltip: true }) };
   const visuals = [
-    visualFile(page.name, "context", posNew(8, 8, 304, 36), cardVisual("Contexto Tooltip", "Contexto"))
+    visualFile(page.name, "tooltip-html", posNew(8, 8, 304, 224), htmlVisual(htmlMeasure))
   ];
-  const positions = measures.length === 5
-    ? [
-      [8, 50, 148, 80], [164, 50, 148, 80],
-      [8, 138, 96, 94], [112, 138, 96, 94], [216, 138, 96, 94]
-    ]
-    : [
-      [8, 50, 96, 82], [112, 50, 96, 82], [216, 50, 96, 82],
-      [8, 140, 96, 92], [112, 140, 96, 92], [216, 140, 96, 92]
-    ];
-  measures.forEach((measure, index) => {
-    const [x, y, width, height] = positions[index];
-    visuals.push(visualFile(page.name, `metric-${index + 1}`, posNew(x, y, width, height), cardVisual(measure.measure, measure.title)));
-  });
   addPage(definition, visuals);
 }
 
@@ -1721,38 +1801,10 @@ const detailVisuals = [
 ];
 addPage(detailPage, detailVisuals);
 
-tooltipPage(pages.tooltipCommercial, [
-  { measure: "Valor Transacionado", title: "Valor" },
-  { measure: "Valor Transacionado Mês Anterior", title: "Mês anterior" },
-  { measure: "Variação Absoluta Valor Mensal", title: "Variação R$" },
-  { measure: "Variação Valor Mensal", title: "Variação %" },
-  { measure: "Participação Valor Transacionado", title: "Participação" }
-]);
-
-tooltipPage(pages.tooltipOrders, [
-  { measure: "Pedidos Criados", title: "Pedidos" },
-  { measure: "Pedidos Mês Anterior", title: "Mês anterior" },
-  { measure: "Variação Absoluta Pedidos Mensal", title: "Variação" },
-  { measure: "Variação Pedidos Mensal", title: "Variação %" },
-  { measure: "Participação Pedidos", title: "Participação" }
-]);
-
-tooltipPage(pages.tooltipFinance, [
-  { measure: "Valor Pago", title: "Valor pago" },
-  { measure: "Valor Pago Mês Anterior", title: "Mês anterior" },
-  { measure: "Variação Absoluta Valor Pago Mensal", title: "Variação R$" },
-  { measure: "Variação Valor Pago Mensal", title: "Variação %" },
-  { measure: "Participação Valor Pago", title: "Participação" }
-]);
-
-tooltipPage(pages.tooltipDelivery, [
-  { measure: "Pedidos com Entrega", title: "Pedidos" },
-  { measure: "Taxa Entrega Concluída", title: "Concluída" },
-  { measure: "Taxa Múltiplas Tentativas", title: "Retentativas" },
-  { measure: "Tempo Ciclo P50", title: "Ciclo P50" },
-  { measure: "Tempo Ciclo P90", title: "Ciclo P90" },
-  { measure: "Participação Pedidos com Entrega", title: "Participação" }
-]);
+tooltipPage(pages.tooltipCommercial, "HTML | Tooltip Comercial");
+tooltipPage(pages.tooltipOrders, "HTML | Tooltip Pedidos");
+tooltipPage(pages.tooltipFinance, "HTML | Tooltip Financeiro");
+tooltipPage(pages.tooltipDelivery, "HTML | Tooltip Entregas");
 
 write(`${reportName}/CustomVisuals/README.md`, `# Visual HTML utilizado
 
