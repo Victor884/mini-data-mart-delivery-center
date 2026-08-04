@@ -23,7 +23,7 @@ Criar um projeto robusto de BI e SQL para provar a capacidade de:
 - [x] **Validações de Qualidade de Dados**: Consultas para assegurar a integridade e consistência volumétrica dos dados importados.
 - [x] **Camada de Data Marts**: Views detalhadas e agregadas para vendas, logística, pagamentos e desempenho de lojas.
 - [x] **Consultas para KPIs Executivos**: Indicadores documentados e calculados com regras explícitas de grão, denominador e exclusão.
-- [ ] **Dashboard Power BI**: Painel interativo com os KPIs consolidados (prints serão adicionados no README).
+- [x] **Projeto Power BI (versão futura)**: Arquivos nativos PBIP/PBIR, modelo Import, 18 medidas DAX e duas páginas com 29 visuais, preparados para validação posterior no Power BI Desktop.
 - [x] **Documentação Completa**:
   * [Regras de Negócio](docs/regras-negocio.md)
   * [Modelo Dimensional](docs/modelo-dimensional.md)
@@ -41,6 +41,7 @@ A estrutura de dados está implementada e validada até a camada de consumo anal
 | `stg` | 7 tabelas carregadas diretamente dos CSVs |
 | `dw` | 8 dimensões conformadas e 3 tabelas fato |
 | `mart` | 3 views detalhadas e 5 views agregadas |
+| `powerbi` | Versão futura do relatório, com validação estrutural concluída e validação visual pendente |
 
 Volumes reconciliados entre staging, DW e data marts:
 
@@ -135,25 +136,26 @@ Conecte-se ao banco de dados (`localhost:5432`, base `mini_datamart_delivery`, u
 
 ## 📊 Dashboard Power BI
 
-*(Os prints do dashboard finalizado e as principais visões do painel executivo serão adicionados aqui)*
+A versão futura do relatório está disponível em [`powerbi/DeliveryCenter.pbip`](powerbi/DeliveryCenter.pbip), com instruções de reprodução em [`powerbi/README.md`](powerbi/README.md).
 
-- [ ] *Print do Dashboard - Visão Executiva de Vendas*
-- [ ] *Print do Dashboard - Visão Operacional e SLAs de Entrega*
+- [x] **Visão Executiva:** KPIs financeiros e operacionais, evolução mensal, comparação por hub e mix de canais.
+- [x] **Performance Logística:** conclusão, tempos P50/P90, múltiplas tentativas, status, modal e detalhamento por hub.
+- [x] **Modelo semântico:** 18 medidas DAX dinâmicas e partição Import reproduzível.
+- [x] **Validação estrutural PBIR:** 0 erros e 0 avisos.
+- [ ] **Validação posterior no Power BI Desktop:** atualizar dados, revisar renderização, interações e filtros.
+- [ ] **Capturas finais:** adicionar prints após a validação visual.
 
 ---
-
 ## 🚀 Próximos Passos
 
-1. **Conectar o Power BI ao schema `mart`**:
-   * Usar as views agregadas nas páginas executivas.
-   * Reservar as views detalhadas para drill-through.
-2. **Criar três páginas iniciais do dashboard**:
-   * Visão Executiva de Vendas.
-   * Performance Logística e Tempos de Ciclo.
-   * Conciliação e Mix de Pagamentos.
-3. **Desenvolver as medidas em DAX**:
-   * Recalcular taxas usando numeradores e denominadores.
-   * Criar comparações mensais, acumulados e participação percentual.
+1. **Validar a versão futura no Power BI Desktop**:
+   * Gerar o snapshot Import e regenerar o PBIP na máquina de validação.
+   * Atualizar o modelo e conferir visuais, filtros, interações e formatação.
+   * Reconciliar os cartões com `powerbi/data/validacao.json`.
+2. **Adicionar evidências visuais**:
+   * Publicar prints das páginas Visão Executiva e Performance Logística.
+3. **Evoluir o relatório após a validação**:
+   * Avaliar conexão direta ao schema `mart`, drill-through e uma página futura de pagamentos.
 4. **Definir Metas Operacionais**:
    * Avaliar as séries semanais e mensais dos KPIs.
    * Aprovar limites de SLA e metas por hub antes de classificar performance.

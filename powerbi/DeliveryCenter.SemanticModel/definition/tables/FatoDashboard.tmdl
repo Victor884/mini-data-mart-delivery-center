@@ -1,0 +1,294 @@
+table FatoDashboard
+	measure 'Pedidos Criados' = COUNTROWS(FatoDashboard)
+		formatString: #,0
+		displayFolder: Comercial
+
+	measure 'Pedidos Finalizados' = CALCULATE([Pedidos Criados], FatoDashboard[Status do Pedido] = "FINISHED")
+		formatString: #,0
+		displayFolder: Comercial
+
+	measure 'Pedidos Cancelados' = CALCULATE([Pedidos Criados], FatoDashboard[Status do Pedido] = "CANCELED")
+		formatString: #,0
+		displayFolder: Comercial
+
+	measure 'Taxa de Cancelamento' = DIVIDE([Pedidos Cancelados], [Pedidos Criados])
+		formatString: 0.00%
+		displayFolder: Comercial
+
+	measure 'Valor Transacionado Finalizado' = CALCULATE(SUM(FatoDashboard[Valor Total Pedido]), FatoDashboard[Status do Pedido] = "FINISHED")
+		formatString: R$ #,##0.00
+		displayFolder: Comercial
+
+	measure 'Ticket Médio Finalizado' = DIVIDE([Valor Transacionado Finalizado], [Pedidos Finalizados])
+		formatString: R$ #,##0.00
+		displayFolder: Comercial
+
+	measure 'Margem de Entrega' = CALCULATE(SUM(FatoDashboard[Margem Entrega]), FatoDashboard[Status do Pedido] = "FINISHED")
+		formatString: R$ #,##0.00;[Red]-R$ #,##0.00
+		displayFolder: Comercial
+
+	measure 'Tempo Ciclo P50' =
+			PERCENTILEX.INC(
+				FILTER(FatoDashboard, FatoDashboard[Status do Pedido] = "FINISHED" && FatoDashboard[Tempo Ciclo Total (min)] >= 0),
+				FatoDashboard[Tempo Ciclo Total (min)],
+				0.5
+			)
+		formatString: 0.00 "min"
+		displayFolder: Experiência
+
+	measure 'Tempo Ciclo P90' =
+			PERCENTILEX.INC(
+				FILTER(FatoDashboard, FatoDashboard[Status do Pedido] = "FINISHED" && FatoDashboard[Tempo Ciclo Total (min)] >= 0),
+				FatoDashboard[Tempo Ciclo Total (min)],
+				0.9
+			)
+		formatString: 0.00 "min"
+		displayFolder: Experiência
+
+	measure 'Pedidos com Entrega' = CALCULATE([Pedidos Criados], FatoDashboard[Possui Entrega] = TRUE())
+		formatString: #,0
+		displayFolder: Logística
+
+	measure 'Entregas Concluídas' = CALCULATE([Pedidos com Entrega], FatoDashboard[Status da Entrega] = "DELIVERED")
+		formatString: #,0
+		displayFolder: Logística
+
+	measure 'Entregas Não Concluídas' = [Pedidos com Entrega] - [Entregas Concluídas]
+		formatString: #,0
+		displayFolder: Logística
+
+	measure 'Taxa Entrega Concluída' = DIVIDE([Entregas Concluídas], [Pedidos com Entrega])
+		formatString: 0.00%
+		displayFolder: Logística
+
+	measure 'Pedidos Múltiplas Tentativas' = CALCULATE([Pedidos com Entrega], FatoDashboard[Número de Tentativas] > 1)
+		formatString: #,0
+		displayFolder: Logística
+
+	measure 'Taxa Múltiplas Tentativas' = DIVIDE([Pedidos Múltiplas Tentativas], [Pedidos com Entrega])
+		formatString: 0.00%
+		displayFolder: Logística
+
+	measure 'Tempo Ciclo Logístico P50' =
+			PERCENTILEX.INC(
+				FILTER(FatoDashboard, FatoDashboard[Possui Entrega] = TRUE() && FatoDashboard[Status do Pedido] = "FINISHED" && FatoDashboard[Tempo Ciclo Total (min)] >= 0),
+				FatoDashboard[Tempo Ciclo Total (min)],
+				0.5
+			)
+		formatString: 0.00 "min"
+		displayFolder: Logística
+
+	measure 'Tempo Ciclo Logístico P90' =
+			PERCENTILEX.INC(
+				FILTER(FatoDashboard, FatoDashboard[Possui Entrega] = TRUE() && FatoDashboard[Status do Pedido] = "FINISHED" && FatoDashboard[Tempo Ciclo Total (min)] >= 0),
+				FatoDashboard[Tempo Ciclo Total (min)],
+				0.9
+			)
+		formatString: 0.00 "min"
+		displayFolder: Logística
+
+	measure 'Distância Média Entrega (km)' = DIVIDE(CALCULATE(AVERAGE(FatoDashboard[Distância da Entrega (m)]), FatoDashboard[Status da Entrega] = "DELIVERED"), 1000)
+		formatString: 0.00 "km"
+		displayFolder: Logística
+
+	column 'ID do Pedido'
+		dataType: int64
+		sourceColumn: order_id
+		summarizeBy: none
+		isHidden
+
+	column Data
+		dataType: dateTime
+		formatString: Short Date
+		sourceColumn: data_pedido
+		summarizeBy: none
+
+	column Ano
+		dataType: int64
+		sourceColumn: ano
+		summarizeBy: none
+
+	column 'Número do Mês'
+		dataType: int64
+		sourceColumn: mes_numero
+		summarizeBy: none
+		isHidden
+
+	column 'Nome do Mês'
+		dataType: string
+		sourceColumn: mes_nome
+		summarizeBy: none
+
+	column 'Mês/Ano'
+		dataType: string
+		sourceColumn: mes_ano
+		sortByColumn: 'Ordem Mês'
+		summarizeBy: none
+
+	column 'Ordem Mês'
+		dataType: int64
+		sourceColumn: mes_ordem
+		summarizeBy: none
+		isHidden
+
+	column 'ID do Hub'
+		dataType: int64
+		sourceColumn: hub_id
+		summarizeBy: none
+		isHidden
+
+	column Hub
+		dataType: string
+		sourceColumn: hub_nome
+		summarizeBy: none
+
+	column 'Cidade do Hub'
+		dataType: string
+		sourceColumn: hub_cidade
+		summarizeBy: none
+
+	column 'UF do Hub'
+		dataType: string
+		sourceColumn: hub_estado
+		summarizeBy: none
+
+	column 'ID da Loja'
+		dataType: int64
+		sourceColumn: store_id
+		summarizeBy: none
+		isHidden
+
+	column Loja
+		dataType: string
+		sourceColumn: loja_nome
+		summarizeBy: none
+
+	column 'Segmento da Loja'
+		dataType: string
+		sourceColumn: segmento_loja
+		summarizeBy: none
+
+	column 'ID do Canal'
+		dataType: int64
+		sourceColumn: channel_id
+		summarizeBy: none
+		isHidden
+
+	column Canal
+		dataType: string
+		sourceColumn: canal_nome
+		summarizeBy: none
+
+	column 'Tipo de Canal'
+		dataType: string
+		sourceColumn: tipo_canal
+		summarizeBy: none
+
+	column 'Status do Pedido'
+		dataType: string
+		sourceColumn: status_pedido
+		summarizeBy: none
+
+	column 'Valor do Pedido'
+		dataType: double
+		formatString: R$ #,##0.00
+		sourceColumn: valor_pedido
+		summarizeBy: sum
+
+	column 'Taxa de Entrega'
+		dataType: double
+		formatString: R$ #,##0.00
+		sourceColumn: taxa_entrega
+		summarizeBy: sum
+
+	column 'Custo de Entrega'
+		dataType: double
+		formatString: R$ #,##0.00
+		sourceColumn: custo_entrega
+		summarizeBy: sum
+
+	column 'Valor Total Pedido'
+		dataType: double
+		formatString: R$ #,##0.00
+		sourceColumn: valor_total_pedido
+		summarizeBy: sum
+
+	column 'Margem Entrega'
+		dataType: double
+		formatString: R$ #,##0.00
+		sourceColumn: margem_entrega
+		summarizeBy: sum
+
+	column 'Tempo de Produção (min)'
+		dataType: double
+		sourceColumn: tempo_producao_minutos
+		summarizeBy: average
+
+	column 'Tempo de Trânsito (min)'
+		dataType: double
+		sourceColumn: tempo_transito_minutos
+		summarizeBy: average
+
+	column 'Tempo Ciclo Total (min)'
+		dataType: double
+		sourceColumn: tempo_ciclo_total_minutos
+		summarizeBy: average
+
+	column 'Possui Entrega'
+		dataType: boolean
+		sourceColumn: possui_entrega
+		summarizeBy: none
+		isHidden
+
+	column 'ID da Entrega'
+		dataType: int64
+		sourceColumn: delivery_id
+		summarizeBy: none
+		isHidden
+
+	column 'Status da Entrega'
+		dataType: string
+		sourceColumn: status_entrega
+		summarizeBy: none
+
+	column 'Número de Tentativas'
+		dataType: int64
+		sourceColumn: numero_tentativas
+		summarizeBy: none
+
+	column 'Distância da Entrega (m)'
+		dataType: int64
+		sourceColumn: distancia_entrega_metros
+		summarizeBy: average
+
+	column 'Modal do Entregador'
+		dataType: string
+		sourceColumn: modal_entregador
+		summarizeBy: none
+
+	column 'Tipo do Entregador'
+		dataType: string
+		sourceColumn: tipo_entregador
+		summarizeBy: none
+
+	partition FatoDashboard = m
+		mode: import
+		source =
+			let
+				Source = Csv.Document(File.Contents("E:\mini-data-mart-delivery-center\powerbi\data\fato_dashboard.csv"), [Delimiter = ",", Columns = 33, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				ChangedTypes = Table.TransformColumnTypes(PromotedHeaders, {
+					{"order_id", Int64.Type}, {"data_pedido", type date}, {"ano", Int64.Type}, {"mes_numero", Int64.Type},
+					{"mes_nome", type text}, {"mes_ano", type text}, {"mes_ordem", Int64.Type}, {"hub_id", Int64.Type},
+					{"hub_nome", type text}, {"hub_cidade", type text}, {"hub_estado", type text}, {"store_id", Int64.Type},
+					{"loja_nome", type text}, {"segmento_loja", type text}, {"channel_id", Int64.Type}, {"canal_nome", type text},
+					{"tipo_canal", type text}, {"status_pedido", type text}, {"valor_pedido", type number}, {"taxa_entrega", type number},
+					{"custo_entrega", type number}, {"valor_total_pedido", type number}, {"margem_entrega", type number},
+					{"tempo_producao_minutos", type number}, {"tempo_transito_minutos", type number}, {"tempo_ciclo_total_minutos", type number},
+					{"possui_entrega", type logical}, {"delivery_id", Int64.Type}, {"status_entrega", type text},
+					{"numero_tentativas", Int64.Type}, {"distancia_entrega_metros", Int64.Type}, {"modal_entregador", type text}, {"tipo_entregador", type text}
+				}, "en-US")
+			in
+				ChangedTypes
+
+	annotation PBI_ResultType = Table

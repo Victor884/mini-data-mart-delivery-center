@@ -1,0 +1,18 @@
+{
+  "linhas": 368999,
+  "periodo_inicial": "2021-01-01",
+  "periodo_final": "2021-04-30",
+  "pedidos_finalizados": 352020,
+  "pedidos_cancelados": 16979,
+  "taxa_cancelamento_pct": 4.6,
+  "valor_transacionado_finalizado": 37481358.97,
+  "ticket_medio_finalizado": 106.48,
+  "margem_entrega_finalizada": -434905.63,
+  "tempo_ciclo_p50_minutos": 42.18,
+  "tempo_ciclo_p90_minutos": 83.17,
+  "tempo_ciclo_logistico_p50_minutos": 42.23,
+  "tempo_ciclo_logistico_p90_minutos": 82.67,
+  "pedidos_com_entrega": 358654,
+  "taxa_entrega_concluida_pct": 97.95,
+  "taxa_multiplas_tentativas_pct": 5.22
+}
