@@ -33,8 +33,9 @@ def main() -> None:
     channels = load_csv("channels.csv")
     deliveries = load_csv("deliveries.csv")
     drivers = load_csv("drivers.csv")
+    payments = load_csv("payments.csv")
 
-    for frame in (orders, stores, hubs, channels, deliveries, drivers):
+    for frame in (orders, stores, hubs, channels, deliveries, drivers, payments):
         for column in frame.select_dtypes(include=["object", "str"]).columns:
             frame[column] = frame[column].str.strip()
 
@@ -46,6 +47,8 @@ def main() -> None:
         raise ValueError("hubs.csv possui hub_id duplicado")
     if not channels["channel_id"].is_unique:
         raise ValueError("channels.csv possui channel_id duplicado")
+    if not payments["payment_id"].is_unique:
+        raise ValueError("payments.csv possui payment_id duplicado")
 
     lojas = stores.merge(hubs, on="hub_id", how="inner", validate="many_to_one")
     fato = orders.merge(lojas, on="store_id", how="inner", validate="many_to_one")
@@ -144,6 +147,117 @@ def main() -> None:
         fato["possui_entrega"] & fato["driver_type"].isna(), "driver_type"
     ] = "NAO INFORMADO"
 
+    payments["valor_pago_confirmado"] = payments["payment_amount"].where(
+        payments["payment_status"].eq("PAID"), 0
+    )
+    payments["valor_chargeback"] = payments["payment_amount"].where(
+        payments["payment_status"].eq("CHARGEBACK"), 0
+    )
+    payments["valor_aguardando"] = payments["payment_amount"].where(
+        payments["payment_status"].eq("AWAITING"), 0
+    )
+    payments["taxa_pagamento_pago"] = payments["payment_fee"].where(
+        payments["payment_status"].eq("PAID"), 0
+    )
+    payments["flag_pago"] = payments["payment_status"].eq("PAID").astype("int64")
+    payments["flag_chargeback"] = payments["payment_status"].eq(
+        "CHARGEBACK"
+    ).astype("int64")
+    payments["flag_aguardando"] = payments["payment_status"].eq(
+        "AWAITING"
+    ).astype("int64")
+
+    pagamentos = (
+        payments.groupby("payment_order_id", as_index=False)
+        .agg(
+            qtd_pagamentos=("payment_id", "size"),
+            qtd_pagamentos_pagos=("flag_pago", "sum"),
+            qtd_chargebacks=("flag_chargeback", "sum"),
+            qtd_pagamentos_aguardando=("flag_aguardando", "sum"),
+            total_pago_confirmado=("valor_pago_confirmado", "sum"),
+            total_chargeback=("valor_chargeback", "sum"),
+            total_aguardando=("valor_aguardando", "sum"),
+            taxas_pagamentos_pagos=("taxa_pagamento_pago", "sum"),
+        )
+        .rename(columns={"payment_order_id": "order_id"})
+    )
+
+    meio_principal = (
+        payments.loc[payments["payment_status"].eq("PAID")]
+        .sort_values(
+            ["payment_order_id", "payment_amount", "payment_id"],
+            ascending=[True, False, True],
+            kind="mergesort",
+        )
+        .drop_duplicates("payment_order_id")
+        [["payment_order_id", "payment_method"]]
+        .rename(
+            columns={
+                "payment_order_id": "order_id",
+                "payment_method": "meio_pagamento_principal",
+            }
+        )
+    )
+    pagamentos = pagamentos.merge(
+        meio_principal, on="order_id", how="left", validate="one_to_one"
+    )
+    fato = fato.merge(pagamentos, on="order_id", how="left", validate="one_to_one")
+
+    colunas_pagamento = [
+        "qtd_pagamentos",
+        "qtd_pagamentos_pagos",
+        "qtd_chargebacks",
+        "qtd_pagamentos_aguardando",
+        "total_pago_confirmado",
+        "total_chargeback",
+        "total_aguardando",
+        "taxas_pagamentos_pagos",
+    ]
+    fato[colunas_pagamento] = fato[colunas_pagamento].fillna(0)
+    fato[
+        [
+            "qtd_pagamentos",
+            "qtd_pagamentos_pagos",
+            "qtd_chargebacks",
+            "qtd_pagamentos_aguardando",
+        ]
+    ] = fato[
+        [
+            "qtd_pagamentos",
+            "qtd_pagamentos_pagos",
+            "qtd_chargebacks",
+            "qtd_pagamentos_aguardando",
+        ]
+    ].astype("int64")
+    fato["meio_pagamento_principal"] = fato[
+        "meio_pagamento_principal"
+    ].fillna("SEM PAGAMENTO PAGO")
+    fato["valor_pago_apos_taxas"] = (
+        fato["total_pago_confirmado"] - fato["taxas_pagamentos_pagos"]
+    ).round(2)
+    fato["diferenca_conciliacao"] = (
+        fato["total_pago_confirmado"] - fato["valor_total_pedido"]
+    ).round(2)
+
+    fato["status_conciliacao"] = "PAGAMENTO_A_MAIOR"
+    fato.loc[
+        fato["total_pago_confirmado"] < fato["valor_total_pedido"],
+        "status_conciliacao",
+    ] = "PAGAMENTO_A_MENOR"
+    fato.loc[
+        fato["diferenca_conciliacao"].abs() <= 0.01,
+        "status_conciliacao",
+    ] = "CONCILIADO"
+    fato.loc[
+        fato["qtd_pagamentos_pagos"].eq(0), "status_conciliacao"
+    ] = "SEM_PAGAMENTO_PAGO"
+    fato.loc[fato["qtd_pagamentos"].eq(0), "status_conciliacao"] = (
+        "SEM_PAGAMENTO"
+    )
+    fato.loc[fato["order_status"].eq("CANCELED"), "status_conciliacao"] = (
+        "PEDIDO_CANCELADO"
+    )
+
     output = fato[
         [
             "order_id",
@@ -179,6 +293,18 @@ def main() -> None:
             "distancia_entrega_metros",
             "driver_modal",
             "driver_type",
+            "qtd_pagamentos",
+            "qtd_pagamentos_pagos",
+            "qtd_chargebacks",
+            "qtd_pagamentos_aguardando",
+            "total_pago_confirmado",
+            "total_chargeback",
+            "total_aguardando",
+            "taxas_pagamentos_pagos",
+            "valor_pago_apos_taxas",
+            "diferenca_conciliacao",
+            "status_conciliacao",
+            "meio_pagamento_principal",
         ]
     ].rename(
         columns={
@@ -210,6 +336,13 @@ def main() -> None:
     ciclo_valido = finalizados & output["tempo_ciclo_total_minutos"].ge(0)
     com_entrega = output["possui_entrega"]
     ciclo_logistico = ciclo_valido & com_entrega
+    producao_valida = finalizados & output["tempo_producao_minutos"].ge(0)
+    transito_valido = finalizados & output["tempo_transito_minutos"].ge(0)
+    distancia_valida = (
+        output["status_entrega"].eq("DELIVERED")
+        & output["distancia_entrega_metros"].ge(0)
+    )
+    conciliados = finalizados & output["status_conciliacao"].eq("CONCILIADO")
 
     validacao = {
         "linhas": int(len(output)),
@@ -228,6 +361,12 @@ def main() -> None:
         ),
         "margem_entrega_finalizada": round(
             float(output.loc[finalizados, "margem_entrega"].sum()), 2
+        ),
+        "tempo_producao_medio_minutos": round(
+            float(output.loc[producao_valida, "tempo_producao_minutos"].mean()), 2
+        ),
+        "tempo_transito_medio_minutos": round(
+            float(output.loc[transito_valido, "tempo_transito_minutos"].mean()), 2
         ),
         "tempo_ciclo_p50_minutos": round(
             float(output.loc[ciclo_valido, "tempo_ciclo_total_minutos"].quantile(0.5)),
@@ -258,17 +397,55 @@ def main() -> None:
             / com_entrega.sum(),
             2,
         ),
+        "distancia_media_entregue_km": round(
+            float(output.loc[distancia_valida, "distancia_entrega_metros"].mean())
+            / 1000,
+            2,
+        ),
+        "transacoes_pagas": int(output["qtd_pagamentos_pagos"].sum()),
+        "valor_pago_confirmado": round(
+            float(output["total_pago_confirmado"].sum()), 2
+        ),
+        "taxas_pagamentos_pagos": round(
+            float(output["taxas_pagamentos_pagos"].sum()), 2
+        ),
+        "chargebacks": int(output["qtd_chargebacks"].sum()),
+        "valor_chargeback": round(float(output["total_chargeback"].sum()), 2),
+        "pedidos_conciliados": int(conciliados.sum()),
+        "taxa_conciliacao_pct": round(
+            100 * conciliados.sum() / finalizados.sum(), 2
+        ),
+        "diferenca_absoluta_conciliacao": round(
+            float(
+                output.loc[finalizados, "diferenca_conciliacao"].abs().sum()
+            ),
+            2,
+        ),
     }
 
     expected = {
         "linhas": 368_999,
+        "pedidos_finalizados": 352_020,
         "pedidos_cancelados": 16_979,
         "taxa_cancelamento_pct": 4.60,
         "valor_transacionado_finalizado": 37_481_358.97,
         "ticket_medio_finalizado": 106.48,
         "margem_entrega_finalizada": -434_905.63,
+        "tempo_producao_medio_minutos": 61.71,
+        "tempo_transito_medio_minutos": 46.55,
+        "tempo_ciclo_p50_minutos": 42.18,
+        "tempo_ciclo_p90_minutos": 83.17,
+        "pedidos_com_entrega": 358_654,
         "taxa_entrega_concluida_pct": 97.95,
         "taxa_multiplas_tentativas_pct": 5.22,
+        "distancia_media_entregue_km": 10.11,
+        "transacoes_pagas": 400_381,
+        "valor_pago_confirmado": 37_304_232.78,
+        "taxas_pagamentos_pagos": 753_363.85,
+        "chargebacks": 438,
+        "valor_chargeback": 7_160.50,
+        "taxa_conciliacao_pct": 96.60,
+        "diferenca_absoluta_conciliacao": 465_576.41,
     }
     for metric, expected_value in expected.items():
         if validacao[metric] != expected_value:
