@@ -1,48 +1,68 @@
-# Delivery Center — especificação da versão portátil
+# Especificação — Delivery Center Dark e Light
 
-## Objetivo e isolamento
+## Escopo e isolamento
 
-- Formato: projeto PBIP/PBIR paralelo, com modelo semântico Import.
-- Branch: `agent/power-bi-future-version`.
-- Fonte: `powerbi/data/fato_dashboard.csv`, gerado deterministicamente dos CSVs completos em `data/raw`.
-- Grão: uma linha por pedido, com última tentativa de entrega e pagamentos previamente agregados por pedido.
-- Uso: demonstração e validação local quando PostgreSQL ou Docker não estiverem disponíveis.
-- Restrição: não modifica nem substitui `DeliveryCenterAnalytics.pbip`; o schema `mart` continua sendo a fonte canônica da versão principal.
+- Branch de trabalho: `agent/power-bi-future-version`.
+- Projetos: `DeliveryCenterDark.pbip` e `DeliveryCenterLight.pbip`.
+- Modelo compartilhado: `DeliveryCenter.SemanticModel` em modo Import.
+- Fonte portátil: `powerbi/data/fato_dashboard.csv`, gerada dos CSVs completos.
+- Restrição: não modificar nem substituir `DeliveryCenterAnalytics.pbip` ou a versão atual da branch principal.
+- Grão: uma linha por pedido, última tentativa de entrega e pagamentos previamente agregados por pedido.
 
-## Páginas implementadas
+## Direção visual
 
-1. **Visão Executiva**: KPIs HTML, tendência comercial, ranking de hubs, mix de canais, saúde operacional e lojas de maior impacto.
-2. **Pedidos & Operação**: KPIs HTML, volume diário, composição por status, decomposição do ciclo e operação por hub.
-3. **Financeiro & Conciliação**: KPIs HTML, valores transacionado/pago, resultado por segmento e hub, chargebacks e conciliação.
-4. **Entregas & Qualidade**: KPIs HTML, percentis do ciclo, conclusão por modal, retentativas e matriz de qualidade por hub.
-5. **Detalhamento**: cabeçalho HTML do pedido e tabela auditável com atributos comerciais, financeiros e logísticos.
+### Dark
 
-Quatro páginas ocultas complementam os gráficos com tooltips HTML contextuais contendo período/categoria, valor atual, período anterior, variação absoluta, variação percentual e participação no total quando aplicável.
+- referência principal: dashboard `Performance Logística` fornecido pelo usuário;
+- canvas `1440 × 1024`, fundo azul-marinho, superfícies profundas e bordas discretas;
+- navegação horizontal no topo;
+- filtros no cabeçalho;
+- gráfico combinado dominante, painel circular de conclusão e tabela de hubs;
+- ciano para informação, verde para saúde, âmbar para atenção e vermelho para exceção.
 
-## Experiência e identidade visual
+### Light
 
-- canvas `1440 × 810`, grade fixa, fundo azul-marinho e contraste alto;
-- navegação lateral nativa em todas as páginas analíticas;
-- quatro filtros no topo de cada página, com botão nativo para limpar todas as segmentações;
-- HTML/CSS reservado a resumos e tooltips; gráficos, tabelas, filtros e ações permanecem nativos;
-- cores semânticas consistentes: ciano/verde para saúde, vermelho para exceções, âmbar para atenção e roxo/azul para comparação;
-- P90 identificado como percentil descritivo, nunca como meta de SLA.
+- referência principal: dashboard `Delivery Center | Visão Executiva` fornecido pelo usuário;
+- canvas `1440 × 1024`, fundo cinza muito claro e cartões brancos;
+- sidebar azul-marinho compacta;
+- filtros no cabeçalho e faixa de KPIs;
+- tendência mensal, ranking por hub, margem, ciclo e participação por canal;
+- azul para destaque primário e teal para indicadores operacionais positivos.
 
-## Modelo e regras preservadas
+## Arquitetura das páginas
 
-- Percentis são calculados dinamicamente em DAX no detalhe válido, nunca pela média de percentis agregados.
-- Taxas usam numerador e denominador no contexto do filtro.
-- Pagamentos são agregados antes da união com pedidos para impedir fanout.
-- Apenas pagamentos `PAID` compõem valor pago; `CHARGEBACK` e `AWAITING` são guardrails separados.
-- A conciliação segue a tolerância de R$ 0,01 definida no `mart`.
-- A última tentativa é determinada por `delivery_id`, pois a origem não possui timestamp por tentativa.
-- O parâmetro Power Query `Arquivo Snapshot` centraliza o caminho local do arquivo Import.
+1. **Executivo** — destino principal do modo Light.
+2. **Logística** — destino principal do modo Dark.
+3. **Pagamentos** — análise financeira e conciliação.
+4. **Pedidos & Operação** — página analítica preservada e oculta na navegação principal.
+5. **Detalhamento** — página auditável preservada e oculta na navegação principal.
+6. **Quatro tooltips** — Comercial, Pedidos, Financeiro e Entregas.
 
-## Critérios de aceite
+O menu principal exibe somente Executivo, Logística e Pagamentos para manter a navegação equivalente às referências. Páginas ocultas continuam no projeto e não perdem visuais ou regras.
 
-- cinco páginas analíticas e quatro tooltips na ordem definida;
-- 46 colunas, 57 medidas DAX, 87 visuais e 11 componentes HTML/CSS;
-- todos os campos usados pelos visuais existentes no modelo;
-- filtros, navegação e limpeza configurados em todas as páginas analíticas;
-- validação determinística de dados e estrutura sem erro;
-- homologação visual final no Power BI Desktop antes do merge.
+## Regras de negócio preservadas
+
+- Percentis são calculados dinamicamente em DAX no detalhe válido.
+- Taxas preservam numerador e denominador no contexto do filtro.
+- Pagamentos são agregados antes da união com pedidos, evitando fanout.
+- Apenas pagamentos `PAID` compõem o valor pago.
+- `CHARGEBACK` e `AWAITING` permanecem guardrails separados.
+- A conciliação usa tolerância de R$ 0,01.
+- A última tentativa usa `delivery_id`, pois a origem não possui timestamp por tentativa.
+- O P90 é um percentil descritivo, não uma meta de SLA.
+- Nenhum valor, região ou meta fictícia dos mockups foi incorporado ao modelo.
+
+## Critérios de aceite estruturais
+
+- dois arquivos PBIP independentes apontando para o mesmo modelo semântico;
+- Dark ativo em Logística e Light ativo em Executivo;
+- 46 colunas e 72 medidas DAX;
+- 9 páginas internas por relatório, sendo 4 tooltips;
+- 84 visuais no Dark e 92 no Light;
+- 12 componentes HTML/CSS em cada modo;
+- filtros com altura mínima para não cortar títulos ou seletores;
+- todos os visuais contidos no canvas;
+- campos e medidas referenciados existentes no modelo;
+- zero erros no validador PBIR;
+- baselines numéricos preservados;
+- homologação visual final no Power BI Desktop antes de avaliar merge.

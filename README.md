@@ -1,5 +1,7 @@
 # Mini Data Mart - Delivery Center 🚀
 
+> **Versão em construção no PR:** esta branch mantém a entrega atual intacta e adiciona [`DeliveryCenterDark.pbip`](powerbi/DeliveryCenterDark.pbip) e [`DeliveryCenterLight.pbip`](powerbi/DeliveryCenterLight.pbip). Os dois modos compartilham o mesmo modelo semântico Import e seguem, respectivamente, as referências de Performance Logística escura e Visão Executiva clara. Detalhes em [`powerbi/README-PORTABLE.md`](powerbi/README-PORTABLE.md).
+
 Este projeto consiste na estruturação de um **Data Warehouse** e de **Data Marts** analíticos utilizando dados operacionais de um centro de distribuição e entregas (Delivery Center). 
 
 O objetivo principal é demonstrar competência em **Engenharia de Dados (ELT)**, **Modelagem Dimensional (Star Schema)**, **SQL Avançado (PostgreSQL)** e **Visualização de Dados (Power BI)**.
@@ -44,7 +46,7 @@ A estrutura de dados está implementada e validada até a camada de consumo anal
 | `dw` | 8 dimensões conformadas e 3 tabelas fato |
 | `mart` | 3 views detalhadas e 5 views agregadas |
 | Power BI | 6 dimensões, 4 fatos, 58 medidas, 5 páginas analíticas, 4 tooltips e 81 visuais |
-| Power BI portátil | 46 colunas, 57 medidas, 5 páginas analíticas, 4 tooltips, 87 visuais e 11 componentes HTML/CSS em branch paralela |
+| Power BI portátil | dois modos PBIP, modelo compartilhado com 46 colunas e 72 medidas, 9 páginas internas e 12 componentes HTML/CSS por relatório |
 
 Volumes reconciliados entre staging, DW e data marts:
 
@@ -215,7 +217,7 @@ A estrutura PBIP/PBIR foi validada com **0 erros**. As **10 consultas M** execut
 
 ### Versão portátil em branch paralela
 
-A branch deste PR também mantém [`powerbi/DeliveryCenter.pbip`](powerbi/DeliveryCenter.pbip), uma alternativa Import reproduzível a partir dos CSVs do projeto. A implementação estrutural está concluída com cinco páginas analíticas, quatro tooltips contextuais, 57 medidas DAX, 87 visuais e 11 componentes HTML/CSS. Ela permanece separada da entrega atual até a homologação visual no Power BI Desktop. Consulte [`powerbi/README-PORTABLE.md`](powerbi/README-PORTABLE.md).
+A branch deste PR mantém [`powerbi/DeliveryCenterDark.pbip`](powerbi/DeliveryCenterDark.pbip) e [`powerbi/DeliveryCenterLight.pbip`](powerbi/DeliveryCenterLight.pbip), alternativas Import reproduzíveis a partir dos CSVs do projeto. Os dois relatórios compartilham o mesmo modelo com 46 colunas e 72 medidas DAX; cada um contém nove páginas internas, quatro tooltips e doze componentes HTML/CSS. Eles permanecem separados da entrega atual até a homologação visual no Power BI Desktop. Consulte [`powerbi/README-PORTABLE.md`](powerbi/README-PORTABLE.md).
 
 ---
 ## 🚀 Próximos Passos

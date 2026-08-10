@@ -1,5 +1,14 @@
 # Delivery Center Analytics — Power BI Project
 
+## Nova versão de portfólio nesta branch
+
+Esta branch isolada contém duas novas variantes, ambas conectadas ao mesmo modelo Import reproduzível:
+
+- [`DeliveryCenterDark.pbip`](DeliveryCenterDark.pbip) — modo Dark com página inicial de Performance Logística e navegação superior;
+- [`DeliveryCenterLight.pbip`](DeliveryCenterLight.pbip) — modo Light com página inicial Executiva e sidebar compacta.
+
+Os dois projetos compartilham [`DeliveryCenter.SemanticModel`](DeliveryCenter.SemanticModel), com 46 colunas e 72 medidas DAX. A versão atual [`DeliveryCenterAnalytics.pbip`](DeliveryCenterAnalytics.pbip) foi preservada sem alterações. Consulte [`README-PORTABLE.md`](README-PORTABLE.md) para geração, validação e pendências de homologação.
+
 Projeto Power BI em formato PBIP/PBIR, versionável como texto, conectado às views PostgreSQL do schema `mart`. A versão atual foi reformulada como peça de portfólio, com hierarquia visual, navegação e contexto analítico consistentes.
 
 ## Entrega atual
@@ -73,4 +82,4 @@ O visual HTML customizado emite apenas conteúdo estático. Os elementos que exi
 
 ## Versão portátil paralela
 
-A branch `agent/power-bi-future-version` também contém `DeliveryCenter.pbip`, baseado em um snapshot Import reproduzível. A implementação estrutural possui cinco páginas analíticas, quatro tooltips, 57 medidas, 87 visuais e 11 componentes HTML/CSS. Ela é documentada em [`README-PORTABLE.md`](README-PORTABLE.md) e continua isolada até a homologação visual no Power BI Desktop, sem substituir o projeto atual.
+A branch `agent/power-bi-future-version` também contém `DeliveryCenterDark.pbip` e `DeliveryCenterLight.pbip`, baseados em um snapshot Import reproduzível e no mesmo modelo semântico. A implementação estrutural possui 46 colunas, 72 medidas, nove páginas internas por relatório e doze componentes HTML/CSS em cada modo. Ela é documentada em [`README-PORTABLE.md`](README-PORTABLE.md) e continua isolada até a homologação visual no Power BI Desktop, sem substituir o projeto atual.

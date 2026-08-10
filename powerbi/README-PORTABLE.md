@@ -1,20 +1,54 @@
-# Delivery Center — versão portátil
+# Delivery Center — portfólio Dark e Light
 
-> **Status:** implementação estrutural concluída na branch `agent/power-bi-future-version`. Esta versão continua isolada e não substitui `DeliveryCenterAnalytics.pbip` enquanto a homologação visual no Power BI Desktop não for encerrada.
+> **Status:** as duas variantes PBIP foram implementadas e validadas estruturalmente na branch `agent/power-bi-future-version`. A branch principal e `DeliveryCenterAnalytics.pbip` permanecem inalterados.
 
-O projeto [`DeliveryCenter.pbip`](DeliveryCenter.pbip) é uma alternativa Import reproduzível a partir dos CSVs completos do repositório. Ele permite demonstrar o portfólio sem depender do PostgreSQL ou do Docker e preserva as regras do `mart`: uma linha por pedido, última tentativa de entrega e pagamentos agregados antes da união, sem fanout financeiro.
+Esta entrega usa um único modelo semântico Import e dois relatórios independentes:
 
-## Conteúdo entregue
+- [`DeliveryCenterDark.pbip`](DeliveryCenterDark.pbip): experiência escura orientada à operação logística, com navegação superior;
+- [`DeliveryCenterLight.pbip`](DeliveryCenterLight.pbip): experiência clara orientada à visão executiva, com sidebar compacta;
+- `DeliveryCenter.SemanticModel`: modelo compartilhado pelos dois relatórios, evitando medidas ou resultados divergentes.
 
-- cinco páginas analíticas: Visão Executiva, Pedidos & Operação, Financeiro & Conciliação, Entregas & Qualidade e Detalhamento;
-- quatro páginas ocultas de tooltip, associadas aos principais gráficos;
-- 46 colunas e 57 medidas DAX no modelo Import;
-- 87 visuais, incluindo 20 segmentações, cinco navegadores e cinco botões para limpar filtros;
-- 11 componentes HTML/CSS com o visual certificado **HTML Content (lite)**: KPIs, saúde operacional, etapas do ciclo, detalhe do pedido e tooltips;
-- tema dark profissional, títulos e unidades padronizados e `altText` nos componentes HTML;
-- parâmetro Power Query `Arquivo Snapshot`, atualizado pelo gerador para a máquina atual.
+As referências visuais foram usadas como direção de composição, hierarquia e identidade. Categorias, hubs e valores fictícios presentes nos mockups não foram copiados; todos os visuais usam os dados reais do snapshot reconciliado.
 
-## Preparar e abrir
+## Experiência implementada
+
+### Dark — Performance Logística
+
+- página inicial `Logística`;
+- navegação horizontal entre Executivo, Logística e Pagamentos;
+- filtros de período, hub e modal no cabeçalho;
+- gráfico combinado mensal de entregas concluídas e P50 do ciclo;
+- painel HTML/CSS com anel de conclusão, P50, P90 e total de tentativas;
+- tabela HTML/CSS de desempenho dos cinco principais hubs, com barras de progresso e cores semânticas;
+- paleta azul-marinho, ciano, verde, âmbar e vermelho de exceção.
+
+### Light — Visão Executiva
+
+- página inicial `Executivo`;
+- sidebar azul-marinho compacta e navegação nativa;
+- filtros de período, hub, canal e status no cabeçalho;
+- faixa executiva com quatro KPIs;
+- evolução mensal do valor transacionado e ranking de hubs;
+- cartões HTML/CSS de margem e tempo de ciclo;
+- participação por canal em visual nativo;
+- superfícies brancas, tipografia azul-marinho e acentos azul/teal.
+
+### Conteúdo preservado
+
+Os dois projetos mantêm internamente as páginas Executivo, Logística, Pagamentos, Pedidos & Operação e Detalhamento, além de quatro tooltips contextuais. Pedidos e Detalhamento ficam ocultos no menu principal para reproduzir a navegação enxuta das referências, mas continuam disponíveis para evolução e drill-through.
+
+## Modelo e componentes
+
+- 46 colunas e 72 medidas DAX no modelo Import compartilhado;
+- 9 páginas internas em cada relatório: 5 analíticas e 4 tooltips;
+- 3 destinos visíveis na navegação principal;
+- Dark: 84 visuais, 19 segmentações e 12 componentes HTML/CSS;
+- Light: 92 visuais, 20 segmentações e 12 componentes HTML/CSS;
+- filtros nativos, botões para limpar segmentações e tooltips associados;
+- canvas `1440 × 1024`, alinhado à proporção das referências fornecidas;
+- visual certificado **HTML Content (lite)** registrado nos dois relatórios.
+
+## Gerar, validar e abrir
 
 Na raiz do repositório:
 
@@ -24,43 +58,50 @@ node powerbi/scripts/generate_pbip.mjs
 node powerbi/scripts/validate_portable_pbip.mjs
 ```
 
-Depois, abra `powerbi/DeliveryCenter.pbip` no Power BI Desktop e atualize o modelo. Caso o visual não seja carregado automaticamente, instale **HTML Content (lite)** pelo AppSource.
+O gerador cria as duas variantes e atualiza o parâmetro Power Query `Arquivo Snapshot` para a máquina atual. Depois, abra o modo desejado no Power BI Desktop:
 
-O snapshot `powerbi/data/fato_dashboard.csv` tem aproximadamente 82 MB, não é versionado e pode ser reconstruído deterministicamente. O arquivo `powerbi/data/validacao.json` permanece versionado como evidência dos baselines.
+```text
+powerbi/DeliveryCenterDark.pbip
+powerbi/DeliveryCenterLight.pbip
+```
+
+Se solicitado, instale **HTML Content (lite)** por `Obter mais visuais > AppSource` e atualize o modelo. O snapshot `powerbi/data/fato_dashboard.csv` tem aproximadamente 82 MB, não é versionado e pode ser reconstruído deterministicamente.
 
 ## Validação executada
 
-| Controle | Resultado |
-|---|---:|
-| Reconciliação dos dados completos | aprovado |
-| Páginas / tooltips | 5 / 4 |
-| Visuais / componentes HTML | 87 / 11 |
-| Colunas / medidas DAX | 46 / 57 |
-| Referências de campos dos visuais | aprovado |
-| PBIR nativo | 0 erros |
-| Avisos do validador | 11 esperados — schema externo do HTML Content |
+| Controle | Dark | Light |
+|---|---:|---:|
+| PBIR | 0 erros | 0 erros |
+| Páginas internas / tooltips | 9 / 4 | 9 / 4 |
+| Visuais | 84 | 92 |
+| Componentes HTML/CSS | 12 | 12 |
+| Segmentações | 19 | 20 |
+| Navegadores / limpar filtros | 5 / 5 | 5 / 5 |
+| Limites do canvas | aprovado | aprovado |
+| Referências de campos e medidas | aprovado | aprovado |
 
-O comando `powerbi-report-author validate` não conhece o schema interno do visual de terceiros e, por isso, registra um aviso por componente HTML. O visual está declarado em `publicCustomVisuals` com o mesmo identificador já utilizado na versão principal.
+O `powerbi-report-author` retorna 12 avisos esperados em cada relatório porque não conhece o schema interno do visual externo HTML Content. O identificador está registrado em `publicCustomVisuals`, e não houve erro de PBIR.
 
 ## Baselines reconciliados
 
 - 368.999 pedidos e 352.020 finalizados;
 - R$ 37.481.358,97 em valor transacionado finalizado;
-- 400.381 transações pagas e R$ 37.304.232,78 em valor pago;
-- 96,60% de conciliação e R$ 465.576,41 de diferença absoluta;
-- 438 chargebacks, totalizando R$ 7.160,50;
-- 97,95% de conclusão de entrega e 5,22% de múltiplas tentativas.
+- R$ 37.304.232,78 em valor pago confirmado;
+- 96,60% de conciliação;
+- 97,95% de conclusão de entrega;
+- 5,22% de múltiplas tentativas;
+- P50/P90 logístico de 42,18 / 83,17 minutos;
+- margem agregada de entrega de -R$ 434.905,63.
 
-## Evidências e manutenção
+## Arquivos de manutenção
 
-- `data/validacao.json`: baselines reconciliados;
-- `validation-report.json`: última validação estrutural registrada;
-- `DeliveryCenter.SemanticModel/definition/tables/FatoDashboard.tmdl`: modelo, medidas DAX e partição Import;
-- `scripts/build_import_data.py`: construção e reconciliação do snapshot;
-- `scripts/generate_pbip.mjs`: geração determinística do PBIP/PBIR/TMDL;
-- `scripts/validate_portable_pbip.mjs`: checagem local de páginas, campos, navegação, filtros e HTML;
-- `report-spec.md`: escopo, regras e critério de aceite.
+- `scripts/build_import_data.py`: constrói e reconcilia o snapshot;
+- `scripts/generate_pbip.mjs`: gera o modelo e o relatório-base transitório;
+- `scripts/generate_design_modes.mjs`: materializa os layouts Dark e Light;
+- `scripts/validate_portable_pbip.mjs`: valida os dois relatórios e o modelo compartilhado;
+- `validation-report.json`: evidência resumida da validação;
+- `report-spec.md`: regras, decisões e critérios de aceite.
 
-## Pendência antes do merge
+## Próxima etapa
 
-Abrir esta branch no Power BI Desktop, atualizar o parâmetro/snapshot e homologar visualmente as cinco páginas, os quatro tooltips, a navegação, a limpeza de filtros e o comportamento do HTML Content. A automação de UI do Windows não ficou disponível nesta sessão, portanto essa etapa não foi marcada como concluída sem evidência.
+Abrir ambos os `.pbip` no Power BI Desktop, atualizar o snapshot e homologar visualmente fontes, quebras de texto, HTML Content, navegação, tooltips, filtros cruzados e drill-through. A validação de arquivos confirma a estrutura, mas não substitui a inspeção do motor de renderização do Desktop.
