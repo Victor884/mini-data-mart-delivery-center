@@ -1,0 +1,1 @@
+expression 'Arquivo Snapshot' = "C:\tmp\mini-data-mart-delivery-pr1\powerbi\data\fato_dashboard.csv" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]

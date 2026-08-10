@@ -1,5 +1,6 @@
 # Snapshot de importação reproduzível; gere com powerbi/scripts/build_import_data.py.
 powerbi/data/fato_dashboard.csv
+powerbi/README-PORTABLE.generated.md
 
 # Estado e cache locais criados pelo Power BI Desktop.
 powerbi/**/.pbi/

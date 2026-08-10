@@ -91,6 +91,205 @@ table FatoDashboard
 		formatString: 0.00 "km"
 		displayFolder: Logística
 
+	measure 'Tempo Produção Médio' =
+			AVERAGEX(
+				FILTER(FatoDashboard, FatoDashboard[Status do Pedido] = "FINISHED" && FatoDashboard[Tempo de Produção (min)] >= 0),
+				FatoDashboard[Tempo de Produção (min)]
+			)
+		formatString: 0.00 "min"
+		displayFolder: Operação
+
+	measure 'Tempo Trânsito Médio' =
+			AVERAGEX(
+				FILTER(FatoDashboard, FatoDashboard[Status do Pedido] = "FINISHED" && FatoDashboard[Tempo de Trânsito (min)] >= 0),
+				FatoDashboard[Tempo de Trânsito (min)]
+			)
+		formatString: 0.00 "min"
+		displayFolder: Operação
+
+	measure 'Transações Pagas' = SUM(FatoDashboard[Qtd Pagamentos Pagos])
+		formatString: #,0
+		displayFolder: Financeiro
+
+	measure 'Valor Pago' = SUM(FatoDashboard[Total Pago Confirmado])
+		formatString: R$ #,##0.00
+		displayFolder: Financeiro
+
+	measure 'Taxas Pagamento' = SUM(FatoDashboard[Taxas Pagamentos Pagos])
+		formatString: R$ #,##0.00
+		displayFolder: Financeiro
+
+	measure 'Valor Líquido Pago' = SUM(FatoDashboard[Valor Pago Após Taxas])
+		formatString: R$ #,##0.00
+		displayFolder: Financeiro
+
+	measure Chargebacks = SUM(FatoDashboard[Qtd Chargebacks])
+		formatString: #,0
+		displayFolder: Financeiro
+
+	measure 'Valor Chargeback' = SUM(FatoDashboard[Total Chargeback])
+		formatString: R$ #,##0.00
+		displayFolder: Financeiro
+
+	measure 'Pedidos Conciliados' =
+			CALCULATE(
+				[Pedidos Criados],
+				FatoDashboard[Status do Pedido] = "FINISHED",
+				FatoDashboard[Status Conciliação] = "CONCILIADO"
+			)
+		formatString: #,0
+		displayFolder: Financeiro
+
+	measure 'Pedidos Finalizados Conciliação' = [Pedidos Finalizados]
+		formatString: #,0
+		displayFolder: Financeiro
+
+	measure 'Taxa Conciliação' = DIVIDE([Pedidos Conciliados], [Pedidos Finalizados Conciliação])
+		formatString: 0.00%
+		displayFolder: Financeiro
+
+	measure 'Diferença Absoluta Conciliação' =
+			SUMX(
+				FILTER(FatoDashboard, FatoDashboard[Status do Pedido] = "FINISHED"),
+				ABS(FatoDashboard[Diferença Conciliação])
+			)
+		formatString: R$ #,##0.00
+		displayFolder: Financeiro
+
+	measure 'Pedidos sem Pagamento Pago' =
+			CALCULATE(
+				[Pedidos Criados],
+				FatoDashboard[Status do Pedido] = "FINISHED",
+				FatoDashboard[Status Conciliação] IN { "SEM_PAGAMENTO", "SEM_PAGAMENTO_PAGO" }
+			)
+		formatString: #,0
+		displayFolder: Financeiro
+
+	measure 'Valor Transacionado Mês Anterior' =
+			VAR MesAtual = MAX(FatoDashboard[Índice Mês])
+			RETURN
+				CALCULATE(
+					[Valor Transacionado Finalizado],
+					REMOVEFILTERS(FatoDashboard[Data], FatoDashboard[Ano], FatoDashboard[Número do Mês], FatoDashboard[Nome do Mês], FatoDashboard[Mês/Ano], FatoDashboard[Ordem Mês], FatoDashboard[Índice Mês]),
+					FatoDashboard[Índice Mês] = MesAtual - 1
+				)
+		formatString: R$ #,##0.00
+		displayFolder: Comparações
+
+	measure 'Variação Absoluta Valor Transacionado' = [Valor Transacionado Finalizado] - [Valor Transacionado Mês Anterior]
+		formatString: R$ #,##0.00
+		displayFolder: Comparações
+
+	measure 'Variação Valor Transacionado Mensal' = DIVIDE([Variação Absoluta Valor Transacionado], [Valor Transacionado Mês Anterior])
+		formatString: 0.00%
+		displayFolder: Comparações
+
+	measure 'Pedidos Mês Anterior' =
+			VAR MesAtual = MAX(FatoDashboard[Índice Mês])
+			RETURN
+				CALCULATE(
+					[Pedidos Criados],
+					REMOVEFILTERS(FatoDashboard[Data], FatoDashboard[Ano], FatoDashboard[Número do Mês], FatoDashboard[Nome do Mês], FatoDashboard[Mês/Ano], FatoDashboard[Ordem Mês], FatoDashboard[Índice Mês]),
+					FatoDashboard[Índice Mês] = MesAtual - 1
+				)
+		formatString: #,0
+		displayFolder: Comparações
+
+	measure 'Variação Absoluta Pedidos' = [Pedidos Criados] - [Pedidos Mês Anterior]
+		formatString: #,0
+		displayFolder: Comparações
+
+	measure 'Variação Pedidos Mensal' = DIVIDE([Variação Absoluta Pedidos], [Pedidos Mês Anterior])
+		formatString: 0.00%
+		displayFolder: Comparações
+
+	measure 'Valor Pago Mês Anterior' =
+			VAR MesAtual = MAX(FatoDashboard[Índice Mês])
+			RETURN
+				CALCULATE(
+					[Valor Pago],
+					REMOVEFILTERS(FatoDashboard[Data], FatoDashboard[Ano], FatoDashboard[Número do Mês], FatoDashboard[Nome do Mês], FatoDashboard[Mês/Ano], FatoDashboard[Ordem Mês], FatoDashboard[Índice Mês]),
+					FatoDashboard[Índice Mês] = MesAtual - 1
+				)
+		formatString: R$ #,##0.00
+		displayFolder: Comparações
+
+	measure 'Variação Absoluta Valor Pago' = [Valor Pago] - [Valor Pago Mês Anterior]
+		formatString: R$ #,##0.00
+		displayFolder: Comparações
+
+	measure 'Variação Valor Pago Mensal' = DIVIDE([Variação Absoluta Valor Pago], [Valor Pago Mês Anterior])
+		formatString: 0.00%
+		displayFolder: Comparações
+
+	measure 'Tempo Ciclo Médio' = AVERAGEX(FILTER(FatoDashboard, FatoDashboard[Status do Pedido] = "FINISHED" && NOT ISBLANK(FatoDashboard[Tempo de Ciclo Total (min)]) && FatoDashboard[Tempo de Ciclo Total (min)] >= 0), FatoDashboard[Tempo de Ciclo Total (min)])
+		formatString: #,##0.00
+		displayFolder: Operação
+
+	measure 'Participação Valor Transacionado' = DIVIDE([Valor Transacionado Finalizado], CALCULATE([Valor Transacionado Finalizado], ALLSELECTED(FatoDashboard)))
+		formatString: 0.00%
+		displayFolder: Tooltips
+
+	measure 'Participação Pedidos' = DIVIDE([Pedidos Criados], CALCULATE([Pedidos Criados], ALLSELECTED(FatoDashboard)))
+		formatString: 0.00%
+		displayFolder: Tooltips
+
+	measure 'Participação Valor Pago' = DIVIDE([Valor Pago], CALCULATE([Valor Pago], ALLSELECTED(FatoDashboard)))
+		formatString: 0.00%
+		displayFolder: Tooltips
+
+	measure 'Participação Pedidos com Entrega' = DIVIDE([Pedidos com Entrega], CALCULATE([Pedidos com Entrega], ALLSELECTED(FatoDashboard)))
+		formatString: 0.00%
+		displayFolder: Tooltips
+
+	measure 'Contexto Tooltip' = VAR DataSelecionada = SELECTEDVALUE(FatoDashboard[Data]) RETURN COALESCE(IF(NOT ISBLANK(DataSelecionada), FORMAT(DataSelecionada, "dd/MM/yyyy")), SELECTEDVALUE(FatoDashboard[Hub]), SELECTEDVALUE(FatoDashboard[Loja]), SELECTEDVALUE(FatoDashboard[Tipo de Canal]), SELECTEDVALUE(FatoDashboard[Modal do Entregador]), SELECTEDVALUE(FatoDashboard[Meio Pagamento Principal]), SELECTEDVALUE(FatoDashboard[Status do Pedido]), SELECTEDVALUE(FatoDashboard[Status Conciliação]), "Contexto selecionado")
+		formatString: General
+		displayFolder: Tooltips
+
+	measure 'HTML | KPIs Executivos' = VAR Periodo = FORMAT(MIN(FatoDashboard[Data]), "dd/MM/yyyy") & " a " & FORMAT(MAX(FatoDashboard[Data]), "dd/MM/yyyy") VAR CorMargem = IF([Margem de Entrega] >= 0, "#2DD4BF", "#FB7185") RETURN "<div style='font-family:Segoe UI,Arial,sans-serif;color:#F8FAFC;background:#131D31;border:1px solid #2A3955;border-radius:12px;padding:9px 12px;box-sizing:border-box;width:100%;height:100%;overflow:hidden;'><div style='display:flex;justify-content:space-between;margin-bottom:6px;'><b style='font-size:11px;'>RESULTADO DO PERÍODO</b><span style='font-size:9px;color:#9FB0C7;'>" & Periodo & "</span></div><div style='display:flex;gap:8px;height:58px;'><div style='flex:1;background:#1A2540;border-left:4px solid #3B82F6;border-radius:8px;padding:7px;'><small style='color:#9FB0C7;'>VALOR TRANSACIONADO</small><div style='font-size:18px;font-weight:750;margin-top:4px;'>" & FORMAT([Valor Transacionado Finalizado], "R$ #,##0.00", "pt-BR") & "</div></div><div style='flex:1;background:#1A2540;border-left:4px solid #22D3EE;border-radius:8px;padding:7px;'><small style='color:#9FB0C7;'>PEDIDOS FINALIZADOS</small><div style='font-size:18px;font-weight:750;margin-top:4px;'>" & FORMAT([Pedidos Finalizados], "#,##0", "pt-BR") & "</div></div><div style='flex:1;background:#1A2540;border-left:4px solid #8B5CF6;border-radius:8px;padding:7px;'><small style='color:#9FB0C7;'>TICKET MÉDIO</small><div style='font-size:18px;font-weight:750;margin-top:4px;'>" & FORMAT([Ticket Médio Finalizado], "R$ #,##0.00", "pt-BR") & "</div></div><div style='flex:1;background:#1A2540;border-left:4px solid #FBBF24;border-radius:8px;padding:7px;'><small style='color:#9FB0C7;'>CANCELAMENTO</small><div style='font-size:18px;font-weight:750;margin-top:4px;'>" & FORMAT([Taxa de Cancelamento], "0.00%", "pt-BR") & "</div></div><div style='flex:1;background:#1A2540;border-left:4px solid " & CorMargem & ";border-radius:8px;padding:7px;'><small style='color:#9FB0C7;'>MARGEM ENTREGA</small><div style='font-size:18px;font-weight:750;margin-top:4px;color:" & CorMargem & ";'>" & FORMAT([Margem de Entrega], "R$ #,##0.00", "pt-BR") & "</div></div></div></div>"
+		formatString: General
+		displayFolder: HTML
+
+	measure 'HTML | Saúde Executiva' = VAR CorMargem = IF([Margem de Entrega] >= 0, "#2DD4BF", "#FB7185") RETURN "<div style='font-family:Segoe UI,Arial,sans-serif;color:#F8FAFC;background:#131D31;border:1px solid #2A3955;border-radius:12px;padding:14px 16px;box-sizing:border-box;width:100%;height:100%;'><div style='font-size:12px;font-weight:700;margin-bottom:10px;'>SAÚDE OPERACIONAL</div><div style='display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #2A3955;font-size:11px;'><span>Taxa de cancelamento</span><b style='color:#FB7185;'>" & FORMAT([Taxa de Cancelamento], "0.00%", "pt-BR") & "</b></div><div style='display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #2A3955;font-size:11px;'><span>Ciclo P90 <small style='color:#9FB0C7;'>(percentil)</small></span><b style='color:#FBBF24;'>" & FORMAT([Tempo Ciclo P90], "0.00", "pt-BR") & " min</b></div><div style='display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #2A3955;font-size:11px;'><span>Taxa de conciliação</span><b style='color:#22D3EE;'>" & FORMAT([Taxa Conciliação], "0.00%", "pt-BR") & "</b></div><div style='display:flex;justify-content:space-between;padding:9px 0;font-size:11px;'><span>Margem de entrega</span><b style='color:" & CorMargem & ";'>" & FORMAT([Margem de Entrega], "R$ #,##0.00", "pt-BR") & "</b></div></div>"
+		formatString: General
+		displayFolder: HTML
+
+	measure 'HTML | KPIs Pedidos' = "<div style='font-family:Segoe UI,Arial,sans-serif;color:#F8FAFC;background:#131D31;border:1px solid #2A3955;border-radius:12px;padding:9px 12px;box-sizing:border-box;width:100%;height:100%;overflow:hidden;'><div style='font-size:11px;font-weight:700;margin-bottom:6px;'>PEDIDOS E OPERAÇÃO</div><div style='display:flex;gap:8px;height:58px;'><div style='flex:1;background:#1A2540;border-left:4px solid #3B82F6;border-radius:8px;padding:7px;'><small style='color:#9FB0C7;'>PEDIDOS CRIADOS</small><div style='font-size:18px;font-weight:750;margin-top:4px;'>" & FORMAT([Pedidos Criados], "#,##0", "pt-BR") & "</div></div><div style='flex:1;background:#1A2540;border-left:4px solid #22D3EE;border-radius:8px;padding:7px;'><small style='color:#9FB0C7;'>FINALIZADOS</small><div style='font-size:18px;font-weight:750;margin-top:4px;'>" & FORMAT([Pedidos Finalizados], "#,##0", "pt-BR") & "</div></div><div style='flex:1;background:#1A2540;border-left:4px solid #FB7185;border-radius:8px;padding:7px;'><small style='color:#9FB0C7;'>CANCELADOS</small><div style='font-size:18px;font-weight:750;margin-top:4px;'>" & FORMAT([Pedidos Cancelados], "#,##0", "pt-BR") & "</div></div><div style='flex:1;background:#1A2540;border-left:4px solid #FB7185;border-radius:8px;padding:7px;'><small style='color:#9FB0C7;'>TAXA CANCELAMENTO</small><div style='font-size:18px;font-weight:750;margin-top:4px;color:#FB7185;'>" & FORMAT([Taxa de Cancelamento], "0.00%", "pt-BR") & "</div></div><div style='flex:1;background:#1A2540;border-left:4px solid #FBBF24;border-radius:8px;padding:7px;'><small style='color:#9FB0C7;'>CICLO MÉDIO</small><div style='font-size:18px;font-weight:750;margin-top:4px;'>" & FORMAT([Tempo Ciclo Médio], "0.00", "pt-BR") & " min</div></div></div></div>"
+		formatString: General
+		displayFolder: HTML
+
+	measure 'HTML | Etapas Operacionais' = "<div style='font-family:Segoe UI,Arial,sans-serif;color:#F8FAFC;background:#131D31;border:1px solid #2A3955;border-radius:12px;padding:14px;box-sizing:border-box;width:100%;height:100%;'><div style='font-size:12px;font-weight:700;margin-bottom:10px;'>DECOMPOSIÇÃO DO CICLO</div><div style='display:grid;grid-template-columns:1fr 1fr;gap:8px;'><div style='background:#1A2540;border-radius:8px;padding:10px;'><small style='color:#9FB0C7;'>Produção média</small><div style='font-size:17px;font-weight:700;margin-top:5px;'>" & FORMAT([Tempo Produção Médio], "0.00", "pt-BR") & " min</div></div><div style='background:#1A2540;border-radius:8px;padding:10px;'><small style='color:#9FB0C7;'>Trânsito médio</small><div style='font-size:17px;font-weight:700;margin-top:5px;'>" & FORMAT([Tempo Trânsito Médio], "0.00", "pt-BR") & " min</div></div><div style='background:#1A2540;border-radius:8px;padding:10px;'><small style='color:#9FB0C7;'>Ciclo P50</small><div style='font-size:17px;font-weight:700;margin-top:5px;'>" & FORMAT([Tempo Ciclo P50], "0.00", "pt-BR") & " min</div></div><div style='background:#1A2540;border-radius:8px;padding:10px;'><small style='color:#9FB0C7;'>Ciclo P90 · percentil</small><div style='font-size:17px;font-weight:700;margin-top:5px;color:#FBBF24;'>" & FORMAT([Tempo Ciclo P90], "0.00", "pt-BR") & " min</div></div></div></div>"
+		formatString: General
+		displayFolder: HTML
+
+	measure 'HTML | KPIs Financeiros' = "<div style='font-family:Segoe UI,Arial,sans-serif;color:#F8FAFC;background:#131D31;border:1px solid #2A3955;border-radius:12px;padding:9px 12px;box-sizing:border-box;width:100%;height:100%;overflow:hidden;'><div style='font-size:11px;font-weight:700;margin-bottom:6px;'>FINANCEIRO E CONCILIAÇÃO</div><div style='display:flex;gap:8px;height:58px;'><div style='flex:1;background:#1A2540;border-left:4px solid #2DD4BF;border-radius:8px;padding:7px;'><small style='color:#9FB0C7;'>VALOR PAGO</small><div style='font-size:18px;font-weight:750;margin-top:4px;'>" & FORMAT([Valor Pago], "R$ #,##0.00", "pt-BR") & "</div></div><div style='flex:1;background:#1A2540;border-left:4px solid #4ADE80;border-radius:8px;padding:7px;'><small style='color:#9FB0C7;'>CONCILIAÇÃO</small><div style='font-size:18px;font-weight:750;margin-top:4px;'>" & FORMAT([Taxa Conciliação], "0.00%", "pt-BR") & "</div></div><div style='flex:1;background:#1A2540;border-left:4px solid #60A5FA;border-radius:8px;padding:7px;'><small style='color:#9FB0C7;'>TRANSAÇÕES PAGAS</small><div style='font-size:18px;font-weight:750;margin-top:4px;'>" & FORMAT([Transações Pagas], "#,##0", "pt-BR") & "</div></div><div style='flex:1;background:#1A2540;border-left:4px solid #FB7185;border-radius:8px;padding:7px;'><small style='color:#9FB0C7;'>CHARGEBACK</small><div style='font-size:18px;font-weight:750;margin-top:4px;color:#FB7185;'>" & FORMAT([Valor Chargeback], "R$ #,##0.00", "pt-BR") & "</div></div><div style='flex:1;background:#1A2540;border-left:4px solid #FBBF24;border-radius:8px;padding:7px;'><small style='color:#9FB0C7;'>DIFERENÇA ABS.</small><div style='font-size:18px;font-weight:750;margin-top:4px;'>" & FORMAT([Diferença Absoluta Conciliação], "R$ #,##0.00", "pt-BR") & "</div></div></div></div>"
+		formatString: General
+		displayFolder: HTML
+
+	measure 'HTML | KPIs Logística' = "<div style='font-family:Segoe UI,Arial,sans-serif;color:#F8FAFC;background:#131D31;border:1px solid #2A3955;border-radius:12px;padding:9px 12px;box-sizing:border-box;width:100%;height:100%;overflow:hidden;'><div style='font-size:11px;font-weight:700;margin-bottom:6px;'>ENTREGAS E QUALIDADE</div><div style='display:flex;gap:8px;height:58px;'><div style='flex:1;background:#1A2540;border-left:4px solid #2DD4BF;border-radius:8px;padding:7px;'><small style='color:#9FB0C7;'>ENTREGA CONCLUÍDA</small><div style='font-size:18px;font-weight:750;margin-top:4px;'>" & FORMAT([Taxa Entrega Concluída], "0.00%", "pt-BR") & "</div></div><div style='flex:1;background:#1A2540;border-left:4px solid #FB7185;border-radius:8px;padding:7px;'><small style='color:#9FB0C7;'>MÚLTIPLAS TENTATIVAS</small><div style='font-size:18px;font-weight:750;margin-top:4px;color:#FB7185;'>" & FORMAT([Taxa Múltiplas Tentativas], "0.00%", "pt-BR") & "</div></div><div style='flex:1;background:#1A2540;border-left:4px solid #3B82F6;border-radius:8px;padding:7px;'><small style='color:#9FB0C7;'>CICLO P50</small><div style='font-size:18px;font-weight:750;margin-top:4px;'>" & FORMAT([Tempo Ciclo Logístico P50], "0.00", "pt-BR") & " min</div></div><div style='flex:1;background:#1A2540;border-left:4px solid #FBBF24;border-radius:8px;padding:7px;'><small style='color:#9FB0C7;'>CICLO P90 · PERCENTIL</small><div style='font-size:18px;font-weight:750;margin-top:4px;color:#FBBF24;'>" & FORMAT([Tempo Ciclo Logístico P90], "0.00", "pt-BR") & " min</div></div><div style='flex:1;background:#1A2540;border-left:4px solid #8B5CF6;border-radius:8px;padding:7px;'><small style='color:#9FB0C7;'>DISTÂNCIA MÉDIA</small><div style='font-size:18px;font-weight:750;margin-top:4px;'>" & FORMAT([Distância Média Entrega (km)], "0.00", "pt-BR") & " km</div></div></div></div>"
+		formatString: General
+		displayFolder: HTML
+
+	measure 'HTML | Detalhe Pedido' = VAR PedidoId = SELECTEDVALUE(FatoDashboard[ID do Pedido]) VAR StatusPedido = SELECTEDVALUE(FatoDashboard[Status do Pedido], "Vários") VAR Loja = SELECTEDVALUE(FatoDashboard[Loja], "Várias") VAR Hub = SELECTEDVALUE(FatoDashboard[Hub], "Vários") RETURN "<div style='font-family:Segoe UI,Arial,sans-serif;color:#F8FAFC;background:#131D31;border:1px solid #2A3955;border-radius:12px;padding:11px 15px;box-sizing:border-box;width:100%;height:100%;'><div style='display:flex;align-items:center;justify-content:space-between;'><div><small style='color:#9FB0C7;letter-spacing:.07em;'>PEDIDO SELECIONADO</small><div style='font-size:22px;font-weight:800;margin-top:2px;'>#" & COALESCE(FORMAT(PedidoId, "0"), "—") & "</div></div><div style='background:#1A2540;border:1px solid #2A3955;border-radius:999px;padding:6px 11px;font-size:10px;font-weight:700;'>" & StatusPedido & "</div><div><small style='color:#9FB0C7;'>LOJA</small><div style='font-size:13px;font-weight:700;margin-top:3px;'>" & Loja & "</div></div><div><small style='color:#9FB0C7;'>HUB</small><div style='font-size:13px;font-weight:700;margin-top:3px;'>" & Hub & "</div></div><div><small style='color:#9FB0C7;'>VALOR / PAGO</small><div style='font-size:13px;font-weight:700;margin-top:3px;'>" & FORMAT([Valor Transacionado Finalizado], "R$ #,##0.00", "pt-BR") & " · " & FORMAT([Valor Pago], "R$ #,##0.00", "pt-BR") & "</div></div></div></div>"
+		formatString: General
+		displayFolder: HTML
+
+	measure 'HTML | Tooltip Comercial' = VAR Contexto = [Contexto Tooltip] RETURN "<div style='font-family:Segoe UI,Arial,sans-serif;color:#F8FAFC;background:#090D18;border:1px solid #2A3955;border-radius:10px;padding:9px;box-sizing:border-box;width:100%;height:100%;overflow:hidden;'><div style='display:flex;justify-content:space-between;border-bottom:1px solid #2A3955;padding-bottom:7px;'><div><small style='color:#3B82F6;font-weight:700;'>DETALHE DO PONTO</small><div style='font-size:12px;font-weight:700;'>Desempenho comercial</div></div><small style='color:#9FB0C7;'>" & Contexto & "</small></div><div style='display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:7px;'><div style='background:#1A2540;border-left:3px solid #3B82F6;border-radius:7px;padding:7px;'><small style='color:#9FB0C7;'>Valor</small><div style='font-size:14px;font-weight:750;'>" & FORMAT([Valor Transacionado Finalizado], "R$ #,##0.00", "pt-BR") & "</div></div><div style='background:#1A2540;border-left:3px solid #3B82F6;border-radius:7px;padding:7px;'><small style='color:#9FB0C7;'>Mês anterior</small><div style='font-size:14px;font-weight:750;'>" & FORMAT([Valor Transacionado Mês Anterior], "R$ #,##0.00", "pt-BR") & "</div></div><div style='background:#1A2540;border-left:3px solid #8B5CF6;border-radius:7px;padding:7px;'><small style='color:#9FB0C7;'>Variação absoluta</small><div style='font-size:14px;font-weight:750;'>" & FORMAT([Variação Absoluta Valor Transacionado], "R$ #,##0.00", "pt-BR") & "</div></div><div style='background:#1A2540;border-left:3px solid #8B5CF6;border-radius:7px;padding:7px;'><small style='color:#9FB0C7;'>Variação percentual</small><div style='font-size:14px;font-weight:750;'>" & FORMAT([Variação Valor Transacionado Mensal], "0.00%", "pt-BR") & "</div></div><div style='grid-column:span 2;background:#1A2540;border-left:3px solid #22D3EE;border-radius:7px;padding:7px;'><small style='color:#9FB0C7;'>Participação no total</small><div style='font-size:14px;font-weight:750;'>" & FORMAT([Participação Valor Transacionado], "0.00%", "pt-BR") & "</div></div></div></div>"
+		formatString: General
+		displayFolder: HTML\Tooltips
+
+	measure 'HTML | Tooltip Pedidos' = VAR Contexto = [Contexto Tooltip] RETURN "<div style='font-family:Segoe UI,Arial,sans-serif;color:#F8FAFC;background:#090D18;border:1px solid #2A3955;border-radius:10px;padding:9px;box-sizing:border-box;width:100%;height:100%;overflow:hidden;'><div style='display:flex;justify-content:space-between;border-bottom:1px solid #2A3955;padding-bottom:7px;'><div><small style='color:#22D3EE;font-weight:700;'>DETALHE DO PONTO</small><div style='font-size:12px;font-weight:700;'>Pedidos e operação</div></div><small style='color:#9FB0C7;'>" & Contexto & "</small></div><div style='display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:7px;'><div style='background:#1A2540;border-left:3px solid #22D3EE;border-radius:7px;padding:7px;'><small style='color:#9FB0C7;'>Pedidos</small><div style='font-size:14px;font-weight:750;'>" & FORMAT([Pedidos Criados], "#,##0", "pt-BR") & "</div></div><div style='background:#1A2540;border-left:3px solid #22D3EE;border-radius:7px;padding:7px;'><small style='color:#9FB0C7;'>Mês anterior</small><div style='font-size:14px;font-weight:750;'>" & FORMAT([Pedidos Mês Anterior], "#,##0", "pt-BR") & "</div></div><div style='background:#1A2540;border-left:3px solid #8B5CF6;border-radius:7px;padding:7px;'><small style='color:#9FB0C7;'>Variação absoluta</small><div style='font-size:14px;font-weight:750;'>" & FORMAT([Variação Absoluta Pedidos], "#,##0", "pt-BR") & "</div></div><div style='background:#1A2540;border-left:3px solid #8B5CF6;border-radius:7px;padding:7px;'><small style='color:#9FB0C7;'>Variação percentual</small><div style='font-size:14px;font-weight:750;'>" & FORMAT([Variação Pedidos Mensal], "0.00%", "pt-BR") & "</div></div><div style='grid-column:span 2;background:#1A2540;border-left:3px solid #3B82F6;border-radius:7px;padding:7px;'><small style='color:#9FB0C7;'>Participação no total</small><div style='font-size:14px;font-weight:750;'>" & FORMAT([Participação Pedidos], "0.00%", "pt-BR") & "</div></div></div></div>"
+		formatString: General
+		displayFolder: HTML\Tooltips
+
+	measure 'HTML | Tooltip Financeiro' = VAR Contexto = [Contexto Tooltip] RETURN "<div style='font-family:Segoe UI,Arial,sans-serif;color:#F8FAFC;background:#090D18;border:1px solid #2A3955;border-radius:10px;padding:9px;box-sizing:border-box;width:100%;height:100%;overflow:hidden;'><div style='display:flex;justify-content:space-between;border-bottom:1px solid #2A3955;padding-bottom:7px;'><div><small style='color:#8B5CF6;font-weight:700;'>DETALHE DO PONTO</small><div style='font-size:12px;font-weight:700;'>Desempenho financeiro</div></div><small style='color:#9FB0C7;'>" & Contexto & "</small></div><div style='display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:7px;'><div style='background:#1A2540;border-left:3px solid #8B5CF6;border-radius:7px;padding:7px;'><small style='color:#9FB0C7;'>Valor pago</small><div style='font-size:14px;font-weight:750;'>" & FORMAT([Valor Pago], "R$ #,##0.00", "pt-BR") & "</div></div><div style='background:#1A2540;border-left:3px solid #8B5CF6;border-radius:7px;padding:7px;'><small style='color:#9FB0C7;'>Mês anterior</small><div style='font-size:14px;font-weight:750;'>" & FORMAT([Valor Pago Mês Anterior], "R$ #,##0.00", "pt-BR") & "</div></div><div style='background:#1A2540;border-left:3px solid #3B82F6;border-radius:7px;padding:7px;'><small style='color:#9FB0C7;'>Variação absoluta</small><div style='font-size:14px;font-weight:750;'>" & FORMAT([Variação Absoluta Valor Pago], "R$ #,##0.00", "pt-BR") & "</div></div><div style='background:#1A2540;border-left:3px solid #3B82F6;border-radius:7px;padding:7px;'><small style='color:#9FB0C7;'>Variação percentual</small><div style='font-size:14px;font-weight:750;'>" & FORMAT([Variação Valor Pago Mensal], "0.00%", "pt-BR") & "</div></div><div style='grid-column:span 2;background:#1A2540;border-left:3px solid #22D3EE;border-radius:7px;padding:7px;'><small style='color:#9FB0C7;'>Participação no total</small><div style='font-size:14px;font-weight:750;'>" & FORMAT([Participação Valor Pago], "0.00%", "pt-BR") & "</div></div></div></div>"
+		formatString: General
+		displayFolder: HTML\Tooltips
+
+	measure 'HTML | Tooltip Entregas' = VAR Contexto = [Contexto Tooltip] RETURN "<div style='font-family:Segoe UI,Arial,sans-serif;color:#F8FAFC;background:#090D18;border:1px solid #2A3955;border-radius:10px;padding:9px;box-sizing:border-box;width:100%;height:100%;overflow:hidden;'><div style='display:flex;justify-content:space-between;border-bottom:1px solid #2A3955;padding-bottom:7px;'><div><small style='color:#FBBF24;font-weight:700;'>DETALHE DO PONTO</small><div style='font-size:12px;font-weight:700;'>Entregas e qualidade</div></div><small style='color:#9FB0C7;'>" & Contexto & "</small></div><div style='display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:7px;'><div style='background:#1A2540;border-left:3px solid #3B82F6;border-radius:7px;padding:7px;'><small style='color:#9FB0C7;'>Pedidos com entrega</small><div style='font-size:14px;font-weight:750;'>" & FORMAT([Pedidos com Entrega], "#,##0", "pt-BR") & "</div></div><div style='background:#1A2540;border-left:3px solid #22D3EE;border-radius:7px;padding:7px;'><small style='color:#9FB0C7;'>Entrega concluída</small><div style='font-size:14px;font-weight:750;'>" & FORMAT([Taxa Entrega Concluída], "0.00%", "pt-BR") & "</div></div><div style='background:#1A2540;border-left:3px solid #FB7185;border-radius:7px;padding:7px;'><small style='color:#9FB0C7;'>Múltiplas tentativas</small><div style='font-size:14px;font-weight:750;'>" & FORMAT([Taxa Múltiplas Tentativas], "0.00%", "pt-BR") & "</div></div><div style='background:#1A2540;border-left:3px solid #3B82F6;border-radius:7px;padding:7px;'><small style='color:#9FB0C7;'>Ciclo P50</small><div style='font-size:14px;font-weight:750;'>" & FORMAT([Tempo Ciclo Logístico P50], "0.00", "pt-BR") & " min</div></div><div style='background:#1A2540;border-left:3px solid #FBBF24;border-radius:7px;padding:7px;'><small style='color:#9FB0C7;'>Ciclo P90</small><div style='font-size:14px;font-weight:750;'>" & FORMAT([Tempo Ciclo Logístico P90], "0.00", "pt-BR") & " min</div></div><div style='background:#1A2540;border-left:3px solid #8B5CF6;border-radius:7px;padding:7px;'><small style='color:#9FB0C7;'>Participação no total</small><div style='font-size:14px;font-weight:750;'>" & FORMAT([Participação Pedidos com Entrega], "0.00%", "pt-BR") & "</div></div></div></div>"
+		formatString: General
+		displayFolder: HTML\Tooltips
+
 	column 'ID do Pedido'
 		dataType: int64
 		sourceColumn: order_id
@@ -128,6 +327,12 @@ table FatoDashboard
 	column 'Ordem Mês'
 		dataType: int64
 		sourceColumn: mes_ordem
+		summarizeBy: none
+		isHidden
+
+	column 'Índice Mês'
+		dataType: int64
+		sourceColumn: mes_indice
 		summarizeBy: none
 		isHidden
 
@@ -271,22 +476,91 @@ table FatoDashboard
 		sourceColumn: tipo_entregador
 		summarizeBy: none
 
+	column 'Qtd Pagamentos'
+		dataType: int64
+		sourceColumn: qtd_pagamentos
+		summarizeBy: sum
+
+	column 'Qtd Pagamentos Pagos'
+		dataType: int64
+		sourceColumn: qtd_pagamentos_pagos
+		summarizeBy: sum
+
+	column 'Qtd Chargebacks'
+		dataType: int64
+		sourceColumn: qtd_chargebacks
+		summarizeBy: sum
+
+	column 'Qtd Pagamentos Aguardando'
+		dataType: int64
+		sourceColumn: qtd_pagamentos_aguardando
+		summarizeBy: sum
+
+	column 'Total Pago Confirmado'
+		dataType: double
+		formatString: R$ #,##0.00
+		sourceColumn: total_pago_confirmado
+		summarizeBy: sum
+
+	column 'Total Chargeback'
+		dataType: double
+		formatString: R$ #,##0.00
+		sourceColumn: total_chargeback
+		summarizeBy: sum
+
+	column 'Total Aguardando'
+		dataType: double
+		formatString: R$ #,##0.00
+		sourceColumn: total_aguardando
+		summarizeBy: sum
+
+	column 'Taxas Pagamentos Pagos'
+		dataType: double
+		formatString: R$ #,##0.00
+		sourceColumn: taxas_pagamentos_pagos
+		summarizeBy: sum
+
+	column 'Valor Pago Após Taxas'
+		dataType: double
+		formatString: R$ #,##0.00
+		sourceColumn: valor_pago_apos_taxas
+		summarizeBy: sum
+
+	column 'Diferença Conciliação'
+		dataType: double
+		formatString: R$ #,##0.00
+		sourceColumn: diferenca_conciliacao
+		summarizeBy: sum
+
+	column 'Status Conciliação'
+		dataType: string
+		sourceColumn: status_conciliacao
+		summarizeBy: none
+
+	column 'Meio Pagamento Principal'
+		dataType: string
+		sourceColumn: meio_pagamento_principal
+		summarizeBy: none
+
 	partition FatoDashboard = m
 		mode: import
 		source =
 			let
-				Source = Csv.Document(File.Contents("E:\mini-data-mart-delivery-center\powerbi\data\fato_dashboard.csv"), [Delimiter = ",", Columns = 33, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				Source = Csv.Document(File.Contents(#"Arquivo Snapshot"), [Delimiter = ",", Columns = 46, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
 				PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
 				ChangedTypes = Table.TransformColumnTypes(PromotedHeaders, {
 					{"order_id", Int64.Type}, {"data_pedido", type date}, {"ano", Int64.Type}, {"mes_numero", Int64.Type},
-					{"mes_nome", type text}, {"mes_ano", type text}, {"mes_ordem", Int64.Type}, {"hub_id", Int64.Type},
+					{"mes_nome", type text}, {"mes_ano", type text}, {"mes_ordem", Int64.Type}, {"mes_indice", Int64.Type}, {"hub_id", Int64.Type},
 					{"hub_nome", type text}, {"hub_cidade", type text}, {"hub_estado", type text}, {"store_id", Int64.Type},
 					{"loja_nome", type text}, {"segmento_loja", type text}, {"channel_id", Int64.Type}, {"canal_nome", type text},
 					{"tipo_canal", type text}, {"status_pedido", type text}, {"valor_pedido", type number}, {"taxa_entrega", type number},
 					{"custo_entrega", type number}, {"valor_total_pedido", type number}, {"margem_entrega", type number},
 					{"tempo_producao_minutos", type number}, {"tempo_transito_minutos", type number}, {"tempo_ciclo_total_minutos", type number},
 					{"possui_entrega", type logical}, {"delivery_id", Int64.Type}, {"status_entrega", type text},
-					{"numero_tentativas", Int64.Type}, {"distancia_entrega_metros", Int64.Type}, {"modal_entregador", type text}, {"tipo_entregador", type text}
+					{"numero_tentativas", Int64.Type}, {"distancia_entrega_metros", Int64.Type}, {"modal_entregador", type text}, {"tipo_entregador", type text},
+					{"qtd_pagamentos", Int64.Type}, {"qtd_pagamentos_pagos", Int64.Type}, {"qtd_chargebacks", Int64.Type}, {"qtd_pagamentos_aguardando", Int64.Type},
+					{"total_pago_confirmado", type number}, {"total_chargeback", type number}, {"total_aguardando", type number}, {"taxas_pagamentos_pagos", type number},
+					{"valor_pago_apos_taxas", type number}, {"diferenca_conciliacao", type number}, {"status_conciliacao", type text}, {"meio_pagamento_principal", type text}
 				}, "en-US")
 			in
 				ChangedTypes

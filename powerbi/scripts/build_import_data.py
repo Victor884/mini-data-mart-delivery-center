@@ -83,6 +83,7 @@ def main() -> None:
     fato["mes_nome"] = fato["mes_numero"].map(meses)
     fato["mes_ano"] = fato["data_pedido"].dt.strftime("%m/%Y")
     fato["mes_ordem"] = fato["ano"] * 100 + fato["mes_numero"]
+    fato["mes_indice"] = fato["ano"] * 12 + fato["mes_numero"]
 
     fato["valor_total_pedido"] = (
         fato["order_amount"] + fato["order_delivery_fee"]
@@ -267,6 +268,7 @@ def main() -> None:
             "mes_nome",
             "mes_ano",
             "mes_ordem",
+            "mes_indice",
             "hub_id",
             "hub_name",
             "hub_city",

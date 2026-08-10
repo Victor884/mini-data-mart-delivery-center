@@ -1,0 +1,22 @@
+{
+  "name": "DeliveryCenterPortableDark-20260809.json",
+  "dataColors": [
+    "#4ADE80",
+    "#3B82F6",
+    "#22D3EE",
+    "#FBBF24",
+    "#FB7185",
+    "#7357D9",
+    "#45A1A1",
+    "#EE7A4D"
+  ],
+  "background": "#070B16",
+  "foreground": "#F2F8FC",
+  "tableAccent": "#22D3EE",
+  "good": "#4ADE80",
+  "neutral": "#FBBF24",
+  "bad": "#FB7185",
+  "maximum": "#4ADE80",
+  "center": "#FBBF24",
+  "minimum": "#FB7185"
+}
