@@ -290,6 +290,66 @@ table FatoDashboard
 		formatString: General
 		displayFolder: HTML\Tooltips
 
+	measure 'Entregas / Tentativas' = SUM(FatoDashboard[Número de Tentativas])
+		formatString: #,##0
+		displayFolder: Logística
+
+	measure 'HTML | Painel Logística Dark' = VAR Taxa = [Taxa Entrega Concluída] VAR Angulo = FORMAT(Taxa * 360, "0.0", "en-US") RETURN "<div style='font-family:Segoe UI,Arial,sans-serif;color:#F4F7FB;background:#081A28;border:1px solid #244052;border-radius:8px;padding:18px 26px;box-sizing:border-box;width:100%;height:100%;'><div style='font-size:18px;font-weight:700;margin-bottom:14px;'>Entregas concluídas</div><div style='width:205px;height:205px;margin:0 auto 14px;border-radius:50%;background:conic-gradient(#65D987 0deg " & Angulo & "deg,#183141 " & Angulo & "deg 360deg);display:flex;align-items:center;justify-content:center;'><div style='width:160px;height:160px;border-radius:50%;background:#081A28;display:flex;flex-direction:column;align-items:center;justify-content:center;'><div style='font-size:38px;font-weight:800;'>" & FORMAT(Taxa, "0.00%", "pt-BR") & "</div><small style='color:#A5B4C3;'>Entregas concluídas</small></div></div><div style='border-top:1px solid #244052;padding-top:12px;display:grid;grid-template-columns:1fr 1.7fr .5fr;row-gap:12px;align-items:center;'><b style='font-size:22px;color:#35C9F2;'>P50</b><b style='font-size:30px;'>" & FORMAT([Tempo Ciclo Logístico P50], "0.00", "pt-BR") & "</b><span>min</span><b style='font-size:22px;color:#35C9F2;'>P90</b><b style='font-size:30px;'>" & FORMAT([Tempo Ciclo Logístico P90], "0.00", "pt-BR") & "</b><span>min</span><b style='font-size:22px;color:#35C9F2;'>◫</b><b style='font-size:30px;'>" & FORMAT([Entregas / Tentativas], "#,##0", "pt-BR") & "</b><small style='color:#A5B4C3;'>tentativas</small></div></div>"
+		formatString: General
+		displayFolder: HTML\Dark
+
+	measure 'HTML | Tabela Hubs Dark' = VAR Base = TOPN(5, ADDCOLUMNS(VALUES(FatoDashboard[Hub]), "__Entregas", [Pedidos com Entrega], "__Concluidas", [Entregas Concluídas], "__Taxa", [Taxa Entrega Concluída], "__P50", [Tempo Ciclo Logístico P50], "__Multi", [Taxa Múltiplas Tentativas]), [__Entregas], DESC) VAR MaxEntregas = MAXX(Base, [__Entregas]) VAR Linhas = CONCATENATEX(Base, "<div style='display:grid;grid-template-columns:1.35fr 1.05fr 1.15fr .8fr 1fr;gap:14px;align-items:center;padding:11px 14px;border-top:1px solid #244052;'><div style='font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'><span style='color:" & IF([__Taxa] >= .97, "#65D987", "#FFC244") & ";margin-right:9px;'>●</span>" & FatoDashboard[Hub] & "</div><div><b>" & FORMAT([__Entregas], "#,##0", "pt-BR") & "</b><div style='height:7px;background:#25394A;border-radius:8px;margin-top:5px;'><div style='height:7px;width:" & FORMAT(DIVIDE([__Entregas], MaxEntregas), "0%", "en-US") & ";background:#35C9F2;border-radius:8px;'></div></div></div><div><b>" & FORMAT([__Concluidas], "#,##0", "pt-BR") & "</b><div style='height:7px;background:#25394A;border-radius:8px;margin-top:5px;'><div style='height:7px;width:" & FORMAT([__Taxa], "0%", "en-US") & ";background:#65D987;border-radius:8px;'></div></div></div><div style='color:#35C9F2;font-size:17px;font-weight:700;'>" & FORMAT([__P50], "0.00", "pt-BR") & "</div><div style='color:" & IF([__Multi] <= .07, "#65D987", "#FFC244") & ";font-weight:700;'>" & FORMAT([__Multi], "0.00%", "pt-BR") & "</div></div>", "", [__Entregas], DESC) RETURN "<div style='font-family:Segoe UI,Arial,sans-serif;color:#F4F7FB;background:#081A28;border:1px solid #244052;border-radius:8px;padding:14px;box-sizing:border-box;width:100%;height:100%;overflow:hidden;'><div style='display:flex;justify-content:space-between;align-items:flex-start;margin:0 10px 12px;'><div style='font-size:20px;font-weight:750;'>Desempenho por hub</div><div style='display:flex;gap:44px;'><div><small style='color:#A5B4C3;'>Taxa de cancelamento</small><div style='font-size:25px;font-weight:800;'>" & FORMAT([Taxa de Cancelamento], "0.00%", "pt-BR") & "</div></div><div><small style='color:#A5B4C3;'>Margem de entrega</small><div style='font-size:25px;font-weight:800;color:#FF7A6E;'>" & FORMAT([Margem de Entrega], "R$ #,##0.00", "pt-BR") & "</div></div></div></div><div style='display:grid;grid-template-columns:1.35fr 1.05fr 1.15fr .8fr 1fr;gap:14px;padding:8px 14px;color:#A5B4C3;font-size:11px;text-transform:uppercase;'><span>Hub</span><span>Entregas</span><span>Concluídas</span><span>P50 (min)</span><span>Múltiplas tentativas</span></div>" & Linhas & "</div>"
+		formatString: General
+		displayFolder: HTML\Dark
+
+	measure 'HTML | Margem Light' = VAR Cor = IF([Margem de Entrega] >= 0, "#14B8A6", "#FF5A52") RETURN "<div style='font-family:Segoe UI,Arial,sans-serif;color:#0B1B38;background:#FFFFFF;border:1px solid #D8DEE8;border-radius:10px;padding:18px;box-sizing:border-box;width:100%;height:100%;'><div style='font-size:17px;font-weight:750;'>Margem de entrega</div><div style='font-size:34px;font-weight:800;color:" & Cor & ";margin-top:40px;'>" & FORMAT([Margem de Entrega], "R$ #,##0.00", "pt-BR") & "</div><div style='height:2px;background:" & Cor & ";margin-top:14px;'></div><div style='font-size:11px;color:#596579;margin-top:12px;'>taxas de entrega × custo de entrega</div></div>"
+		formatString: General
+		displayFolder: HTML\Light
+
+	measure 'HTML | Ciclo Light' = VAR P50 = [Tempo Ciclo Logístico P50] VAR P90 = [Tempo Ciclo Logístico P90] RETURN "<div style='font-family:Segoe UI,Arial,sans-serif;color:#0B1B38;background:#FFFFFF;border:1px solid #D8DEE8;border-radius:10px;padding:18px;box-sizing:border-box;width:100%;height:100%;'><div style='font-size:17px;font-weight:750;margin-bottom:26px;'>Tempo de ciclo</div><div style='display:grid;grid-template-columns:58px 115px 1fr;gap:12px;align-items:center;margin-bottom:42px;'><b style='color:#14B8A6;font-size:18px;'>P50</b><b style='font-size:22px;color:#14B8A6;'>" & FORMAT(P50, "0.00", "pt-BR") & " min</b><div style='height:8px;background:#E6EBF2;border-radius:8px;'><div style='height:8px;width:" & FORMAT(DIVIDE(P50, 180), "0%", "en-US") & ";background:#14B8A6;border-radius:8px;'></div></div><b style='color:#2563EB;font-size:18px;'>P90</b><b style='font-size:22px;color:#2563EB;'>" & FORMAT(P90, "0.00", "pt-BR") & " min</b><div style='height:8px;background:#E6EBF2;border-radius:8px;'><div style='height:8px;width:" & FORMAT(DIVIDE(P90, 180), "0%", "en-US") & ";background:#2563EB;border-radius:8px;'></div></div></div></div>"
+		formatString: General
+		displayFolder: HTML\Light
+
+	measure 'HTML | KPIs Executivos Light' = VAR Html = [HTML | KPIs Executivos] RETURN SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(Html, "#F8FAFC", "#0B1B38"), "#131D31", "#FFFFFF"), "#1A2540", "#F5F7FB"), "#2A3955", "#D8DEE8"), "#9FB0C7", "#596579")
+		formatString: General
+		displayFolder: HTML\Light
+
+	measure 'HTML | KPIs Pedidos Light' = VAR Html = [HTML | KPIs Pedidos] RETURN SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(Html, "#F8FAFC", "#0B1B38"), "#131D31", "#FFFFFF"), "#1A2540", "#F5F7FB"), "#2A3955", "#D8DEE8"), "#9FB0C7", "#596579")
+		formatString: General
+		displayFolder: HTML\Light
+
+	measure 'HTML | Etapas Operacionais Light' = VAR Html = [HTML | Etapas Operacionais] RETURN SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(Html, "#F8FAFC", "#0B1B38"), "#131D31", "#FFFFFF"), "#1A2540", "#F5F7FB"), "#2A3955", "#D8DEE8"), "#9FB0C7", "#596579")
+		formatString: General
+		displayFolder: HTML\Light
+
+	measure 'HTML | KPIs Financeiros Light' = VAR Html = [HTML | KPIs Financeiros] RETURN SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(Html, "#F8FAFC", "#0B1B38"), "#131D31", "#FFFFFF"), "#1A2540", "#F5F7FB"), "#2A3955", "#D8DEE8"), "#9FB0C7", "#596579")
+		formatString: General
+		displayFolder: HTML\Light
+
+	measure 'HTML | KPIs Logística Light' = VAR Html = [HTML | KPIs Logística] RETURN SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(Html, "#F8FAFC", "#0B1B38"), "#131D31", "#FFFFFF"), "#1A2540", "#F5F7FB"), "#2A3955", "#D8DEE8"), "#9FB0C7", "#596579")
+		formatString: General
+		displayFolder: HTML\Light
+
+	measure 'HTML | Detalhe Pedido Light' = VAR Html = [HTML | Detalhe Pedido] RETURN SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(Html, "#F8FAFC", "#0B1B38"), "#131D31", "#FFFFFF"), "#1A2540", "#F5F7FB"), "#2A3955", "#D8DEE8"), "#9FB0C7", "#596579")
+		formatString: General
+		displayFolder: HTML\Light
+
+	measure 'HTML | Tooltip Comercial Light' = VAR Html = [HTML | Tooltip Comercial] RETURN SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(Html, "#F8FAFC", "#0B1B38"), "#090D18", "#FFFFFF"), "#1A2540", "#F5F7FB"), "#2A3955", "#D8DEE8"), "#9FB0C7", "#596579"), "#F4F7FB", "#0B1B38")
+		formatString: General
+		displayFolder: HTML\Light\Tooltips
+
+	measure 'HTML | Tooltip Pedidos Light' = VAR Html = [HTML | Tooltip Pedidos] RETURN SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(Html, "#F8FAFC", "#0B1B38"), "#090D18", "#FFFFFF"), "#1A2540", "#F5F7FB"), "#2A3955", "#D8DEE8"), "#9FB0C7", "#596579"), "#F4F7FB", "#0B1B38")
+		formatString: General
+		displayFolder: HTML\Light\Tooltips
+
+	measure 'HTML | Tooltip Financeiro Light' = VAR Html = [HTML | Tooltip Financeiro] RETURN SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(Html, "#F8FAFC", "#0B1B38"), "#090D18", "#FFFFFF"), "#1A2540", "#F5F7FB"), "#2A3955", "#D8DEE8"), "#9FB0C7", "#596579"), "#F4F7FB", "#0B1B38")
+		formatString: General
+		displayFolder: HTML\Light\Tooltips
+
+	measure 'HTML | Tooltip Entregas Light' = VAR Html = [HTML | Tooltip Entregas] RETURN SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(Html, "#F8FAFC", "#0B1B38"), "#090D18", "#FFFFFF"), "#1A2540", "#F5F7FB"), "#2A3955", "#D8DEE8"), "#9FB0C7", "#596579"), "#F4F7FB", "#0B1B38")
+		formatString: General
+		displayFolder: HTML\Light\Tooltips
+
 	column 'ID do Pedido'
 		dataType: int64
 		sourceColumn: order_id

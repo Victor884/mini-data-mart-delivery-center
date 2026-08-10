@@ -1,0 +1,20 @@
+{
+  "name": "DeliveryCenterPortfolioLight-20260809.json",
+  "dataColors": [
+    "#2563EB",
+    "#14B8A6",
+    "#061A35",
+    "#94A3B8",
+    "#FFB020",
+    "#FF5A52"
+  ],
+  "background": "#F6F8FB",
+  "foreground": "#0B1B38",
+  "tableAccent": "#2563EB",
+  "good": "#14B8A6",
+  "neutral": "#FFB020",
+  "bad": "#FF5A52",
+  "maximum": "#2563EB",
+  "center": "#14B8A6",
+  "minimum": "#D5DDE8"
+}
