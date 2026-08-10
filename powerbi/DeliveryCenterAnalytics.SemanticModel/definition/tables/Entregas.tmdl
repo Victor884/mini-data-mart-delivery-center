@@ -1,0 +1,81 @@
+/// Fato de entregas no grão de uma linha por tentativa de entrega.
+table Entregas
+
+	column 'Chave Entrega'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: sk_entrega
+
+	column 'Entrega ID'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: delivery_id
+
+	column 'Pedido ID'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: order_id
+
+	column 'Chave Pedido'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: sk_pedido
+
+	column 'Chave Data'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: sk_tempo
+
+	column 'Chave Loja'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: store_id
+
+	column 'Chave Hub'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: hub_id
+
+	column 'Chave Entregador'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: driver_id
+
+	column 'Status Entrega'
+		dataType: string
+		sourceColumn: delivery_status
+
+	column 'Status Pedido'
+		dataType: string
+		isHidden
+		sourceColumn: order_status
+
+	column 'Número Tentativa'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: numero_tentativa
+
+	column 'É Última Tentativa'
+		dataType: boolean
+		summarizeBy: none
+		sourceColumn: eh_ultima_tentativa
+
+	column 'Distância Entrega (m)'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: distancia_entrega_metros
+
+	partition Entregas = m
+		mode: import
+		source =
+			let
+				Fonte = PostgreSQL.Database(#"Servidor PostgreSQL", #"Banco PostgreSQL", [Query = "SELECT sk_entrega, delivery_id, order_id, sk_pedido, sk_tempo, store_id, hub_id, driver_id, delivery_status, order_status, numero_tentativa::bigint AS numero_tentativa, eh_ultima_tentativa, distancia_entrega_metros::numeric(18,2) AS distancia_entrega_metros FROM mart.vw_entregas_enriquecidas"])
+			in
+				Fonte

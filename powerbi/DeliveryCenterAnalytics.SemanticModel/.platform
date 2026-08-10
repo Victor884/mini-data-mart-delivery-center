@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "Delivery Center Analytics",
+    "description": "Modelo semântico em estrela conectado às views PostgreSQL do schema mart."
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "91e40e34-0988-45ac-8ee6-645628bf952f"
+  }
+}

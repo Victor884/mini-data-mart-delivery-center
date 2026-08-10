@@ -1,29 +1,76 @@
-# Relatório Power BI — Delivery Center
+# Delivery Center Analytics — Power BI Project
 
-> **Status:** versão futura pronta para validação no Power BI Desktop. A estrutura PBIR foi validada com **0 erros e 0 avisos**; a carga e a inspeção visual no Desktop ficaram deliberadamente pendentes para outra máquina.
+Projeto Power BI em formato PBIP/PBIR, versionável como texto, conectado às views PostgreSQL do schema `mart`. A versão atual foi reformulada como peça de portfólio, com hierarquia visual, navegação e contexto analítico consistentes.
 
-O projeto nativo `DeliveryCenter.pbip` contém duas páginas modernas e responsivas ao contexto de filtro:
+## Entrega atual
 
-- **Visão Executiva:** faturamento finalizado, pedidos, ticket médio, cancelamento, margem, tendência mensal, hubs e canais.
-- **Performance Logística:** conclusão de entregas, P50/P90 de ciclo, múltiplas tentativas, modal, status e matriz por hub.
+- modelo estrela em TMDL com 6 dimensões, 4 fatos e 20 relacionamentos `1:*` unidirecionais;
+- conexão Import parametrizada, sem credenciais versionadas;
+- 58 medidas DAX, incluindo 11 componentes HTML/CSS;
+- 5 páginas analíticas visíveis e 4 páginas ocultas de tooltip;
+- 81 visuais: KPIs, linhas, barras horizontais, tabelas, filtros, botões, sidebar e navegação;
+- tema dark premium `DeliveryCenterDarkNeon-20260802.json`;
+- drill-through por pedido e botão nativo de retorno;
+- tooltips com contexto, período anterior, variação absoluta/percentual e participação;
+- gerador determinístico e três níveis de validação.
 
-O modelo Import utiliza um extrato de uma linha por pedido, gerado a partir dos CSVs completos do repositório. O snapshot de 82 MB não é versionado porque pode ser reproduzido de forma determinística.
+## Abrir no Power BI Desktop
 
-## Preparar e abrir em outra máquina
+1. Suba e carregue o PostgreSQL conforme o README da raiz.
+2. Use uma versão atual do Power BI Desktop com PBIP, PBIR e TMDL habilitados.
+3. Abra `DeliveryCenterAnalytics.pbip`.
+4. Na primeira atualização, escolha autenticação de banco de dados e informe as credenciais localmente.
+5. Se necessário, instale **HTML Content (lite)** por `Obter mais visuais > AppSource`.
+6. Atualize o modelo e confira os valores de `docs/VALIDACAO.md`.
 
-Na raiz do repositório:
+| Parâmetro | Valor padrão |
+|---|---|
+| `Servidor PostgreSQL` | `localhost:5432` |
+| `Banco PostgreSQL` | `mini_datamart_delivery` |
 
-```powershell
-python powerbi/scripts/build_import_data.py
-node powerbi/scripts/generate_pbip.mjs
+## Estrutura
+
+```text
+powerbi/
+├── DeliveryCenterAnalytics.pbip
+├── DeliveryCenterAnalytics.Report/       # PBIR: páginas, visuais e tema
+├── DeliveryCenterAnalytics.SemanticModel/# TMDL: consultas, relações e DAX
+├── docs/                                  # arquitetura, auditoria, páginas e QA
+│   └── assets/                            # conceitos desktop/mobile aprovados
+├── html/                                  # referência dos tokens CSS
+├── scripts/                               # geração e validadores
+└── validation/                            # baselines SQL
 ```
 
-O segundo comando regenera o projeto e grava no Power Query o caminho absoluto correto da máquina atual. Depois, abra `powerbi/DeliveryCenter.pbip` no Power BI Desktop e atualize o modelo.
+## Documentação
 
-## Evidências e manutenção
+- [Auditoria do redesign](docs/AUDITORIA_REDESIGN.md)
+- [Contrato visual aprovado](docs/CONTRATO_VISUAL.md)
+- [Arquitetura e relacionamentos](docs/ARQUITETURA.md)
+- [Páginas, filtros e interações](docs/PAGINAS.md)
+- [Catálogo de medidas DAX](docs/MEDIDAS.md)
+- [Validação estrutural e numérica](docs/VALIDACAO.md)
+- [HTML e CSS](html/README.md)
 
-- `data/validacao.json`: baselines reconciliados com os dados completos.
-- `validation-report.json`: validação estrutural do PBIR.
-- `DeliveryCenter.SemanticModel/definition/tables/FatoDashboard.tmdl`: colunas, partição Import e 18 medidas DAX.
-- `scripts/generate_pbip.mjs`: geração determinística das duas páginas e de seus 29 visuais.
-- `report-spec.md`: escopo, regras e critérios de aceite.
+## Regenerar e validar
+
+Requer Node.js 20 ou superior:
+
+```powershell
+node powerbi\scripts\generate-pbip.mjs
+node powerbi\scripts\validate-pbip.mjs
+node powerbi\scripts\validate-m-queries.mjs
+powerbi-report-author validate powerbi\DeliveryCenterAnalytics.Report --pretty
+```
+
+O gerador reconstrói somente os artefatos PBIP/PBIR/TMDL. Documentação, conceitos e validações permanecem preservados.
+
+## Decisões preservadas
+
+O redesign não alterou os 20 relacionamentos, o grão das tabelas nem as medidas existentes de negócio. A nova identidade usa sidebar, superfícies azul-marinho e acentos em ciano, roxo e rosa, sem copiar elementos fictícios das referências. P90 continua sendo um percentil descritivo, não um SLA; nenhum alvo foi inventado sem regra aprovada.
+
+O visual HTML customizado emite apenas conteúdo estático. Os elementos que exigem interação ou auditabilidade continuam nativos, mantendo filtros cruzados, drill-through e exportação.
+
+## Versão portátil paralela
+
+A branch experimental também contém `DeliveryCenter.pbip`, baseado em um snapshot Import reproduzível. Essa versão é documentada separadamente em [`README-PORTABLE.md`](README-PORTABLE.md) e não substitui o projeto atual durante a construção.

@@ -1,0 +1,17 @@
+model Model
+	culture: pt-BR
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: pt-BR
+	discourageImplicitMeasures
+
+ref table 'Calendário'
+ref table Hubs
+ref table Lojas
+ref table Canais
+ref table Entregadores
+ref table Pedido
+ref table Pedidos
+ref table Entregas
+ref table Pagamentos
+ref table 'Conciliação'
+ref table 'Métricas'

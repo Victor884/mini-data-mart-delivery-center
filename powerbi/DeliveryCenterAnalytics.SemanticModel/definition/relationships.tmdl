@@ -1,0 +1,79 @@
+relationship 65301d7ad5c96b737e35
+	fromColumn: Pedidos.'Chave Data'
+	toColumn: 'Calendário'.'Chave Data'
+
+relationship 6530cef4203400734876
+	fromColumn: Pedidos.'Chave Hub'
+	toColumn: Hubs.'Chave Hub'
+
+relationship 9a6be5c48255a52b4d1b
+	fromColumn: Pedidos.'Chave Loja'
+	toColumn: Lojas.'Chave Loja'
+
+relationship 8d4c8f4b78b82694391f
+	fromColumn: Pedidos.'Chave Pedido'
+	toColumn: Pedido.'Chave Pedido'
+
+relationship 7e8f9e5e3d5ec9c8173d
+	fromColumn: Entregas.'Chave Data'
+	toColumn: 'Calendário'.'Chave Data'
+
+relationship 6a797cc2d38e4f511ba8
+	fromColumn: Entregas.'Chave Hub'
+	toColumn: Hubs.'Chave Hub'
+
+relationship 1b0afacace46352bbca2
+	fromColumn: Entregas.'Chave Loja'
+	toColumn: Lojas.'Chave Loja'
+
+relationship b9883730aa2a19d5faaf
+	fromColumn: Entregas.'Chave Pedido'
+	toColumn: Pedido.'Chave Pedido'
+
+relationship c9d204014bc4f8138fda
+	fromColumn: Pagamentos.'Chave Data'
+	toColumn: 'Calendário'.'Chave Data'
+
+relationship 54424f3c533018bb7f59
+	fromColumn: Pagamentos.'Chave Hub'
+	toColumn: Hubs.'Chave Hub'
+
+relationship 5ed8d653d57f7f6bf115
+	fromColumn: Pagamentos.'Chave Loja'
+	toColumn: Lojas.'Chave Loja'
+
+relationship dd5771690bf96f6509ef
+	fromColumn: Pagamentos.'Chave Pedido'
+	toColumn: Pedido.'Chave Pedido'
+
+relationship 69ab6c0b63666a98e48f
+	fromColumn: 'Conciliação'.'Chave Data'
+	toColumn: 'Calendário'.'Chave Data'
+
+relationship bf62071231f07705b35c
+	fromColumn: 'Conciliação'.'Chave Hub'
+	toColumn: Hubs.'Chave Hub'
+
+relationship ec4985054e182285f4c2
+	fromColumn: 'Conciliação'.'Chave Loja'
+	toColumn: Lojas.'Chave Loja'
+
+relationship a01b13c176c526827b9f
+	fromColumn: 'Conciliação'.'Chave Pedido'
+	toColumn: Pedido.'Chave Pedido'
+
+relationship 4a4f9aeb507910167822
+	fromColumn: Pedidos.'Chave Canal'
+	toColumn: Canais.'Chave Canal'
+
+relationship 58fa7265a33b7fd70355
+	fromColumn: Pagamentos.'Chave Canal'
+	toColumn: Canais.'Chave Canal'
+
+relationship 9314eecf279d79d4fe57
+	fromColumn: 'Conciliação'.'Chave Canal'
+	toColumn: Canais.'Chave Canal'
+
+relationship 63b29e3a9ae4f294a9ae
+	fromColumn: Entregas.'Chave Entregador'
+	toColumn: Entregadores.'Chave Entregador'

@@ -3,3 +3,6 @@ powerbi/data/fato_dashboard.csv
 
 # Estado e cache locais criados pelo Power BI Desktop.
 powerbi/**/.pbi/
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+docs/LINKEDIN_PUBLICACAO.md

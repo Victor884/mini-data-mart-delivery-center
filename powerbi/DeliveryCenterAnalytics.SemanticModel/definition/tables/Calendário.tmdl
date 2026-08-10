@@ -1,0 +1,81 @@
+/// Dimensão de datas contínua derivada da view de pedidos; uma linha por dia.
+table 'Calendário'
+	dataCategory: Time
+
+	column 'Chave Data'
+		dataType: int64
+		isHidden
+		isKey
+		summarizeBy: none
+		sourceColumn: sk_tempo
+
+	column Data
+		dataType: dateTime
+		summarizeBy: none
+		sourceColumn: data_completa
+
+	column Ano
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: ano
+
+	column Semestre
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: semestre
+
+	column Trimestre
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: trimestre
+
+	column 'Número Mês'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: mes
+
+	column 'Mês'
+		dataType: string
+		sortByColumn: 'Número Mês'
+		sourceColumn: nome_mes
+
+	column Dia
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: dia
+
+	column 'Número Dia Semana'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: numero_dia_semana
+
+	column 'Dia da Semana'
+		dataType: string
+		sortByColumn: 'Número Dia Semana'
+		sourceColumn: nome_dia_semana
+
+	column 'Fim de Semana'
+		dataType: boolean
+		summarizeBy: none
+		sourceColumn: eh_fim_semana
+
+	column 'Ano Mês'
+		dataType: string
+		sortByColumn: 'Ordem Ano Mês'
+		sourceColumn: ano_mes
+
+	column 'Ordem Ano Mês'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: ordem_ano_mes
+
+	partition 'Calendário' = m
+		mode: import
+		source =
+			let
+				Fonte = PostgreSQL.Database(#"Servidor PostgreSQL", #"Banco PostgreSQL", [Query = "SELECT DISTINCT sk_tempo, data_completa, ano::bigint AS ano, semestre::bigint AS semestre, trimestre::bigint AS trimestre, mes::bigint AS mes, nome_mes, dia::bigint AS dia, numero_dia_semana::bigint AS numero_dia_semana, nome_dia_semana, eh_fim_semana, TO_CHAR(data_completa, 'YYYY-MM') AS ano_mes, (ano::bigint * 100 + mes::bigint) AS ordem_ano_mes FROM mart.vw_pedidos_enriquecidos"])
+			in
+				Fonte

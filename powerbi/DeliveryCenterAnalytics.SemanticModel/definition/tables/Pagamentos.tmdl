@@ -1,0 +1,85 @@
+/// Fato de pagamentos no grão de uma linha por transação de pagamento.
+table Pagamentos
+
+	column 'Chave Pagamento'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: sk_pagamento
+
+	column 'Pagamento ID'
+		dataType: int64
+		summarizeBy: none
+		sourceColumn: payment_id
+
+	column 'Pedido ID'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: order_id
+
+	column 'Chave Pedido'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: sk_pedido
+
+	column 'Chave Data'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: sk_tempo
+
+	column 'Chave Loja'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: store_id
+
+	column 'Chave Hub'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: hub_id
+
+	column 'Chave Canal'
+		dataType: int64
+		isHidden
+		summarizeBy: none
+		sourceColumn: channel_id
+
+	column 'Meio Pagamento'
+		dataType: string
+		sourceColumn: payment_method
+
+	column 'Status Pagamento'
+		dataType: string
+		sourceColumn: payment_status
+
+	column 'Status Pedido'
+		dataType: string
+		isHidden
+		sourceColumn: order_status
+
+	column 'Valor Pagamento'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: valor_pagamento
+
+	column 'Taxa Pagamento'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: taxa_pagamento
+
+	column 'Valor Líquido Pagamento'
+		dataType: decimal
+		summarizeBy: none
+		sourceColumn: valor_liquido_pagamento
+
+	partition Pagamentos = m
+		mode: import
+		source =
+			let
+				Fonte = PostgreSQL.Database(#"Servidor PostgreSQL", #"Banco PostgreSQL", [Query = "SELECT sk_pagamento, payment_id, order_id, sk_pedido, sk_tempo, store_id, hub_id, channel_id, payment_method, payment_status, order_status, valor_pagamento, taxa_pagamento, valor_liquido_pagamento FROM mart.vw_pagamentos_enriquecidos"])
+			in
+				Fonte

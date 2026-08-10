@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "Delivery Center Analytics",
+    "description": "Dashboard comercial, logístico e financeiro do mini data mart de delivery."
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "dc59c1ba-6db8-4f96-a88a-3bb1489f7fb8"
+  }
+}

@@ -23,12 +23,14 @@ Criar um projeto robusto de BI e SQL para provar a capacidade de:
 - [x] **Validações de Qualidade de Dados**: Consultas para assegurar a integridade e consistência volumétrica dos dados importados.
 - [x] **Camada de Data Marts**: Views detalhadas e agregadas para vendas, logística, pagamentos e desempenho de lojas.
 - [x] **Consultas para KPIs Executivos**: Indicadores documentados e calculados com regras explícitas de grão, denominador e exclusão.
-- [x] **Projeto Power BI (versão futura)**: Arquivos nativos PBIP/PBIR, modelo Import, 18 medidas DAX e duas páginas com 29 visuais, preparados para validação posterior no Power BI Desktop.
+- [x] **Dashboard Power BI**: Projeto `.pbip` versionável, modelo TMDL, tema JSON, medidas DAX, páginas analíticas e componentes HTML/CSS.
+- [ ] **Power BI portátil (em desenvolvimento)**: Segunda versão PBIP baseada em snapshot Import reproduzível, mantida separadamente até concluir a validação.
 - [x] **Documentação Completa**:
   * [Regras de Negócio](docs/regras-negocio.md)
   * [Modelo Dimensional](docs/modelo-dimensional.md)
   * [Dicionário de Dados](docs/dicionario-dados.md)
   * [Catálogo de KPIs](docs/kpis.md)
+  * [Projeto Power BI](powerbi/README.md)
 
 ---
 
@@ -41,7 +43,8 @@ A estrutura de dados está implementada e validada até a camada de consumo anal
 | `stg` | 7 tabelas carregadas diretamente dos CSVs |
 | `dw` | 8 dimensões conformadas e 3 tabelas fato |
 | `mart` | 3 views detalhadas e 5 views agregadas |
-| `powerbi` | Versão futura do relatório, com validação estrutural concluída e validação visual pendente |
+| Power BI | 6 dimensões, 4 fatos, 58 medidas, 5 páginas analíticas, 4 tooltips e 81 visuais |
+| Power BI portátil | Branch experimental com modelo Import local, sem substituir a entrega atual |
 
 Volumes reconciliados entre staging, DW e data marts:
 
@@ -60,14 +63,16 @@ As cargas foram executadas mais de uma vez para confirmar reprocessamento seguro
 - coerência entre timestamps e a dimensão de tempo;
 - reconciliação dos totais financeiros.
 
-Baselines publicados para o futuro dashboard:
+Baselines publicados para o dashboard:
 
 - taxa de cancelamento: **4,60%**;
 - valor transacionado de pedidos finalizados: **R$ 37.481.358,97**;
 - ticket médio finalizado: **R$ 106,48**;
 - margem agregada de entrega: **-R$ 434.905,63**;
 - tempo de ciclo P50/P90: **42,18 / 83,17 minutos**;
-- taxa de entrega concluída: **97,95%**.
+- taxa de entrega concluída: **97,95%**;
+- taxa de conciliação de pedidos finalizados: **96,60%**;
+- valor pago confirmado: **R$ 37.304.232,78**.
 
 ---
 
@@ -80,7 +85,9 @@ flowchart LR
     CSV[Arquivos CSV] -->|COPY Ingestion| STG[(Schema stg)]
     STG -->|ELT / SQL| DW[(Schema dw)]
     DW -->|Views / Agregados| MART[(Schema mart)]
-    MART -->|Conexão Direta| PBI[Power BI Dashboard]
+    MART -->|Views detalhadas| MODEL[Modelo semântico TMDL]
+    MODEL -->|Medidas DAX| PBI[Relatório PBIR]
+    PBI --> HTML[KPIs HTML/CSS]
 ```
 
 ### Tecnologias Utilizadas:
@@ -88,7 +95,7 @@ flowchart LR
 * **Ambiente**: Docker & Docker Compose
 * **Linguagem**: SQL (PL/pgSQL)
 * **Modelagem**: Star Schema (Fatos e Dimensões)
-* **Visualização**: Power BI
+* **Visualização**: Power BI Project (`.pbip`), PBIR, TMDL, DAX e HTML Content (lite)
 
 ---
 
@@ -118,6 +125,12 @@ Conecte-se ao banco de dados (`localhost:5432`, base `mini_datamart_delivery`, u
 9. [`sql/09_create_mart_views.sql`](sql/09_create_mart_views.sql): Cria as views detalhadas e agregadas da camada `mart`.
 10. [`sql/10_mart_quality_checks.sql`](sql/10_mart_quality_checks.sql): Verifica cardinalidade, reconciliação e ausência de dupla contagem nas views.
 
+### Passo 3: Abrir o projeto Power BI
+
+Com o banco em execução, abra [`powerbi/DeliveryCenterAnalytics.pbip`](powerbi/DeliveryCenterAnalytics.pbip) em uma versão atual do Power BI Desktop. Informe as credenciais do PostgreSQL somente no Desktop, atualize o modelo e confira os baselines descritos em [`powerbi/docs/VALIDACAO.md`](powerbi/docs/VALIDACAO.md).
+
+Os cartões e rankings em HTML/CSS usam o visual certificado **HTML Content (lite)**. Caso o tenant não o carregue automaticamente, instale-o pelo AppSource do Power BI.
+
 ---
 
 ## 💡 Decisões de Engenharia de Dados
@@ -136,29 +149,93 @@ Conecte-se ao banco de dados (`localhost:5432`, base `mini_datamart_delivery`, u
 
 ## 📊 Dashboard Power BI
 
-A versão futura do relatório está disponível em [`powerbi/DeliveryCenter.pbip`](powerbi/DeliveryCenter.pbip), com instruções de reprodução em [`powerbi/README.md`](powerbi/README.md).
+O projeto está em [`powerbi/`](powerbi/README.md) e contém:
 
-- [x] **Visão Executiva:** KPIs financeiros e operacionais, evolução mensal, comparação por hub e mix de canais.
-- [x] **Performance Logística:** conclusão, tempos P50/P90, múltiplas tentativas, status, modal e detalhamento por hub.
-- [x] **Modelo semântico:** 18 medidas DAX dinâmicas e partição Import reproduzível.
-- [x] **Validação estrutural PBIR:** 0 erros e 0 avisos.
-- [ ] **Validação posterior no Power BI Desktop:** atualizar dados, revisar renderização, interações e filtros.
-- [ ] **Capturas finais:** adicionar prints após a validação visual.
+- **01 Visão Executiva**: resultado comercial, tendências, ranking de hubs e saúde do negócio;
+- **02 Pedidos & Operação**: volume, status, tempos de produção/trânsito e análise por hub;
+- **03 Financeiro**: pagamentos, conciliação, chargebacks, segmentos e variação mensal;
+- **04 Entregas & Qualidade**: conclusão, retentativas, ciclo P50/P90, distância e modalidades;
+- **05 Detalhamento**: drill-through com pedido, tentativas de entrega e pagamentos;
+- quatro tooltips HTML dedicados com período anterior, variações e participação;
+- sidebar com navegação vertical nativa e filtros, tema dark neon em JSON e onze componentes HTML/CSS.
+
+<p align="center">
+  <img src="powerbi/docs/assets/screenshots/portfolio-cover.png" alt="Delivery Center Analytics — visão executiva do dashboard Power BI" width="100%">
+</p>
+
+<p align="center"><em>Projeto analítico ponta a ponta: PostgreSQL, Data Warehouse dimensional, data marts e Power BI.</em></p>
+
+### Páginas analíticas
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="powerbi/docs/assets/screenshots/executive-overview.png" alt="Página Visão Executiva do Delivery Center Analytics" width="100%"><br>
+      <strong>Visão Executiva</strong><br>
+      Resultado comercial, tendências, ranking de hubs e sinais de saúde operacional.
+    </td>
+    <td width="50%" valign="top">
+      <img src="powerbi/docs/assets/screenshots/orders-overview.png" alt="Página Pedidos e Operação do Delivery Center Analytics" width="100%"><br>
+      <strong>Pedidos &amp; Operação</strong><br>
+      Volume, status, decomposição do ciclo e desempenho operacional por hub.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <img src="powerbi/docs/assets/screenshots/finance-overview.png" alt="Página Desempenho Financeiro do Delivery Center Analytics" width="100%"><br>
+      <strong>Desempenho Financeiro</strong><br>
+      Valor transacionado e pago, conciliação, meios de pagamento e margem de entrega.
+    </td>
+    <td width="50%" valign="top">
+      <img src="powerbi/docs/assets/screenshots/delivery-overview.png" alt="Página Entregas e Qualidade do Delivery Center Analytics" width="100%"><br>
+      <strong>Entregas &amp; Qualidade</strong><br>
+      Conclusão, retentativas, ciclo P50/P90, modalidades e hubs críticos.
+    </td>
+  </tr>
+</table>
+
+<details>
+  <summary><strong>Ver os tooltips analíticos</strong></summary>
+  <br>
+  <table>
+    <tr>
+      <td width="50%"><img src="powerbi/docs/assets/screenshots/executive-tooltip.png" alt="Tooltip analítico da Visão Executiva" width="100%"></td>
+      <td width="50%"><img src="powerbi/docs/assets/screenshots/orders-tooltip.png" alt="Tooltip analítico de Pedidos e Operação" width="100%"></td>
+    </tr>
+    <tr>
+      <td width="50%"><img src="powerbi/docs/assets/screenshots/finance-tooltip.png" alt="Tooltip analítico de Desempenho Financeiro" width="100%"></td>
+      <td width="50%"><img src="powerbi/docs/assets/screenshots/delivery-tooltip.png" alt="Tooltip analítico de Entregas e Qualidade" width="100%"></td>
+    </tr>
+  </table>
+</details>
+
+> A capa possui apenas tratamento editorial de apresentação. As capturas da galeria são imagens originais do Power BI Desktop, preservadas sem alteração de valores ou elementos do relatório.
+
+A estrutura PBIP/PBIR foi validada com **0 erros**. As **10 consultas M** executaram no PostgreSQL e **43 de 43** baselines conferiram. Os 20 relacionamentos e as regras originais de negócio foram preservados. A homologação visual no Power BI Desktop confirmou a renderização das páginas, a sidebar corrigida e os tooltips contextuais.
+
+### Versão portátil em desenvolvimento
+
+A branch deste PR também mantém [`powerbi/DeliveryCenter.pbip`](powerbi/DeliveryCenter.pbip), uma alternativa Import reproduzível a partir dos CSVs do projeto. Ela permanece separada da entrega atual até concluir páginas, medidas, validação visual e evidências. Consulte [`powerbi/README-PORTABLE.md`](powerbi/README-PORTABLE.md).
 
 ---
 ## 🚀 Próximos Passos
 
-1. **Validar a versão futura no Power BI Desktop**:
-   * Gerar o snapshot Import e regenerar o PBIP na máquina de validação.
-   * Atualizar o modelo e conferir visuais, filtros, interações e formatação.
-   * Reconciliar os cartões com `powerbi/data/validacao.json`.
-2. **Adicionar evidências visuais**:
-   * Publicar prints das páginas Visão Executiva e Performance Logística.
-3. **Evoluir o relatório após a validação**:
-   * Avaliar conexão direta ao schema `mart`, drill-through e uma página futura de pagamentos.
-4. **Definir Metas Operacionais**:
+1. **Preparar a publicação no Power BI Service/Fabric**:
+   * Configurar gateway para o PostgreSQL.
+   * Definir atualização agendada e política do visual customizado no tenant.
+   * Implementar RLS quando houver uma regra de acesso aprovada.
+2. **Concluir a experiência multiplataforma**:
+   * Criar e homologar o layout mobile nativo das cinco páginas.
+   * Validar navegação, filtros, tooltips e drill-through após a publicação no tenant.
+3. **Definir metas operacionais**:
    * Avaliar as séries semanais e mensais dos KPIs.
    * Aprovar limites de SLA e metas por hub antes de classificar performance.
-5. **Finalizar a apresentação do projeto**:
-   * Adicionar prints do dashboard ao README.
-   * Documentar os principais insights e decisões de negócio.
+4. **Evoluir a análise**:
+   * Adicionar metas somente depois de aprovar definições de SLA e margem-alvo.
+   * Avaliar bookmarks apenas quando existir uma visão alternativa necessária.
+   * Avaliar agregações ou refresh incremental se o volume crescer.
+   * Documentar insights e decisões de negócio após o uso pelos stakeholders.
+5. **Concluir a versão portátil antes de avaliar o merge**:
+   * Reconciliar todos os KPIs com as regras do `mart`.
+   * Validar páginas, filtros e interações no Power BI Desktop.
+   * Manter os dois projetos PBIP independentes durante a construção.
