@@ -1,5 +1,7 @@
 # Mini Data Mart - Delivery Center 🚀
 
+> **Versão em construção no PR:** esta branch mantém a entrega atual intacta e adiciona [`DeliveryCenterDark.pbip`](powerbi/DeliveryCenterDark.pbip) e [`DeliveryCenterLight.pbip`](powerbi/DeliveryCenterLight.pbip). Os dois modos compartilham o mesmo modelo semântico Import e seguem, respectivamente, as referências de Performance Logística escura e Visão Executiva clara. Detalhes em [`powerbi/README-PORTABLE.md`](powerbi/README-PORTABLE.md).
+
 Este projeto consiste na estruturação de um **Data Warehouse** e de **Data Marts** analíticos utilizando dados operacionais de um centro de distribuição e entregas (Delivery Center). 
 
 O objetivo principal é demonstrar competência em **Engenharia de Dados (ELT)**, **Modelagem Dimensional (Star Schema)**, **SQL Avançado (PostgreSQL)** e **Visualização de Dados (Power BI)**.
@@ -24,6 +26,7 @@ Criar um projeto robusto de BI e SQL para provar a capacidade de:
 - [x] **Camada de Data Marts**: Views detalhadas e agregadas para vendas, logística, pagamentos e desempenho de lojas.
 - [x] **Consultas para KPIs Executivos**: Indicadores documentados e calculados com regras explícitas de grão, denominador e exclusão.
 - [x] **Dashboard Power BI**: Projeto `.pbip` versionável, modelo TMDL, tema JSON, medidas DAX, páginas analíticas e componentes HTML/CSS.
+- [x] **Power BI portátil (branch paralela)**: Segunda versão PBIP baseada em snapshot Import reproduzível, com cinco páginas, quatro tooltips e componentes HTML/CSS; mantida separadamente até a homologação visual.
 - [x] **Documentação Completa**:
   * [Regras de Negócio](docs/regras-negocio.md)
   * [Modelo Dimensional](docs/modelo-dimensional.md)
@@ -43,6 +46,7 @@ A estrutura de dados está implementada e validada até a camada de consumo anal
 | `dw` | 8 dimensões conformadas e 3 tabelas fato |
 | `mart` | 3 views detalhadas e 5 views agregadas |
 | Power BI | 6 dimensões, 4 fatos, 58 medidas, 5 páginas analíticas, 4 tooltips e 81 visuais |
+| Power BI portátil | dois modos PBIP, modelo compartilhado com 46 colunas e 72 medidas, 9 páginas internas e 12 componentes HTML/CSS por relatório |
 
 Volumes reconciliados entre staging, DW e data marts:
 
@@ -211,8 +215,11 @@ O projeto está em [`powerbi/`](powerbi/README.md) e contém:
 
 A estrutura PBIP/PBIR foi validada com **0 erros**. As **10 consultas M** executaram no PostgreSQL e **43 de 43** baselines conferiram. Os 20 relacionamentos e as regras originais de negócio foram preservados. A homologação visual no Power BI Desktop confirmou a renderização das páginas, a sidebar corrigida e os tooltips contextuais.
 
----
+### Versão portátil em branch paralela
 
+A branch deste PR mantém [`powerbi/DeliveryCenterDark.pbip`](powerbi/DeliveryCenterDark.pbip) e [`powerbi/DeliveryCenterLight.pbip`](powerbi/DeliveryCenterLight.pbip), alternativas Import reproduzíveis a partir dos CSVs do projeto. Os dois relatórios compartilham o mesmo modelo com 46 colunas e 72 medidas DAX; cada um contém nove páginas internas, quatro tooltips e doze componentes HTML/CSS. Eles permanecem separados da entrega atual até a homologação visual no Power BI Desktop. Consulte [`powerbi/README-PORTABLE.md`](powerbi/README-PORTABLE.md).
+
+---
 ## 🚀 Próximos Passos
 
 1. **Preparar a publicação no Power BI Service/Fabric**:
@@ -230,3 +237,7 @@ A estrutura PBIP/PBIR foi validada com **0 erros**. As **10 consultas M** execut
    * Avaliar bookmarks apenas quando existir uma visão alternativa necessária.
    * Avaliar agregações ou refresh incremental se o volume crescer.
    * Documentar insights e decisões de negócio após o uso pelos stakeholders.
+5. **Homologar a versão portátil antes de avaliar o merge**:
+   * Abrir a branch paralela no Power BI Desktop e atualizar o snapshot Import.
+   * Validar visualmente páginas, filtros, navegação, HTML Content e tooltips.
+   * Manter os dois projetos PBIP independentes até a aprovação dessa homologação.

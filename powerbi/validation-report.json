@@ -1,0 +1,51 @@
+{
+  "data": {
+    "result": "succeededWithExpectedWarnings",
+    "validationDate": "2026-08-09",
+    "validator": "powerbi-report-author + validate_portable_pbip.mjs",
+    "semanticModel": {
+      "path": "powerbi/DeliveryCenter.SemanticModel",
+      "columns": 46,
+      "measures": 72,
+      "sharedByBothReports": true
+    },
+    "reports": [
+      {
+        "mode": "dark",
+        "project": "powerbi/DeliveryCenterDark.pbip",
+        "activePage": "Logística",
+        "pages": 9,
+        "tooltipPages": 4,
+        "visibleNavigationPages": 3,
+        "visuals": 84,
+        "slicers": 19,
+        "htmlCssVisuals": 12,
+        "pbirErrors": 0,
+        "expectedWarnings": 12
+      },
+      {
+        "mode": "light",
+        "project": "powerbi/DeliveryCenterLight.pbip",
+        "activePage": "Executivo",
+        "pages": 9,
+        "tooltipPages": 4,
+        "visibleNavigationPages": 3,
+        "visuals": 92,
+        "slicers": 20,
+        "htmlCssVisuals": 12,
+        "pbirErrors": 0,
+        "expectedWarnings": 12
+      }
+    ],
+    "warningCode": "PBIR_VISUAL_TYPE_UNKNOWN",
+    "warningReason": "Um aviso esperado para cada componente do visual externo certificado HTML Content (lite).",
+    "baseline": {
+      "orders": 368999,
+      "finalizedOrders": 352020,
+      "finalizedValue": 37481358.97,
+      "paidValue": 37304232.78,
+      "deliveryCompletionPct": 97.95,
+      "reconciliationPct": 96.6
+    }
+  }
+}

@@ -1,5 +1,14 @@
 # Delivery Center Analytics — Power BI Project
 
+## Nova versão de portfólio nesta branch
+
+Esta branch isolada contém duas novas variantes, ambas conectadas ao mesmo modelo Import reproduzível:
+
+- [`DeliveryCenterDark.pbip`](DeliveryCenterDark.pbip) — modo Dark com página inicial de Performance Logística e navegação superior;
+- [`DeliveryCenterLight.pbip`](DeliveryCenterLight.pbip) — modo Light com página inicial Executiva e sidebar compacta.
+
+Os dois projetos compartilham [`DeliveryCenter.SemanticModel`](DeliveryCenter.SemanticModel), com 46 colunas e 72 medidas DAX. A versão atual [`DeliveryCenterAnalytics.pbip`](DeliveryCenterAnalytics.pbip) foi preservada sem alterações. Consulte [`README-PORTABLE.md`](README-PORTABLE.md) para geração, validação e pendências de homologação.
+
 Projeto Power BI em formato PBIP/PBIR, versionável como texto, conectado às views PostgreSQL do schema `mart`. A versão atual foi reformulada como peça de portfólio, com hierarquia visual, navegação e contexto analítico consistentes.
 
 ## Entrega atual
@@ -70,3 +79,7 @@ O gerador reconstrói somente os artefatos PBIP/PBIR/TMDL. Documentação, conce
 O redesign não alterou os 20 relacionamentos, o grão das tabelas nem as medidas existentes de negócio. A nova identidade usa sidebar, superfícies azul-marinho e acentos em ciano, roxo e rosa, sem copiar elementos fictícios das referências. P90 continua sendo um percentil descritivo, não um SLA; nenhum alvo foi inventado sem regra aprovada.
 
 O visual HTML customizado emite apenas conteúdo estático. Os elementos que exigem interação ou auditabilidade continuam nativos, mantendo filtros cruzados, drill-through e exportação.
+
+## Versão portátil paralela
+
+A branch `agent/power-bi-future-version` também contém `DeliveryCenterDark.pbip` e `DeliveryCenterLight.pbip`, baseados em um snapshot Import reproduzível e no mesmo modelo semântico. A implementação estrutural possui 46 colunas, 72 medidas, nove páginas internas por relatório e doze componentes HTML/CSS em cada modo. Ela é documentada em [`README-PORTABLE.md`](README-PORTABLE.md) e continua isolada até a homologação visual no Power BI Desktop, sem substituir o projeto atual.
