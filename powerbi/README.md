@@ -73,4 +73,4 @@ O visual HTML customizado emite apenas conteúdo estático. Os elementos que exi
 
 ## Versão portátil paralela
 
-A branch experimental também contém `DeliveryCenter.pbip`, baseado em um snapshot Import reproduzível. Essa versão é documentada separadamente em [`README-PORTABLE.md`](README-PORTABLE.md) e não substitui o projeto atual durante a construção.
+A branch `agent/power-bi-future-version` também contém `DeliveryCenter.pbip`, baseado em um snapshot Import reproduzível. A implementação estrutural possui cinco páginas analíticas, quatro tooltips, 57 medidas, 87 visuais e 11 componentes HTML/CSS. Ela é documentada em [`README-PORTABLE.md`](README-PORTABLE.md) e continua isolada até a homologação visual no Power BI Desktop, sem substituir o projeto atual.

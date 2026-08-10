@@ -1,8 +1,24 @@
 {
   "data": {
-    "result": "succeeded",
+    "result": "succeededWithWarnings",
     "errorCount": 0,
-    "warningCount": 0,
-    "reportPath": "E:\\mini-data-mart-delivery-center\\powerbi\\DeliveryCenter.Report"
+    "warningCount": 11,
+    "reportPath": "powerbi/DeliveryCenter.Report",
+    "validationDate": "2026-08-09",
+    "validator": "powerbi-report-author",
+    "warningCode": "PBIR_VISUAL_TYPE_UNKNOWN",
+    "warningReason": "Um aviso esperado para cada um dos 11 componentes do visual externo certificado HTML Content (lite).",
+    "localIntegrityValidation": {
+      "result": "succeeded",
+      "analyticalPages": 5,
+      "tooltipPages": 4,
+      "visuals": 87,
+      "htmlCssVisuals": 11,
+      "columns": 46,
+      "measures": 57,
+      "slicers": 20,
+      "navigation": 5,
+      "clearFilterButtons": 5
+    }
   }
 }

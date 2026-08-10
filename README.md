@@ -24,7 +24,7 @@ Criar um projeto robusto de BI e SQL para provar a capacidade de:
 - [x] **Camada de Data Marts**: Views detalhadas e agregadas para vendas, logística, pagamentos e desempenho de lojas.
 - [x] **Consultas para KPIs Executivos**: Indicadores documentados e calculados com regras explícitas de grão, denominador e exclusão.
 - [x] **Dashboard Power BI**: Projeto `.pbip` versionável, modelo TMDL, tema JSON, medidas DAX, páginas analíticas e componentes HTML/CSS.
-- [ ] **Power BI portátil (em desenvolvimento)**: Segunda versão PBIP baseada em snapshot Import reproduzível, mantida separadamente até concluir a validação.
+- [x] **Power BI portátil (branch paralela)**: Segunda versão PBIP baseada em snapshot Import reproduzível, com cinco páginas, quatro tooltips e componentes HTML/CSS; mantida separadamente até a homologação visual.
 - [x] **Documentação Completa**:
   * [Regras de Negócio](docs/regras-negocio.md)
   * [Modelo Dimensional](docs/modelo-dimensional.md)
@@ -44,7 +44,7 @@ A estrutura de dados está implementada e validada até a camada de consumo anal
 | `dw` | 8 dimensões conformadas e 3 tabelas fato |
 | `mart` | 3 views detalhadas e 5 views agregadas |
 | Power BI | 6 dimensões, 4 fatos, 58 medidas, 5 páginas analíticas, 4 tooltips e 81 visuais |
-| Power BI portátil | Branch experimental com modelo Import local, sem substituir a entrega atual |
+| Power BI portátil | 46 colunas, 57 medidas, 5 páginas analíticas, 4 tooltips, 87 visuais e 11 componentes HTML/CSS em branch paralela |
 
 Volumes reconciliados entre staging, DW e data marts:
 
@@ -213,9 +213,9 @@ O projeto está em [`powerbi/`](powerbi/README.md) e contém:
 
 A estrutura PBIP/PBIR foi validada com **0 erros**. As **10 consultas M** executaram no PostgreSQL e **43 de 43** baselines conferiram. Os 20 relacionamentos e as regras originais de negócio foram preservados. A homologação visual no Power BI Desktop confirmou a renderização das páginas, a sidebar corrigida e os tooltips contextuais.
 
-### Versão portátil em desenvolvimento
+### Versão portátil em branch paralela
 
-A branch deste PR também mantém [`powerbi/DeliveryCenter.pbip`](powerbi/DeliveryCenter.pbip), uma alternativa Import reproduzível a partir dos CSVs do projeto. Ela permanece separada da entrega atual até concluir páginas, medidas, validação visual e evidências. Consulte [`powerbi/README-PORTABLE.md`](powerbi/README-PORTABLE.md).
+A branch deste PR também mantém [`powerbi/DeliveryCenter.pbip`](powerbi/DeliveryCenter.pbip), uma alternativa Import reproduzível a partir dos CSVs do projeto. A implementação estrutural está concluída com cinco páginas analíticas, quatro tooltips contextuais, 57 medidas DAX, 87 visuais e 11 componentes HTML/CSS. Ela permanece separada da entrega atual até a homologação visual no Power BI Desktop. Consulte [`powerbi/README-PORTABLE.md`](powerbi/README-PORTABLE.md).
 
 ---
 ## 🚀 Próximos Passos
@@ -235,7 +235,7 @@ A branch deste PR também mantém [`powerbi/DeliveryCenter.pbip`](powerbi/Delive
    * Avaliar bookmarks apenas quando existir uma visão alternativa necessária.
    * Avaliar agregações ou refresh incremental se o volume crescer.
    * Documentar insights e decisões de negócio após o uso pelos stakeholders.
-5. **Concluir a versão portátil antes de avaliar o merge**:
-   * Reconciliar todos os KPIs com as regras do `mart`.
-   * Validar páginas, filtros e interações no Power BI Desktop.
-   * Manter os dois projetos PBIP independentes durante a construção.
+5. **Homologar a versão portátil antes de avaliar o merge**:
+   * Abrir a branch paralela no Power BI Desktop e atualizar o snapshot Import.
+   * Validar visualmente páginas, filtros, navegação, HTML Content e tooltips.
+   * Manter os dois projetos PBIP independentes até a aprovação dessa homologação.
